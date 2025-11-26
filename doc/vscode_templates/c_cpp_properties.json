@@ -1,0 +1,44 @@
+{
+  "configurations": [
+    {
+      "name": "Windows",
+      "includePath": [
+        "${workspaceFolder}/ToyLibCore/include",
+        "${workspaceFolder}/GameApp",
+        "C:/tools/vcpkg/installed/x64-windows/include",
+        "${workspaceFolder}/**"
+      ],
+      "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.3x.xxxxx/bin/Hostx64/x64/cl.exe",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "windows-msvc-x64"
+    },
+    {
+      "name": "macOS",
+      "includePath": [
+        "${workspaceFolder}/ToyLibCore/include",
+        "${workspaceFolder}/GameApp",
+        "/usr/local/include",
+        "${workspaceFolder}/**"
+      ],
+      "compilerPath": "/usr/bin/clang++",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "macos-clang-x64"
+    },
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/ToyLibCore/include",
+        "${workspaceFolder}/GameApp",
+        "/usr/include",
+        "${workspaceFolder}/**"
+      ],
+      "compilerPath": "/usr/bin/g++",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "linux-gcc-x64"
+    }
+  ],
+  "version": 4
+}

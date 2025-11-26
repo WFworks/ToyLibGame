@@ -1,0 +1,83 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // =========================
+    // Clean
+    // =========================
+    {
+      "label": "Clean Build Folder (Unix)",
+      "type": "shell",
+      "command": "rm",
+      "args": ["-rf", "build"],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Clean Build Folder (Windows)",
+      "type": "shell",
+      "command": "Remove-Item -Recurse -Force build",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+
+    // =========================
+    // CMake Configure
+    // =========================
+    {
+      "label": "CMake Configure (Unix)",
+      "type": "shell",
+      "command": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+      // 必要なら ↓ を付けて「毎回クリーン」もできる
+      // "dependsOn": "Clean Build Folder (Unix)"
+    },
+    {
+      "label": "CMake Configure (Windows)",
+      "type": "shell",
+      "command": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+      // 必要なら ↓
+      // "dependsOn": "Clean Build Folder (Windows)"
+    },
+
+    // =========================
+    // CMake Build
+    // =========================
+    {
+      "label": "CMake Build (Unix)",
+      "type": "shell",
+      "command": "cmake --build build --parallel",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "dependsOn": "CMake Configure (Unix)"
+    },
+    {
+      "label": "CMake Build (Windows)",
+      "type": "shell",
+      "command": "cmake --build build --config Debug --parallel",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "dependsOn": "CMake Configure (Windows)"
+    }
+  ]
+}

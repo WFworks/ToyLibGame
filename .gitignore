@@ -1,0 +1,43 @@
+# macOS system files
+.DS_Store
+
+# Build artifacts
+build/
+DerivedData/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# Xcode specific
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcuserdata/
+*.xccheckout
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+
+# Logs and temporary
+*.log
+*.tmp
+*.swp
+
+# VSCode settings (if you don't want to share local settings)
+.vscode/
+# VS settings (if you don't want to share local settings)
+.vs/
+# OS-related
+Thumbs.db
+ehthumbs.db
+Icon?

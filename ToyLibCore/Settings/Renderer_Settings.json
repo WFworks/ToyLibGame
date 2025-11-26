@@ -1,0 +1,37 @@
+{
+  "title": "ToyLib Game",
+  "shader_path": "ToyLibCore/Shaders/",
+  "screen": {
+    "width": 1280.0,
+    "height": 768.0,
+    "fullscreen": false
+  },
+  "perspectiveFOV": 60.0,
+  "camera": {
+    "position": [0.0, 0.0, 5.0]
+  },
+  "debug": {
+    "enabled": true
+  },
+  "clearColor": [0.2, 0.5, 0.8],
+  "ambient": [0.5, 0.5, 0.5],
+  "specular": [0.5, 0.5, 0.5],
+  "directionalLight": {
+    "diffuse": [0.5, 0.5, 0.5],
+    "position": [30.0, 30.0, -1.0],
+    "target": [0.0, 0.0, 0.0]
+  },
+  "fog": {
+    "maxDist": 10000.0,
+    "minDist": 0.001,
+    "color": [0.4, 0.4, 0.4]
+  },
+  "shadow": {
+    "near": 1.0,
+    "far": 100.0,
+    "ortho_width": 100.0,
+    "ortho_height": 100.0,
+    "resolution_width": 4096,
+    "resolution_height": 4096
+  }
+}
