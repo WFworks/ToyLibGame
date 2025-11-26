@@ -10,7 +10,7 @@ GameRPG::GameRPG()
 : Application()
 {
     SetIMEEnabled(false);
-    SetAssetsPath("GameRPG/Assets/");
+    SetAssetsPath("GameApp/Assets/RPG/");
 }
 
 GameRPG::~GameRPG()
