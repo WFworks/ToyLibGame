@@ -9,27 +9,29 @@ set(GAME_PATH  GameApp)
 
 find_package(OpenGL REQUIRED)
 
-# ソースファイル収集
-file(GLOB_RECURSE SOURCES
-    ${CMAKE_SOURCE_DIR}/*.cpp
+# ToyLibCore のソース
+file(GLOB_RECURSE TOYLIB_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/${TOYLIB_PATH}/src/*.cpp
+)
+
+# GameApp 以下のソース（GameApp/RPG, GameApp/Shooting も全部拾う）
+file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/${GAME_PATH}/*.cpp
 )
 
-# 内部ファイル除去
-foreach(source ${SOURCES})
-    if(${source} MATCHES ".*/CMakeFiles/.*")
-        list(REMOVE_ITEM SOURCES ${source})
-    endif()
-endforeach()
+# まとめる
+set(SOURCES
+    ${TOYLIB_SOURCES}
+    ${GAME_SOURCES}
+)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-include_directories(
+# インクルードパス
+target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/${TOYLIB_PATH}/include
-    ${CMAKE_SOURCE_DIR}/${GAME_PATH}/
+    ${CMAKE_SOURCE_DIR}/${GAME_PATH}
 )
-
 #========================
 # プラットフォーム別設定
 #========================
@@ -53,7 +55,6 @@ if(WIN32)
         GLEW::GLEW
         assimp::assimp
     )
-
     # SDLのエントリポイント無効化
     target_compile_definitions(${PROJECT_NAME} PRIVATE SDL_MAIN_HANDLED)
 
@@ -76,7 +77,7 @@ if(WIN32)
         "${VCPKG_BIN_DIR}/SDL2_mixer.dll"
         "${VCPKG_BIN_DIR}/glew32.dll"
         "${VCPKG_BIN_DIR}/assimp-vc143-mt.dll"
-        
+
         # SDL_mixer が使う音声コーデックまわり
         "${VCPKG_BIN_DIR}/ogg.dll"
         "${VCPKG_BIN_DIR}/vorbis.dll"
