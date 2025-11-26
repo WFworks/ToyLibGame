@@ -2,11 +2,11 @@
 #include <string>
 #include <memory>
 
-class Game : public Application
+class GameRPG : public Application
 {
 public:
-    Game();
-    ~Game();
+    GameRPG();
+    ~GameRPG();
 protected:
     void InitGame() override;
     void LoadData();

@@ -1,24 +1,24 @@
-#include "game.h"
+#include "GameRPG.h"
 #include "ApplicationEntry.h"
 #include "HeroActor.h"
 
 // ToyLibの起動Applicationとして登録
-TOYLIB_REGISTER_APP(Game)
+TOYLIB_REGISTER_APP(GameRPG)
 
 
-Game::Game()
+GameRPG::GameRPG()
 : Application()
 {
     SetIMEEnabled(false);
-    SetAssetsPath("GameApp/Assets/");
+    SetAssetsPath("GameRPG/Assets/");
 }
 
-Game::~Game()
+GameRPG::~GameRPG()
 {
     
 }
 
-void Game::InitGame()
+void GameRPG::InitGame()
 {
     LoadData();
     
@@ -106,7 +106,7 @@ void Game::InitGame()
     */
 }
 
-void Game::LoadData()
+void GameRPG::LoadData()
 {
     
     auto hero = CreateActor<HeroActor>();
@@ -232,12 +232,12 @@ void Game::LoadData()
     GetSoundMixer()->PlayBGM();
 }
 
-void Game::UpdateGame(float deltaTime)
+void GameRPG::UpdateGame(float deltaTime)
 {
     mWeather->Update(deltaTime);
 }
 
-void Game::ShutdownGame()
+void GameRPG::ShutdownGame()
 {
     GetSoundMixer()->StopBGM();
     

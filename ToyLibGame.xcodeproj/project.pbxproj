@@ -30,9 +30,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		7EDCE8F52ED72FC00069EE3D /* GameApp */ = {
+		7EDCE8F52ED72FC00069EE3D /* GameRPG */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = GameApp;
+			path = GameRPG;
 			sourceTree = "<group>";
 		};
 		7EDCE9852ED72FC00069EE3D /* ToyLibCore */ = {
@@ -58,7 +58,7 @@
 		7EDCE8972ED72F7F0069EE3D = {
 			isa = PBXGroup;
 			children = (
-				7EDCE8F52ED72FC00069EE3D /* GameApp */,
+				7EDCE8F52ED72FC00069EE3D /* GameRPG */,
 				7EDCE9852ED72FC00069EE3D /* ToyLibCore */,
 				7EDCE9BE2ED72FD00069EE3D /* Frameworks */,
 				7EDCE8A12ED72F7F0069EE3D /* Products */,
@@ -98,7 +98,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				7EDCE8F52ED72FC00069EE3D /* GameApp */,
+				7EDCE8F52ED72FC00069EE3D /* GameRPG */,
 				7EDCE9852ED72FC00069EE3D /* ToyLibCore */,
 			);
 			name = ToyLibGame;
