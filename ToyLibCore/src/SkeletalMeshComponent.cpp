@@ -50,7 +50,8 @@ void SkeletalMeshComponent::Draw()
     mShader->SetFloatUniform("uShadowBias", 0.005);
     mShader->SetBooleanUniform("uUseToon", mIsToon);
     mShader->SetMatrixUniform("uWorldTransform", mOwnerActor->GetWorldTransform());
-
+    
+    
     // アニメーション行列取得
     std::vector<Matrix4> transforms =
         mAnimPlayer ? mAnimPlayer->GetFinalMatrices() : std::vector<Matrix4>();

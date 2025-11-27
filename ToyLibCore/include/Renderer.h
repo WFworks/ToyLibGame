@@ -88,7 +88,7 @@ public:
     std::shared_ptr<class Texture> GetShadowMapTexture() const { return mShadowMapTexture; }
     
     bool IsDebugMode() const { return mIsDebugMode; }
-
+    
 private:
     // セッティング読み込み
     bool LoadSettings(const std::string& filePath);
@@ -118,7 +118,6 @@ private:
     int mShadowFBOWidth;
     int mShadowFBOHeight;
     
-
     // ビューマトリックス
     Matrix4 mViewMatrix;
     Matrix4 mInvView;

@@ -55,6 +55,7 @@ void BillboardComponent::Draw()
 
     mShader->SetActive();
     mLightingManager->ApplyToShader(mShader, view);
+    
 
     // 最終行列
     Matrix4 world = scaleMat * rotY * translate;
@@ -63,6 +64,7 @@ void BillboardComponent::Draw()
     mTexture->SetActive(0);
     mShader->SetTextureUniform("uTexture", 0);
     
+
     // VAO有効化
     mVertexArray->SetActive();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);

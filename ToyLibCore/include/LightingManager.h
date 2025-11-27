@@ -20,9 +20,10 @@ struct DirectionalLight
 
 struct FogInfo
 {
-    float MaxDist = 10000.f;
+    float MaxDist = 100.f;
     float MinDist = 0.00001f;
     Vector3 Color = Vector3(0.5f, 0.5f, 0.5f);
+
 };
 
 class LightingManager

@@ -56,6 +56,8 @@ void MeshComponent::Draw()
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
     Matrix4 light = renderer->GetLightSpaceMatrix();
+    
+
  
     mShader->SetActive();
     mLightingManger->ApplyToShader(mShader, view);
@@ -64,6 +66,9 @@ void MeshComponent::Draw()
     mShader->SetTextureUniform("uShadowMap", 1);
     mShader->SetFloatUniform("uShadowBias", 0.005);
     mShader->SetBooleanUniform("uUseToon", mIsToon);
+    
+
+
     
     // WorldマトリックスをShaderに送る
     mShader->SetMatrixUniform("uWorldTransform", mOwnerActor->GetWorldTransform());

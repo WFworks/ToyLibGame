@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "LightingManager.h"
 #include "JsonHelper.h"
 #include <fstream>
 
@@ -38,6 +39,7 @@ bool Renderer::LoadSettings(const std::string& filePath)
         JsonHelper::GetBool(data["screen"], "fullscreen", mIsFullScreen);
     }
 
+
     // FOV
     JsonHelper::GetFloat(data, "perspectiveFOV", mPerspectiveFOV);
 
@@ -64,15 +66,21 @@ bool Renderer::LoadSettings(const std::string& filePath)
         JsonHelper::GetVector3(data["directionalLight"], "position", mDirLightPosition);
         JsonHelper::GetVector3(data["directionalLight"], "target", mDirLightTarget);
     }
-
+*/
+    
     // フォグ設定
     if (data.contains("fog"))
     {
-        JsonHelper::GetFloat(data["fog"], "maxDist", mFogMaxDist);
-        JsonHelper::GetFloat(data["fog"], "minDist", mFogMinDist);
-        JsonHelper::GetVector3(data["fog"], "color", mFogColor);
+        FogInfo fog;
+        JsonHelper::GetFloat(data["fog"], "maxDist", fog.MaxDist);
+        JsonHelper::GetFloat(data["fog"], "minDist", fog.MinDist);
+        JsonHelper::GetVector3(data["fog"], "color", fog.Color);
+        
+        mLightingManager->SetFogInfo(fog);
     }
-    */
+
+    
+    
     // シャドウ設定
     if (data.contains("shadow"))
     {

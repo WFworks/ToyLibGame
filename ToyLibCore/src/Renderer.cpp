@@ -35,6 +35,7 @@ Renderer::Renderer()
 , mGLContext(nullptr)
 , mShaderPath("ToyLibCore/Shaders/")
 {
+    mLightingManager = std::make_shared<LightingManager>();
     LoadSettings("ToyLibCore/Settings/Renderer_Settings.json");
 }
 

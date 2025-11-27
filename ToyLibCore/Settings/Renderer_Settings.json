@@ -22,9 +22,9 @@
     "target": [0.0, 0.0, 0.0]
   },
   "fog": {
-    "maxDist": 1000.0,
+    "maxDist": 200.0,
     "minDist": 0.001,
-    "color": [0.4, 0.4, 0.4]
+    "color": [0.5, 0.5, 0.5]
   },
   "shadow": {
     "near": 1.0,
