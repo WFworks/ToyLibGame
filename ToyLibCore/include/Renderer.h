@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MathUtils.h"
+#include "MathUtil.h"
 
 #include <iostream>
 #include <string>
@@ -71,7 +71,7 @@ public:
     
     
     // ライトマネージャー
-    void SetLightingManager(std::shared_ptr<class LightingManager> manager) { mLightingManager = manager; }
+    //void SetLightingManager(std::shared_ptr<class LightingManager> manager) { mLightingManager = manager; }
     std::shared_ptr<class LightingManager> GetLightingManager() const { return mLightingManager; }
     
     

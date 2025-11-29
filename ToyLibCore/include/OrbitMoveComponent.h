@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MoveComponent.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 
 class OrbitMoveComponent : public MoveComponent
 {

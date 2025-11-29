@@ -38,7 +38,7 @@
 #include "WeatherOverlayComponent.h"
 
 // --- Utility ---
-#include "MathUtils.h"
+#include "MathUtil.h"
 #include "JsonHelper.h"
 #include "Texture.h"
 #include "Shader.h"

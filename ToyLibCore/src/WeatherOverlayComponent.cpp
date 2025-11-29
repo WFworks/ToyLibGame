@@ -4,7 +4,7 @@
 #include "Shader.h"
 #include "VertexArray.h"
 #include "Renderer.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 
 
 WeatherOverlayComponent::WeatherOverlayComponent(Actor* a, int drawOrder, VisualLayer layer)

@@ -21,6 +21,16 @@ private:
     float mTime;
     Vector3 mSunDir;
     WeatherType mWeatherType;
+
+    Vector3 mRawSkyColor;
+    Vector3 mRawCloudColor;
+    Vector3 mFogColor;
+    float   mFogDensity;
+    
     float SmoothStep(float edge0, float edge1, float x);
     void ApplyTime();
+    
+    void ComputeFogFromSky(float timeOfDay);
+    Vector3 GetCloudColor(float time);
+    Vector3 GetSkyColor(float time);
 };

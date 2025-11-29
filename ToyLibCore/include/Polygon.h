@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MathUtils.h"
+#include "MathUtil.h"
 
 // ポリゴンデータの格納用（三角形）
 struct Polygon

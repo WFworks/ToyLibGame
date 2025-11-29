@@ -1,6 +1,6 @@
 #include "SkyDomeMeshGenerator.h"
 #include "VertexArray.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 #include <vector>
 #include <cmath>
 

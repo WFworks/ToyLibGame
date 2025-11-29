@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MathUtils.h"
+#include "MathUtil.h"
 #include <assimp/scene.h>
 #include <vector>
 #include <memory>

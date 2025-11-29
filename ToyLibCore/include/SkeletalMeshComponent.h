@@ -1,6 +1,6 @@
 #pragma once
 #include "AnimationPlayer.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 #include "MeshComponent.h"
 #include <vector>
 #include <memory>

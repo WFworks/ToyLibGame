@@ -1,6 +1,6 @@
 #pragma once
 #include "CameraComponent.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 
 class OrbitCameraComponent : public CameraComponent
 {

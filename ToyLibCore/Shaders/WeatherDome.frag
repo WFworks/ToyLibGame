@@ -9,15 +9,20 @@ uniform float uTimeOfDay;     // 0.0〜1.0（夜→昼→夜）
 uniform vec3 uSunDir;         // 太陽ベクトル（ワールド空間）
 
 
+uniform vec3 uRawSkyColor;
+uniform vec3 uRawCloudColor;
+
 // 高速・安定な2Dハッシュ（sin不使用）
-float hash12(vec2 p) {
+float hash12(vec2 p)
+{
     vec3 p3 = fract(vec3(p.x, p.y, p.x) * 0.1031);
     p3 += dot(p3, p3.yzx + 33.33);
     return fract((p3.x + p3.y) * p3.z);
 }
 
 // Value noise（バイリニア補間）
-float vnoise(vec2 p) {
+float vnoise(vec2 p)
+{
     vec2 i = floor(p);
     vec2 f = fract(p);
 
@@ -35,11 +40,13 @@ float vnoise(vec2 p) {
                mix(c, d, u.x), u.y);
 }
 
-float fbm(vec2 p) {
+float fbm(vec2 p)
+{
     float value = 0.0;
     float amp   = 0.5;
     // pが巨大化して精度落ちしないように、各オクターブでwrap
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 5; i++)
+    {
         value += amp * vnoise(p);
         p = (p * 2.0);
         p = mod(p, 1024.0); // ★ ここ重要：範囲を畳み込んでsin問題を根絶
@@ -47,7 +54,7 @@ float fbm(vec2 p) {
     }
     return value;
 }
-
+/*
 // --- 空の色（時間帯に応じて） ---
 vec3 getSkyColor(float time)
 {
@@ -97,14 +104,16 @@ vec3 getCloudColor(float time)
     else
         return mix(duskColor, nightColor, smoothstep(0.9, 1.0, time));
 }
-
+*/
 void main()
 {
     float t = clamp(vWorldDir.y, 0.0, 1.0);
     float weatherFade = (uWeatherType == 0) ? 1.0 : 0.3;
 
-    vec3 rawSky   = getSkyColor(uTimeOfDay);
-    vec3 rawCloud = getCloudColor(uTimeOfDay);
+    //vec3 rawSky   = getSkyColor(uTimeOfDay);
+    //vec3 rawCloud = getCloudColor(uTimeOfDay);
+    vec3 rawSky   = uRawSkyColor;
+    vec3 rawCloud = uRawCloudColor;
     vec3 baseSky     = mix(vec3(0.4, 0.4, 0.5), rawSky, weatherFade);
     vec3 cloudColor  = mix(vec3(0.4, 0.4, 0.4), rawCloud, weatherFade);
 

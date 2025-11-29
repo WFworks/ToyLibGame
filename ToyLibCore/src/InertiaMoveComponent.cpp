@@ -1,6 +1,6 @@
 #include "InertiaMoveComponent.h"
 #include "Actor.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 
 InertiaMoveComponent::InertiaMoveComponent(class Actor* owner, int updateOrder)
     : MoveComponent(owner, updateOrder)

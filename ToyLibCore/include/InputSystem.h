@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MathUtils.h"
+#include "MathUtil.h"
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_gamecontroller.h>
 //#include <SDL2/SDL_mouse.h>

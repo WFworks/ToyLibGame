@@ -2,7 +2,7 @@
 
 
 #include "Component.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 #include <memory>
 
 // カメラ管理コンポーネント

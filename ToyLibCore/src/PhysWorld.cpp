@@ -7,7 +7,7 @@
 #include "Polygon.h"
 #include "ColliderComponent.h"
 #include "MoveComponent.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 #include <algorithm>
 
 

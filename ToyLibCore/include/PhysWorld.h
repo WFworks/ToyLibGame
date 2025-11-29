@@ -1,7 +1,7 @@
 // ハイブリッド方式の GetNearestGroundY に対応した PhysWorld
 #pragma once
 
-#include "MathUtils.h"
+#include "MathUtil.h"
 #include "ColliderComponent.h"
 #include <vector>
 

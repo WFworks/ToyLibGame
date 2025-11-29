@@ -1,6 +1,6 @@
 #include "FollowMoveComponent.h"
 #include "Actor.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 
 FollowMoveComponent::FollowMoveComponent(Actor* owner, int updateOrder)
     : MoveComponent(owner, updateOrder)

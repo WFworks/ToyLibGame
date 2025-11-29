@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MathUtils.h"
+#include "MathUtil.h"
 
 #include <GL/glew.h>
 #include <string>

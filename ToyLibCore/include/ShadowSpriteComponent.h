@@ -1,6 +1,6 @@
 #pragma once
 #include "VisualComponent.h"
-#include "MathUtils.h"
+#include "MathUtil.h"
 
 class ShadowSpriteComponent : public VisualComponent
 {

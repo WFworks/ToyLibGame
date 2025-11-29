@@ -32,4 +32,6 @@ void LightingManager::ApplyToShader(std::shared_ptr<Shader> shader, const Matrix
     shader->SetFloatUniform("uFoginfo.maxDist", mFog.MaxDist);
     shader->SetFloatUniform("uFoginfo.minDist", mFog.MinDist);
     shader->SetVectorUniform("uFoginfo.color", mFog.Color);
+    
+    std::cout << "fog max dist = " << mFog.MaxDist << std::endl;
 }

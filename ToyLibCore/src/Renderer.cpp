@@ -88,7 +88,7 @@ bool Renderer::Initialize()
     }
    
     // ライティングマネージャ生成
-    mLightingManager = std::make_shared<LightingManager>();
+    //mLightingManager = std::make_shared<LightingManager>();
     // シェーダー のロードなどはここでやる
     LoadShaders();
     // スプライト用頂点バッファ
