@@ -28,7 +28,8 @@ float fbm(vec2 p)
 {
     float value = 0.0;
     float amplitude = 0.5;
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; i++)
+    {
         value += amplitude * noise(p);
         p *= 2.0;
         amplitude *= 0.5;
@@ -96,7 +97,8 @@ float noise(vec2 p) {
 float fbm(vec2 p) {
     float v = 0.0;
     float amp = 0.5;
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 5; i++)
+    {
         v += amp * noise(p);
         p *= 2.0;
         amp *= 0.5;

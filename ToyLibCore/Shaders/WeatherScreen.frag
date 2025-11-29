@@ -32,7 +32,8 @@ float noise(vec2 p) {
 float fbm(vec2 p) {
     float value = 0.0;
     float amp = 0.5;
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; i++)
+    {
         value += amp * noise(p);
         p *= 2.0;
         amp *= 0.5;
@@ -55,7 +56,8 @@ float rainPattern(vec2 uv) {
 // --- 雪 ---
 float snowPattern(vec2 uv) {
     float brightness = 0.0;
-    for (int i = 0; i < SNOW_COUNT; ++i) {
+    for (int i = 0; i < SNOW_COUNT; i++)
+    {
         float fi = float(i);
         float x = hash(fi * 1.3) + sin(uTime * 0.2 + fi) * 0.01;
         float speed = 0.1 + hash(fi * 3.2) * 0.5;
@@ -132,7 +134,8 @@ float rainPattern(vec2 uv) {
 // --- 雪パターン（点を滑らかに） ---
 float snowPattern(vec2 uv) {
     float brightness = 0.0;
-    for (int i = 0; i < SNOW_COUNT; ++i) {
+    for (int i = 0; i < SNOW_COUNT; i++)
+    {
         float fi = float(i);
 
         // ランダムな位置と動き
@@ -166,7 +169,8 @@ float noise(vec2 p) {
 float fbm(vec2 p) {
     float value = 0.0;
     float amp = 0.5;
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; i++)
+    {
         value += amp * noise(p);
         p *= 2.0;
         amp *= 0.5;
@@ -243,7 +247,7 @@ void main()
     float snowBrightness = 0.0;
     if (uSnowAmount > 0.01)
     {
-        for (int i = 0; i < SNOW_COUNT; ++i)
+        for (int i = 0; i < SNOW_COUNT; i++)
         {
             float fi = float(i);
             float x = hash(fi * 1.3) + sin(uTime * 0.2 + fi) * 0.01;

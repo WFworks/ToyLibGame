@@ -30,7 +30,7 @@ void IMEUtil::SetIMEEnabled(void* nativeWindowHandle, bool enabled)
         if (sources)
         {
             CFIndex count = CFArrayGetCount(sources);
-            for (CFIndex i = 0; i < count; ++i)
+            for (CFIndex i = 0; i < count; i++)
             {
                 TISInputSourceRef source = (TISInputSourceRef)CFArrayGetValueAtIndex(sources, i);
                 CFStringRef sourceID = (CFStringRef)TISGetInputSourceProperty(source, kTISPropertyInputSourceID);

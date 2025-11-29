@@ -480,7 +480,7 @@ bool PhysWorld::IntersectRayOBB(const Ray& ray, const OBB* obb, float& outT) con
     float tMin = 0.0f;
     float tMax = Math::Infinity;
 
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 3; i++)
     {
         Vector3 axis;
         float r = 0.0f;

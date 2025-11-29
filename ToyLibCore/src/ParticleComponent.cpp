@@ -54,7 +54,7 @@ void ParticleComponent::GenerateParts()
 {
     std::random_device rnd;
 
-    for (int i = 0; i < mNumParts; ++i)
+    for (int i = 0; i < mNumParts; i++)
     {
         if (mParts[i].isVisible) continue;
      
@@ -82,7 +82,7 @@ void ParticleComponent::Update(float deltaTime)
         mIsVisible = false;
     }
 
-    for (int i = 0; i < mNumParts; ++i)
+    for (int i = 0; i < mNumParts; i++)
     {
         if (mParts[i].isVisible)
         {
@@ -140,7 +140,7 @@ void ParticleComponent::Draw()
 
     // VAO有効有効化
     mVertexArray->SetActive();
-    for (int i = 0; i < mNumParts; ++i)
+    for (int i = 0; i < mNumParts; i++)
     {
         if (mParts[i].isVisible)
         {
