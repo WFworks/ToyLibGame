@@ -60,6 +60,9 @@ public:
     const Vector3& GetFogColor() const              { return mFog.Color; }
 
 
+    void  SetSunIntensity(const float i) { mSunIntensity = i; }
+    float GetSunIntensity() const { return mSunIntensity; }
+    
     // シェーダーに反映
     void ApplyToShader(std::shared_ptr<class Shader> shader, const Matrix4& viewMatrix);
     
@@ -67,4 +70,5 @@ private:
     DirectionalLight mDirLight;
     FogInfo mFog;
     Vector3 mAmbientColor = Vector3(0.5f, 0.5f, 0.5f);
+    float mSunIntensity; // 太陽の強さ
 };

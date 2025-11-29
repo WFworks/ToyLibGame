@@ -4,7 +4,8 @@
 in vec2 fragTexCoord;
 in vec3 fragNormal;
 in vec3 fragWorldPos;
-in vec4 fragPosLightSpace;  // ← 追加！
+in vec4 fragPosLightSpace;
+
 
 // 出力
 out vec4 outColor;
@@ -18,6 +19,7 @@ uniform float uSpecPower;
 uniform vec3 uAmbientLight;
 uniform float uShadowBias;
 uniform bool uUseToon;
+uniform float uSunIntensity;
 
 // Directional Light
 struct DirectionalLight {
@@ -45,6 +47,30 @@ const float toonSpecThreshold = 0.95;
 // === 関数：ライティング計算 ===
 vec3 ComputeLighting(vec3 N, vec3 V, vec3 L)
 {
+    vec3 result = vec3(0.0);
+    float NdotL = dot(N, L);
+
+    if (NdotL > 0.0)
+    {
+        if (uUseToon)
+        {
+            float diffIntensity = step(toonDiffuseThreshold, NdotL);
+            float specIntensity = pow(max(dot(reflect(-L, N), V), 0.0), uSpecPower);
+            specIntensity = step(toonSpecThreshold, specIntensity);
+
+            result += uDirLight.mDiffuseColor * diffIntensity;
+            result += uDirLight.mSpecColor * specIntensity;
+        }
+        else
+        {
+            vec3 diffuse = uDirLight.mDiffuseColor * NdotL;
+            vec3 specular = uDirLight.mSpecColor *
+                pow(max(dot(reflect(-L, N), V), 0.0), uSpecPower);
+            result += diffuse + specular;
+        }
+    }
+
+    /*
     vec3 result = uAmbientLight;
     float NdotL = dot(N, L);
 
@@ -67,6 +93,7 @@ vec3 ComputeLighting(vec3 N, vec3 V, vec3 L)
             result += diffuse + specular;
         }
     }
+     */
 
     return result;
 }
@@ -91,6 +118,39 @@ float ComputeShadow()
 // === メイン ===
 void main()
 {
+    // Fog
+    float dist = length(uCameraPos - fragWorldPos);
+    float fogFactor = clamp((uFoginfo.maxDist - dist) / (uFoginfo.maxDist - uFoginfo.minDist), 0.0, 1.0);
+
+    if (uOverrideColor)
+    {
+        outColor = vec4(mix(uFoginfo.color, uUniformColor, fogFactor), 1.0);
+        return;
+    }
+
+
+    vec3 N = normalize(fragNormal);
+    vec3 V = normalize(uCameraPos - fragWorldPos);
+    vec3 L = normalize(-uDirLight.mDirection);
+
+    // ★ まず太陽からの分だけ計算
+    vec3 dirLight = ComputeLighting(N, V, L);
+
+    // ★ アンビエントはそのまま、太陽だけ SunIntensity でスケール
+    vec3 lighting = uAmbientLight + dirLight * uSunIntensity;
+
+    float shadowFactor = ComputeShadow();
+
+    // ★ 影も太陽の強さでフェード（ここは前の提案のままでOK）
+    shadowFactor = mix(1.0, shadowFactor, uSunIntensity);
+
+    vec4 texColor = texture(uTexture, fragTexCoord);
+    texColor.rgb *= lighting * shadowFactor;
+
+    vec3 finalColor = mix(uFoginfo.color, texColor.rgb, fogFactor);
+    outColor = vec4(finalColor, texColor.a);
+    
+    /*
     // フォグ計算
     float dist = length(uCameraPos - fragWorldPos);
     float fogFactor = clamp((uFoginfo.maxDist - dist) / (uFoginfo.maxDist - uFoginfo.minDist), 0.0, 1.0);
@@ -106,13 +166,16 @@ void main()
     vec3 L = normalize(-uDirLight.mDirection);
     
     vec3 lighting = ComputeLighting(N, V, L);
+    lighting *= uSunIntensity;
     float shadowFactor = ComputeShadow();
+    shadowFactor = mix(1.0, shadowFactor, uSunIntensity);
 
     vec4 texColor = texture(uTexture, fragTexCoord);
     texColor.rgb *= lighting * shadowFactor;
 
     vec3 finalColor = mix(uFoginfo.color, texColor.rgb, fogFactor);
     outColor = vec4(finalColor, texColor.a);
+     */
 }
 /*
 #version 410

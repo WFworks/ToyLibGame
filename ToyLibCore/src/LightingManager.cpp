@@ -2,6 +2,7 @@
 #include "Shader.h"
 
 LightingManager::LightingManager()
+: mSunIntensity(1.f)
 {
     
 }
@@ -22,6 +23,8 @@ void LightingManager::ApplyToShader(std::shared_ptr<Shader> shader, const Matrix
     // アンビエント
     shader->SetVectorUniform("uAmbientLight", mAmbientColor);
  
+    // 太陽の強さ
+    shader->SetFloatUniform("uSunIntensity", mSunIntensity);
 
     // ライト方向を再計算（Target - Position）
     shader->SetVectorUniform("uDirLight.mDirection", mDirLight.GetDirection());

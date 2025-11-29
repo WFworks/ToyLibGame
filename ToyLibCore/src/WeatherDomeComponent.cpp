@@ -41,7 +41,7 @@ void WeatherDomeComponent::Draw()
 
     Matrix4 invView = mOwnerActor->GetApp()->GetRenderer()->GetInvViewMatrix();
     
-    Vector3 camPos = invView.GetTranslation() + Vector3(0, -110, 0);
+    Vector3 camPos = invView.GetTranslation() + Vector3(0, 50, 0);
     Matrix4 model = Matrix4::CreateScale(200.0f) * Matrix4::CreateTranslation(camPos);
     Matrix4 view = mOwnerActor->GetApp()->GetRenderer()->GetViewMatrix();
     Matrix4 proj = mOwnerActor->GetApp()->GetRenderer()->GetProjectionMatrix();
@@ -163,7 +163,7 @@ Vector3 WeatherDomeComponent::GetCloudColor(float time)
 {
     Vector3 dayColor   (1.0f, 1.0f, 1.0f);
     Vector3 duskColor  (0.5f, 0.2f, 0.2f);
-    Vector3 nightColor (0.001f, 0.001f, 0.0015f);
+    Vector3 nightColor (0.2f, 0.2001f, 0.30015f);
 
     // time: 0.0〜1.0 を想定（0:00〜24:00）
     time = fmodf(time, 1.0f);
@@ -228,52 +228,26 @@ Vector3 WeatherDomeComponent::GetCloudColor(float time)
 void WeatherDomeComponent::ApplyTime()
 {
     float timeOfDay = fmod(mTime, 1.0f);
-/*
-    // --- 太陽方向 ---
-    float angle = Math::Pi * timeOfDay; // 0.0〜π
 
-    // 高さスケール（1.0 → 現状の高さ。0.5 とかにすると全体的に低くなる）
-    const float elevationScale = 0.8f;   // 好きな値に調整
+    // --- 太陽方向 ---
+    float angle = Math::TwoPi * (timeOfDay - 0.25f);
+
+    const float elevationScale = 0.9f;     // 軌道が低いなら 1.0〜1.2 くらいに上げる
+    const float verticalOffset = -0.1f;    // 全体を少し上に持ち上げたい場合
 
     mSunDir = Vector3(
-        -cosf(angle),                   // 東→西の動き（そのまま）
-        -sinf(angle) * elevationScale,  // ★ 高さを圧縮
-        0.5f * sinf(angle)              // 南への傾きはそのままでもOK
+        -cosf(angle),                                        // 東→西
+        -sinf(angle) * elevationScale + verticalOffset,      // 高さ
+        0.4f * sinf(angle)                                   // 南寄せ（0.3〜0.5で好み調整）
     );
     mSunDir.Normalize();
-
-    mLightingManager->SetLightDirection(
-        Vector3(-mSunDir.x, -mSunDir.y, -mSunDir.z),
-        Vector3::Zero
-    );
-*/
-    // --- 太陽方向 ---
-    // ★ 0.0〜2πに変更して、一周するようにする
-    float angle = Math::TwoPi * timeOfDay; // 0.0〜2π
-
-    const float elevationScale = 0.8f;
-
-    mSunDir = Vector3(
-        -cosf(angle),
-        -sinf(angle) * elevationScale,
-        0.5f * sinf(angle)
-    );
-    mSunDir.Normalize();
-
-    mLightingManager->SetLightDirection(
-        Vector3(-mSunDir.x, -mSunDir.y, -mSunDir.z),
-        Vector3::Zero
-    );
-
-
+    
+    // セット（ディレクショナルライトとシェーダー両方に）
+    mLightingManager->SetLightDirection(Vector3(-mSunDir.x, -mSunDir.y, -mSunDir.z), Vector3::Zero);
+    
     // --- 空のベース色（シェーダと共通のロジック） ---
     mRawSkyColor   = GetSkyColor(timeOfDay);
     mRawCloudColor = GetCloudColor(timeOfDay);
-
-    // --- 昼夜の強さ ---
-    float dayStrength = SmoothStep(0.15f, 0.25f, timeOfDay) *
-                       (1.0f - SmoothStep(0.75f, 0.85f, timeOfDay));
-    float nightStrength = 1.0f - dayStrength;
 
     // --- 天気減衰 ---
     float weatherDim = 1.0f;
@@ -286,6 +260,13 @@ void WeatherDomeComponent::ApplyTime()
         case WeatherType::SNOW:   weatherDim = 0.6f; break;
     }
 
+    // --- 昼夜の強さ ---
+    float dayStrength = SmoothStep(0.15f, 0.25f, timeOfDay) *
+                       (1.0f - SmoothStep(0.75f, 0.85f, timeOfDay));
+    float nightStrength = 1.0f - dayStrength;
+    // 太陽の強度を LightingManager に渡す
+    mLightingManager->SetSunIntensity(dayStrength);
+    
     // --- ライト色 ---
     Vector3 sunColor  = Vector3(1.0f, 0.95f, 0.8f);
     Vector3 moonColor = Vector3(0.3f, 0.4f, 0.6f);
@@ -295,7 +276,7 @@ void WeatherDomeComponent::ApplyTime()
 
     // --- アンビエント色 ---
     Vector3 dayAmbient   = Vector3(0.7f, 0.7f, 0.7f);
-    Vector3 nightAmbient = Vector3(0.1f, 0.15f, 0.2f);
+    Vector3 nightAmbient = Vector3(0.3f, 0.3f, 0.4f);
     Vector3 finalAmbient =
         (dayAmbient * dayStrength + nightAmbient * nightStrength) * weatherDim;
     mLightingManager->SetAmbientColor(finalAmbient);

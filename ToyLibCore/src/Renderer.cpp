@@ -34,7 +34,6 @@ Renderer::Renderer()
 , mWindow(nullptr)
 , mGLContext(nullptr)
 , mShaderPath("ToyLibCore/Shaders/")
-, mEnableShadow(true)
 {
     mLightingManager = std::make_shared<LightingManager>();
     LoadSettings("ToyLibCore/Settings/Renderer_Settings.json");
@@ -254,6 +253,14 @@ bool Renderer::InitializeShadowMapping()
 // シャドウマップのレンダリング
 void Renderer::RenderShadowMap()
 {
+
+    // ★ 追加：太陽がほぼゼロならシャドウパスをスキップ
+    float sunIntensity = mLightingManager->GetSunIntensity();
+    if (sunIntensity <= 0.01f)
+    {
+        return;
+    }
+    
     // FBOバインドして深度バッファだけ描画
     glBindFramebuffer(GL_FRAMEBUFFER, mShadowFBO);
     glViewport(0, 0, static_cast<GLsizei>(mShadowFBOWidth), static_cast<GLsizei>(mShadowFBOHeight));
@@ -274,7 +281,7 @@ void Renderer::RenderShadowMap()
 
     for (auto& visual : mVisualComps)
     {
-        if (mEnableShadow && visual->IsEnableShadow() && visual->IsVisible())
+        if (visual->IsEnableShadow() && visual->IsVisible())
         {
             visual->DrawShadow();
         }
