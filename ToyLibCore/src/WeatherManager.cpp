@@ -3,7 +3,7 @@
 #include "WeatherOverlayComponent.h"
 
 WeatherManager::WeatherManager()
-: mWeather(WeatherType::CLOUDY)
+: mWeather(WeatherType::STORM)
 {
     
 }
@@ -11,7 +11,9 @@ WeatherManager::WeatherManager()
 void WeatherManager::Update(float deltaTime)
 {
     if (!mWeatherDome || !mWeatherOverlay) return;
-      
+    
+    mWeatherDome->SetWeatherType(mWeather);
+    ChangeWeather(mWeather);
 }
 
 

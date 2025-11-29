@@ -6,7 +6,6 @@
 #include "Renderer.h"
 #include "MathUtil.h"
 
-
 WeatherOverlayComponent::WeatherOverlayComponent(Actor* a, int drawOrder, VisualLayer layer)
 : VisualComponent(a, drawOrder, layer)
 , mRainAmount(0.f)
@@ -23,6 +22,7 @@ WeatherOverlayComponent::WeatherOverlayComponent(Actor* a, int drawOrder, Visual
 void WeatherOverlayComponent::Draw()
 {
     if (!mShader || !mVertexArray) return;
+
 
  
     // フルスクリーン用設定
@@ -44,7 +44,6 @@ void WeatherOverlayComponent::Draw()
     // フルスクリーンポリゴンを描画
     mVertexArray->SetActive();
     glDrawElements(GL_TRIANGLES, mVertexArray->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
-
     // 状態戻す
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);

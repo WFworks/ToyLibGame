@@ -284,15 +284,34 @@ void WeatherDomeComponent::ApplyTime()
     // --- フォグ色＋密度 ---
     ComputeFogFromSky(timeOfDay);
 }
-
 void WeatherDomeComponent::ComputeFogFromSky(float timeOfDay)
 {
-    // GLSL の baseSky ロジックと揃える
-    float weatherFade = (mWeatherType == WeatherType::CLEAR) ? 1.0f : 0.3f;
+    // 曇り・雨ベースの少し青みがかったグレー
     Vector3 overcastBase(0.4f, 0.4f, 0.5f);
 
-    Vector3 baseSky = Vector3::Lerp(overcastBase, mRawSkyColor, weatherFade);
+    // 晴れ：1.0 で mRawSkyColor そのまま
+    // 曇り：少しだけ夕焼けを混ぜる
+    // 雨・嵐・雪：夕焼けは混ぜない
+    float weatherFade = 1.0f;
+    switch (mWeatherType)
+    {
+    case WeatherType::CLEAR:
+        weatherFade = 1.0f;
+        break;
+    case WeatherType::CLOUDY:
+        weatherFade = 0.25f;    // 曇りはほんのり夕焼け
+        break;
+    case WeatherType::RAIN:
+    case WeatherType::STORM:
+    case WeatherType::SNOW:
+        weatherFade = 0.0f;     // 夕焼けは一切混ぜない
+        break;
+    }
 
+    // 晴れ：mRawSkyColor ベース
+    // 曇り：overcastBase 75% + mRawSkyColor 25%
+    // 雨/嵐/雪：overcastBase 100%
+    Vector3 baseSky = Vector3::Lerp(overcastBase, mRawSkyColor, weatherFade);
 
     // 地平線寄り（少し暗め）
     float t = 0.1f;
@@ -304,36 +323,46 @@ void WeatherDomeComponent::ComputeFogFromSky(float timeOfDay)
     switch (mWeatherType)
     {
     case WeatherType::CLEAR:
-        cloudMix = 0.2f;
+        cloudMix    = 0.2f;
         mFogDensity = 0.002f;
         break;
+
     case WeatherType::CLOUDY:
-        cloudMix = 0.5f;
+        cloudMix    = 0.5f;
         mFogDensity = 0.004f;
-        skyHorizon = Vector3::Lerp(skyHorizon, Vector3(0.3f,0.3f,0.3f), 0.5f);
+        // 曇りは少しだけ暗くして、夕焼け＋グレーの中間くらい
+        skyHorizon = Vector3::Lerp(skyHorizon, Vector3(0.3f, 0.3f, 0.32f), 0.4f);
         break;
+
     case WeatherType::RAIN:
-        cloudMix = 0.7f;
+        cloudMix    = 0.7f;
         mFogDensity = 0.008f;
-        skyHorizon *= 0.4f;
+        // 完全に無彩色のグレー（r=g=b）
+        skyHorizon  = Vector3(0.20f, 0.20f, 0.21f);
+        cloudColor  = skyHorizon; // fog が完全グレーになるよう揃える
         break;
+
     case WeatherType::STORM:
-        cloudMix = 0.9f;
+        cloudMix    = 0.9f;
         mFogDensity = 0.015f;
-        skyHorizon = Vector3(0.15f, 0.15f, 0.15f);
-        cloudColor = Vector3(0.7f, 0.7f, 0.7f);
+        // かなり暗いグレー
+        skyHorizon  = Vector3(0.12f, 0.12f, 0.13f);
+        cloudColor  = skyHorizon;
         break;
+
     case WeatherType::SNOW:
-        cloudMix = 0.7f;
+        cloudMix    = 0.7f;
         mFogDensity = 0.010f;
-        skyHorizon = Vector3(0.30f, 0.30f, 0.32f);
-        cloudColor = Vector3(0.9f, 0.9f, 0.9f);
+        // 明るいグレー（少しだけ白寄りだけど無彩色）
+        skyHorizon  = Vector3(0.80f, 0.80f, 0.82f);
+        cloudColor  = skyHorizon;
         break;
     }
 
+    // 地平線〜雲の中間
     Vector3 fog = Vector3::Lerp(skyHorizon, cloudColor, cloudMix);
 
-    // 夜は少し暗めにする
+    // 夜は少し暗めにする（元のロジックそのまま）
     float nightFactor = 0.0f;
     if (timeOfDay < 0.25f)
     {

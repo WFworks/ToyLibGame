@@ -12,7 +12,9 @@ GameRPG::GameRPG()
     SetIMEEnabled(false);
     SetAssetsPath("GameApp/Assets/RPG/");
     
-    GetTimeOfDaySystem()->SetTimeScale(2000.f);
+    GetTimeOfDaySystem()->SetTimeScale(6000.f);
+    //GetTimeOfDaySystem()->SetTimeScale(0.f);
+    //GetTimeOfDaySystem()->SetTime(0);
 }
 
 GameRPG::~GameRPG()
@@ -227,7 +229,7 @@ void GameRPG::LoadData()
     mWeather = std::make_unique<WeatherManager>();
     mWeather->SetWeatherDome(dome);
     mWeather->SetWeatherOverlay(overlay);
-    skyActor->SetPosition(Vector3(0.f, -100.f, 0.f));
+    skyActor->SetPosition(Vector3(0.f, -0.f, 0.f));
     
     
     // BGM
