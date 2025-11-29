@@ -12,7 +12,7 @@
 #include "VisualComponent.h"
 #include "SkyDomeComponent.h"
 #include "WireframeComponent.h"
-#include "Font.h"
+#include "TextFont.h"
 #include <GL/glew.h>
 #include <algorithm>
 #include <string>

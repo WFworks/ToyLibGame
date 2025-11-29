@@ -19,7 +19,7 @@ public:
     // BGM
     std::shared_ptr<class Music> GetMusic(const std::string& fileName);
     // フォント
-    std::shared_ptr<class Font> GetFont(const std::string& fileName, int pointSize);
+    std::shared_ptr<class TextFont> GetFont(const std::string& fileName, int pointSize);
     
     std::string GetAssetsPath() const { return mAssetsPath; };
     
@@ -31,7 +31,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<class Mesh>> mMeshes;
     std::unordered_map<std::string, std::shared_ptr<class SoundEffect>> mSoundEffects;
     std::unordered_map<std::string, std::shared_ptr<class Music>> mMusics;
-    std::unordered_map<std::string, std::shared_ptr<class Font>> mFonts;
+    std::unordered_map<std::string, std::shared_ptr<class TextFont>> mFonts;
     
     std::string mAssetsPath;
 };

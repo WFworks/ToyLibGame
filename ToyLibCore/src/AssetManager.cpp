@@ -122,7 +122,7 @@ std::shared_ptr<Music> AssetManager::GetMusic(const std::string& fileName)
 }
 
 // フォント
-std::shared_ptr<Font> AssetManager::GetFont(const std::string& fileName, int pointSize)
+std::shared_ptr<TextFont> AssetManager::GetFont(const std::string& fileName, int pointSize)
 {
     // フォントはサイズ違いもあるので key にサイズ情報を含める
     const std::string key = fileName + "#" + std::to_string(pointSize);
@@ -135,7 +135,7 @@ std::shared_ptr<Font> AssetManager::GetFont(const std::string& fileName, int poi
     }
 
     // 新規ロード
-    auto font = std::make_shared<Font>();
+    auto font = std::make_shared<TextFont>();
 
     // Texture::Load と同じく AssetsPath を前につける
     // GetTexture の実装と同じ感覚で：
