@@ -6,6 +6,7 @@
 #include "IMEUtil.h"
 #include "AssetManager.h"
 #include "SoundMixer.h"
+#include "TimeOfDaySystem.h"
 
 #include <algorithm>
 #include <SDL2/SDL_syswm.h>
@@ -22,6 +23,7 @@ Application::Application()
     mPhysWorld = std::make_unique<PhysWorld>();
     mAssetManager = std::make_unique<AssetManager>();
     mSoundMixer = std::make_unique<SoundMixer>(mAssetManager.get());
+    mTimeOfDaySys = std::make_unique<TimeOfDaySystem>();
     
 }
 
@@ -174,13 +176,6 @@ void Application::UnloadData()
 // Actors, Renderer関連
 void Application::LoadData()
 {
-    // ライト
-    //mRenderer->SetAmbientColor(Vector3(0.9f, 0.9f, 0.9f));
-    //DirectionalLight& dir = mRenderer->GetDirectionalLight();
-    //dir.Direction = Vector3(0.f, 0.f, -1.f);
-    //dir.DiffuseColor = Vector3(0.4f, 0.4f, 0.4f);
-    //dir.SpecColor = Vector3(0.1f, 0.1f, 0.1f);
-    
 
 }
 
@@ -198,6 +193,8 @@ void Application::UpdateFrame()
         deltaTime = 0.05f;
     }
     mTicksCount = SDL_GetTicks();
+    
+    mTimeOfDaySys->Update(deltaTime);
 
     // ポーズ中以降の処理キャンセル
     if(mIsPause) return;

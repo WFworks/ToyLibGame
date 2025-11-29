@@ -43,6 +43,8 @@ public:
     class AssetManager* GetAssetManager() const { return mAssetManager.get(); }
     // オーディオ取得
     class SoundMixer* GetSoundMixer() const { return mSoundMixer.get(); }
+    // 時間取得
+    class TimeOfDaySystem* GetTimeOfDaySystem() const { return mTimeOfDaySys.get(); }
     
     // IMEをオフにする
     void InitIMEControl(SDL_Window* sdlWindow);
@@ -87,8 +89,9 @@ private:
     std::unique_ptr<class AssetManager> mAssetManager;
     // オーディオ関連
     std::unique_ptr<class SoundMixer> mSoundMixer;
-
     // 時間管理
+    std::unique_ptr<class TimeOfDaySystem> mTimeOfDaySys;
+    // カウンター
     unsigned int mTicksCount;
 
     
@@ -111,6 +114,8 @@ private:
     
     // IME 制御のためにハンドル保存（Windows以外はnullptrで良い）
     void* mNativeWindowHandle;
+    
+    
     
 
 

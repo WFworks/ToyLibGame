@@ -183,10 +183,63 @@ void main()
     // --- 太陽ハイライト（雲に応じて透過） ---
     if (uWeatherType <= 1)
     {
+        /*
         float sunAmount = clamp(dot(normalize(vWorldDir), -normalize(uSunDir)), 0.0, 1.0);
         vec3 sunGlow = vec3(1.2, 1.0, 0.8) * pow(sunAmount, 512.0);
         finalColor += sunGlow * (1.0 - cloudAlpha); // 雲が薄いほど強く見える
+         */
+        
+        
+        // --- 太陽ハイライト（時間＋雲＋天気で調整） ---
+        // uTimeOfDay: 0.0〜1.0 = 0:00〜24:00 前提
+        float hour = uTimeOfDay * 24.0;
 
+        const float sunriseHour  = 5.0;   // 日の出
+        const float sunsetHour   = 18.0;  // 日の入り
+        const float dawnSpanHour = 1.0;   // 日の出前後フェード幅
+        const float duskSpanHour = 1.0;   // 日の入り前後フェード幅
+
+        float sunVisibility = 0.0;
+
+        // 日の出前後フェードイン
+        if (hour >= sunriseHour - dawnSpanHour && hour < sunriseHour + dawnSpanHour)
+        {
+            float t = (hour - (sunriseHour - dawnSpanHour)) / (dawnSpanHour * 2.0);
+            sunVisibility = clamp(t, 0.0, 1.0);
+        }
+        // 日中はフル
+        else if (hour >= sunriseHour + dawnSpanHour && hour <= sunsetHour - duskSpanHour)
+        {
+            sunVisibility = 1.0;
+        }
+        // 日の入り前後フェードアウト
+        else if (hour > sunsetHour - duskSpanHour && hour <= sunsetHour + duskSpanHour)
+        {
+            float t = (sunsetHour + duskSpanHour - hour) / (duskSpanHour * 2.0);
+            sunVisibility = clamp(t, 0.0, 1.0);
+        }
+        // それ以外（夜）は 0 のまま
+        
+        // 天気と雲も考慮（CLEAR/CLOUDY のときだけ見える）
+        if (uWeatherType <= 1 && sunVisibility > 0.001)
+        {
+            float sunAmount = clamp(dot(normalize(vWorldDir), -normalize(uSunDir)), 0.0, 1.0);
+
+            // コア＋ハローで少しリッチに
+            float sunCore  = pow(sunAmount, 5120.0);
+            float sunHalo  = pow(sunAmount, 1024.0);
+            
+            vec3 sunCoreColor = vec3(1.3, 1.1, 0.8);
+            vec3 sunHaloColor = vec3(1.1, 0.9, 0.7);
+            vec3 sunGlow = sunCoreColor * sunCore + sunHaloColor * sunHalo;
+
+            float cloudFactor = (1.0 - cloudAlpha);
+            float weatherDim = (uWeatherType == 1) ? 0.6 : 1.0; // CLOUDY はちょい弱め
+
+            sunGlow *= sunVisibility * weatherDim * cloudFactor;
+
+            finalColor += sunGlow;
+        }
     }
 
     FragColor = vec4(finalColor, 1.0);

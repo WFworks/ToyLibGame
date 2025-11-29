@@ -119,6 +119,7 @@
 				TargetAttributes = {
 					7EDCE89F2ED72F7F0069EE3D = {
 						CreatedOnToolsVersion = 26.1.1;
+						LastSwiftMigration = 2610;
 					};
 				};
 			};
@@ -270,6 +271,7 @@
 		7EDCE8A82ED72F7F0069EE3D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = /opt/homebrew/include;
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
@@ -282,12 +284,16 @@
 					"-lassimp",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ToyLibCore/include/ToyLibGame-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
 		7EDCE8A92ED72F7F0069EE3D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = /opt/homebrew/include;
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
@@ -300,6 +306,8 @@
 					"-lassimp",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ToyLibCore/include/ToyLibGame-Bridging-Header.h";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};

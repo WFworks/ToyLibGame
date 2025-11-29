@@ -10,6 +10,7 @@
 #include "Renderer.h"
 #include "SingleInstance.h"
 #include "PhysWorld.h"
+#include "TimeOfDaySystem.h"
 
 // --- Move Components ---
 #include "FollowMoveComponent.h"

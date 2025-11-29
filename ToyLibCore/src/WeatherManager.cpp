@@ -14,15 +14,8 @@ WeatherManager::WeatherManager()
 void WeatherManager::Update(float deltaTime)
 {
     if (!mWeatherDome || !mWeatherOverlay) return;
+
     
-    mTime += mTimeSpeed;
-    mWeatherDome->SetTime(mTime);
-    mCount++;
-    
-    if (mCount % 5000 == 0)
-    {
-        RandomizeWeather();
-    }
 }
 
 
