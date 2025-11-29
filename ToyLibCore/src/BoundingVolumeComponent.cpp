@@ -205,7 +205,6 @@ void BoundingVolumeComponent::CreateVArray()
 
     };
     
-    //mVertexArray = std::make_shared<VertexArray>(BBverts, 8, (unsigned int*)BBindex, (unsigned int)36);
     if (mWireframe)
     {
         mWireframe->SetVertexArray(std::make_shared<VertexArray>(verts, 8, (unsigned int*)index, (unsigned int)36));

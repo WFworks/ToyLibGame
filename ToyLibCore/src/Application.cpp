@@ -203,7 +203,6 @@ void Application::UpdateFrame()
     UpdateGame(deltaTime);
     
     // 物理計算系
-    //physWorld->ComputeGroundHeight();
     mPhysWorld->Test();
     
 

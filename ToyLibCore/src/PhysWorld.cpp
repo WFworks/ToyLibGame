@@ -29,7 +29,6 @@ void PhysWorld::Test()
     
     CollideAndCallback(C_PLAYER, C_ENEMY);                       // ヒットのみ
     CollideAndCallback(C_PLAYER, C_BULLET);                      // ヒットのみ
-    //CollideAndCallback(C_PLAYER, C_WALL, true, false);          // 壁ずり（Y方向除外）
     CollideAndCallback(C_ENEMY, C_WALL, true, false);           // 敵の壁押し戻し
     // Laser vs Enemy（Ray vs Mesh）
     for (auto c1 : mColliders)
