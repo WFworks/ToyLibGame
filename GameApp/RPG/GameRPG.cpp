@@ -239,13 +239,13 @@ void GameRPG::LoadData()
     
     
     // フォント
-    auto font = GetAssetManager()->GetFont("rounded-mplus-1c-bold.ttf", 24);
+    auto fnt = GetAssetManager()->GetFont("rounded-mplus-1c-bold.ttf", 24);
     // テキスト用 Actor を作成
     auto uiActor = CreateActor<Actor>();
     uiActor->SetPosition(Vector3(500.0f, 320.0f, 0.0f)); // 2Dスクリーン座標として扱う
 
     auto textComp = uiActor->CreateComponent<TextSpriteComponent>();
-    textComp->SetFont(font);
+    textComp->SetFont(fnt);
     textComp->SetFormat("");
     textComp->SetColor(Vector3(1.0f, 1.0f, 0.0f)); // 黄
     mTextComp = textComp;

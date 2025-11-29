@@ -1,17 +1,17 @@
-#include "Font.h"
+#include "TextFont.h"
 
 #include <iostream>
 
-Font::Font()
+TextFont::TextFont()
 {
 }
 
-Font::~Font()
+TextFont::~TextFont()
 {
     Unload();
 }
 
-bool Font::Load(const std::string& filePath, int pointSize)
+bool TextFont::Load(const std::string& filePath, int pointSize)
 {
     // すでにロード済みなら一度解放
     if (mFont)
@@ -34,7 +34,7 @@ bool Font::Load(const std::string& filePath, int pointSize)
     return true;
 }
 
-void Font::Unload()
+void TextFont::Unload()
 {
     if (mFont)
     {

@@ -423,7 +423,7 @@ bool Renderer::LoadShaders()
     return true;
 }
 
-std::shared_ptr<Texture> Renderer::CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<Font> font)
+std::shared_ptr<Texture> Renderer::CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<TextFont> font)
 {
     if (!font || !font->IsValid())
     {

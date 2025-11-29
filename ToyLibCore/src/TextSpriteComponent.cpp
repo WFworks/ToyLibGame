@@ -1,5 +1,5 @@
 #include "TextSpriteComponent.h"
-#include "Font.h"
+#include "TextFont.h"
 #include "Actor.h"
 #include "Application.h"
 #include "Renderer.h"
@@ -34,7 +34,7 @@ void TextSpriteComponent::SetColor(const Vector3& color)
     UpdateTexture();
 }
 
-void TextSpriteComponent::SetFont(std::shared_ptr<Font> font)
+void TextSpriteComponent::SetFont(std::shared_ptr<TextFont> font)
 {
     mFont = font;
     UpdateTexture();

@@ -3,7 +3,7 @@
 #include "Mesh.h"
 #include "SoundEffect.h"
 #include "Music.h"
-#include "Font.h"
+#include "TextFont.h"
 
 #include <iostream>
 

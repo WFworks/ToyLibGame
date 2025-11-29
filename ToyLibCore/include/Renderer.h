@@ -91,7 +91,7 @@ public:
     
     
     // テキストからテクスチャを生成する
-    std::shared_ptr<class Texture> CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<class Font> font);
+    std::shared_ptr<class Texture> CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<class TextFont> font);
     
 
 private:

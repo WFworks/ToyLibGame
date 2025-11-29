@@ -3,11 +3,11 @@
 #include <string>
 #include <SDL2/SDL_ttf.h>
 
-class Font
+class TextFont
 {
 public:
-    Font();
-    ~Font();
+    TextFont();
+    ~TextFont();
 
     // フォントファイルを読み込む
     // 例: Load("GameApp/Assets/Fonts/NotoSansJP-Regular.ttf", 24);
@@ -28,8 +28,8 @@ public:
 
 private:
     // コピー禁止（AssetManager で shared_ptr 管理前提）
-    Font(const Font&) = delete;
-    Font& operator=(const Font&) = delete;
+    TextFont(const TextFont&) = delete;
+    TextFont& operator=(const TextFont&) = delete;
 
     TTF_Font*   mFont       = nullptr;
     std::string mFilePath   {};

@@ -51,7 +51,7 @@
 #include "SkyDomeMeshGenerator.h"
 #include "WeatherManager.h"
 #include "AssetManager.h"
-#include "Font.h"
+#include "TextFont.h"
 
 // --- Camera / View ---
 #include "CameraComponent.h"
