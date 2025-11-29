@@ -45,7 +45,7 @@ public:
     void SetLightDirection(const Vector3& pos, const Vector3& target) { mDirLight.LookAt(pos, target); }
     void SetLightDiffuseColor(const Vector3& color) { mDirLight.DiffuseColor = color; }
     void SetLightSpecColor(const Vector3& color)    { mDirLight.SpecColor = color; }
-    Vector3 GetLightPosition() const                { return mDirLight.Position; }
+    const Vector3& GetLightPosition() const                { return mDirLight.Position; }
     Vector3 GetLightDirection() const               { return mDirLight.GetDirection(); }
     // Ambient Color
     void SetAmbientColor(const Vector3 color)       { mAmbientColor = color; }

@@ -21,6 +21,7 @@ void LightingManager::ApplyToShader(std::shared_ptr<Shader> shader, const Matrix
 
     // アンビエント
     shader->SetVectorUniform("uAmbientLight", mAmbientColor);
+ 
 
     // ライト方向を再計算（Target - Position）
     shader->SetVectorUniform("uDirLight.mDirection", mDirLight.GetDirection());
