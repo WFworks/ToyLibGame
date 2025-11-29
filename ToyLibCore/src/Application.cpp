@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <SDL2/SDL_syswm.h>
+#include <SDL2/SDL_ttf.h>
 
 
 Application::Application()
@@ -44,6 +45,8 @@ bool Application::Initialize()
         std::cout << "Failed to init SDL\n";
         return false;
     }
+    // TTFの初期化
+    TTF_Init();
     
     // Renderer初期化
     mRenderer->Initialize();
@@ -102,6 +105,8 @@ void Application::Shutdown()
     UnloadData();
     mInputSys->Shutdown();
     mRenderer->Shutdown();
+
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -170,6 +175,11 @@ void Application::UnloadData()
     if (mRenderer)
     {
         mRenderer->UnloadData();
+    }
+
+    if (mAssetManager)
+    {
+        mAssetManager->UnloadData();
     }
 }
 

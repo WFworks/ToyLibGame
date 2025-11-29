@@ -29,6 +29,17 @@
 		7EDCE9C12ED72FE00069EE3D /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		7EDC06E02EDB86B60069EE3D /* Exceptions for "ToyLibCore" folder in "Compile Sources" phase from "ToyLibGame" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 7EDCE89C2ED72F7F0069EE3D /* Sources */;
+			membershipExceptions = (
+				include/StringUtil.h,
+				include/TextSpriteComponent.h,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7EDCE8F52ED72FC00069EE3D /* GameApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -37,6 +48,13 @@
 		};
 		7EDCE9852ED72FC00069EE3D /* ToyLibCore */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7EDC06E02EDB86B60069EE3D /* Exceptions for "ToyLibCore" folder in "Compile Sources" phase from "ToyLibGame" target */,
+			);
+			explicitFileTypes = {
+				include/StringUtil.h = sourcecode.c.h;
+				include/TextSpriteComponent.h = sourcecode.c.h;
+			};
 			path = ToyLibCore;
 			sourceTree = "<group>";
 		};

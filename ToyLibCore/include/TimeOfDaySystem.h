@@ -34,6 +34,9 @@ public:
     const GameTime& GetGameTime()  const { return mTime; }
     float GetTimeOfDay01() const { return mTime.GetTimeOfDay01(); }
     float GetHourFloat() const { return mTime.GetHourFloat(); }
+    int GetHour() const { return mTime.hour; }
+    int GetMinute() const { return mTime.minute; }
+    int GetSccond() const { return mTime.second; }
 
 private:
     GameTime mTime;

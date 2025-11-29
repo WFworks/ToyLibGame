@@ -12,6 +12,7 @@
 #include "VisualComponent.h"
 #include "SkyDomeComponent.h"
 #include "WireframeComponent.h"
+#include "Font.h"
 #include <GL/glew.h>
 #include <algorithm>
 #include <string>
@@ -420,4 +421,70 @@ bool Renderer::LoadShaders()
     mProjectionMatrix = Matrix4::CreatePerspectiveFOV(Math::ToRadians(mPerspectiveFOV), mScreenWidth, mScreenHeight, 1.0f, 2000.0f);
 
     return true;
+}
+
+std::shared_ptr<Texture> Renderer::CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<Font> font)
+{
+    if (!font || !font->IsValid())
+    {
+        std::cerr << "[Renderer] CreateTextTexture: invalid font" << std::endl;
+        return nullptr;
+    }
+
+    if (text.empty())
+    {
+        return nullptr;
+    }
+
+    TTF_Font* nativeFont = font->GetNativeFont();
+
+    SDL_Color sdlColor;
+    sdlColor.r = static_cast<Uint8>(std::clamp(color.x, 0.0f, 1.0f) * 255.0f);
+    sdlColor.g = static_cast<Uint8>(std::clamp(color.y, 0.0f, 1.0f) * 255.0f);
+    sdlColor.b = static_cast<Uint8>(std::clamp(color.z, 0.0f, 1.0f) * 255.0f);
+    sdlColor.a = 255;
+
+    // UTF-8 の日本語も扱える版
+    SDL_Surface* surface = TTF_RenderUTF8_Blended(
+        nativeFont,
+        text.c_str(),
+        sdlColor
+    );
+    if (!surface)
+    {
+        std::cerr << "[Renderer] TTF_RenderUTF8_Blended failed: "
+                  << TTF_GetError() << std::endl;
+        return nullptr;
+    }
+
+    // OpenGLに食わせやすい RGBA形式に揃える
+    SDL_Surface* conv = SDL_ConvertSurfaceFormat(
+        surface,
+        SDL_PIXELFORMAT_ABGR8888,   // GL_RGBAに対応しやすい
+        0
+    );
+    SDL_FreeSurface(surface);
+
+    if (!conv)
+    {
+        std::cerr << "[Renderer] SDL_ConvertSurfaceFormat failed: "
+                  << SDL_GetError() << std::endl;
+        return nullptr;
+    }
+
+    const int width  = conv->w;
+    const int height = conv->h;
+    const void* pixels = conv->pixels;
+
+    // Texture を生成
+    auto tex = std::make_shared<Texture>();
+    if (!tex->CreateFromPixels(pixels, width, height, /*hasAlpha=*/true))
+    {
+        SDL_FreeSurface(conv);
+        std::cerr << "[Renderer] CreateFromPixels failed" << std::endl;
+        return nullptr;
+    }
+
+    SDL_FreeSurface(conv);
+    return tex;
 }

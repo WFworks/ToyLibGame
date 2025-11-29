@@ -235,11 +235,29 @@ void GameRPG::LoadData()
     // BGM
     GetSoundMixer()->LoadBGM("MusMus-BGM-112.mp3");
     GetSoundMixer()->PlayBGM();
+    
+    
+    
+    // フォント
+    auto font = GetAssetManager()->GetFont("rounded-mplus-1c-bold.ttf", 24);
+    // テキスト用 Actor を作成
+    auto uiActor = CreateActor<Actor>();
+    uiActor->SetPosition(Vector3(500.0f, 320.0f, 0.0f)); // 2Dスクリーン座標として扱う
+
+    auto textComp = uiActor->CreateComponent<TextSpriteComponent>();
+    textComp->SetFont(font);
+    textComp->SetFormat("");
+    textComp->SetColor(Vector3(1.0f, 1.0f, 0.0f)); // 黄
+    mTextComp = textComp;
 }
 
 void GameRPG::UpdateGame(float deltaTime)
 {
     mWeather->Update(deltaTime);
+    auto h = GetTimeOfDaySystem()->GetHour();
+    auto m = GetTimeOfDaySystem()->GetMinute();
+    auto s = GetTimeOfDaySystem()->GetSccond();
+    mTextComp->SetFormat("<< : <<", h, m);
 }
 
 void GameRPG::ShutdownGame()

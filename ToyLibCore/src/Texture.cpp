@@ -312,3 +312,42 @@ bool Texture::CreateRadialRays(int size, int numRays, float fadePow, float raySt
 
     return true;
 }
+
+bool Texture::CreateFromPixels(const void* pixels, int width, int height, bool hasAlpha)
+{
+    // 既存テクスチャがあれば削除
+    if (mTextureID != 0)
+    {
+        glDeleteTextures(1, &mTextureID);
+        mTextureID = 0;
+    }
+
+    mWidth  = width;
+    mHeight = height;
+
+    glGenTextures(1, &mTextureID);
+    glBindTexture(GL_TEXTURE_2D, mTextureID);
+
+    // フィルタ・ラップの設定（他のテクスチャ作成処理とそろえる）
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);   // 必要に応じて
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    GLenum format = hasAlpha ? GL_RGBA : GL_RGB;
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        format,
+        width,
+        height,
+        0,
+        format,
+        GL_UNSIGNED_BYTE,
+        pixels
+    );
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return true;
+}

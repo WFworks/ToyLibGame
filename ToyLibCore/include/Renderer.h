@@ -89,6 +89,10 @@ public:
     
     bool IsDebugMode() const { return mIsDebugMode; }
     
+    
+    // テキストからテクスチャを生成する
+    std::shared_ptr<class Texture> CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<class Font> font);
+    
 
 private:
     // セッティング読み込み

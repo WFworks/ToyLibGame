@@ -28,8 +28,16 @@ SpriteComponent::~SpriteComponent()
 void SpriteComponent::SetTexture(std::shared_ptr<Texture> tex)
 {
     VisualComponent::SetTexture(tex);
-    mTexWidth = tex->GetWidth();
-    mTexHeight = tex->GetHeight();
+    if (tex)
+    {
+        mTexWidth  = tex->GetWidth();
+        mTexHeight = tex->GetHeight();
+    }
+    else
+    {
+        mTexWidth  = 0;
+        mTexHeight = 0;
+    }
 }
 
 void SpriteComponent::Draw()

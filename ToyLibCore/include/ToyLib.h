@@ -37,6 +37,7 @@
 #include "SkyDomeComponent.h"
 #include "WeatherDomeComponent.h"
 #include "WeatherOverlayComponent.h"
+#include "TextSpriteComponent.h"
 
 // --- Utility ---
 #include "MathUtil.h"
@@ -50,6 +51,7 @@
 #include "SkyDomeMeshGenerator.h"
 #include "WeatherManager.h"
 #include "AssetManager.h"
+#include "Font.h"
 
 // --- Camera / View ---
 #include "CameraComponent.h"

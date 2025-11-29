@@ -20,6 +20,9 @@ public:
     bool CreateAlphaCircle(int size, float centerX, float centerY, Vector3 color, float blendPow = 1.0f);
     bool CreateRadialRays(int size, int numRays, float fadePow, float rayStrength, float intensityScale);
     
+    // フォント用
+    bool CreateFromPixels(const void* pixels, int width, int height, bool hasAlpha = true);
+    
     // 削除
 	void Unload();
     // 描画用にBind

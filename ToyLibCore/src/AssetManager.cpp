@@ -3,6 +3,9 @@
 #include "Mesh.h"
 #include "SoundEffect.h"
 #include "Music.h"
+#include "Font.h"
+
+#include <iostream>
 
 AssetManager::AssetManager()
 : mAssetsPath("GameApp/Assets") // デフォルト値
@@ -15,6 +18,12 @@ void AssetManager::UnloadData()
     mTextures.clear();
     // メッシュ削除
     mMeshes.clear();
+    // サウンド削除
+    mSoundEffects.clear();
+    // BGM削除
+    mMusics.clear();
+    // フォント削除
+    mFonts.clear();
 }
 
 // テクスチャ取り出し
@@ -110,4 +119,37 @@ std::shared_ptr<Music> AssetManager::GetMusic(const std::string& fileName)
         return music;
     }
     return nullptr;
+}
+
+// フォント
+std::shared_ptr<Font> AssetManager::GetFont(const std::string& fileName, int pointSize)
+{
+    // フォントはサイズ違いもあるので key にサイズ情報を含める
+    const std::string key = fileName + "#" + std::to_string(pointSize);
+
+    // 既にロード済みならそれを返す
+    auto iter = mFonts.find(key);
+    if (iter != mFonts.end())
+    {
+        return iter->second;
+    }
+
+    // 新規ロード
+    auto font = std::make_shared<Font>();
+
+    // Texture::Load と同じく AssetsPath を前につける
+    // GetTexture の実装と同じ感覚で：
+    //   fullPath = mAssetsPath + fileName;
+    // としておく（fileName 側で "/Fonts/xxx.ttf" などを渡す想定）
+    const std::string fullPath = mAssetsPath + fileName;
+    if (!font->Load(fullPath, pointSize))
+    {
+        std::cerr << "[AssetManager] Failed to load font: "
+                  << fullPath << " (size: " << pointSize << ")"
+                  << std::endl;
+        return nullptr;
+    }
+
+    mFonts.emplace(key, font);
+    return font;
 }
