@@ -1,12 +1,9 @@
 #include "WeatherManager.h"
 #include "WeatherDomeComponent.h"
 #include "WeatherOverlayComponent.h"
-#include <cstdlib>
 
 WeatherManager::WeatherManager()
-: mTimeSpeed(0.0f)
-, mTime(0.5f)
-, mCount(0)
+: mWeather(WeatherType::CLOUDY)
 {
     
 }
@@ -14,54 +11,48 @@ WeatherManager::WeatherManager()
 void WeatherManager::Update(float deltaTime)
 {
     if (!mWeatherDome || !mWeatherOverlay) return;
-
-    
+      
 }
 
 
-void WeatherManager::RandomizeWeather()
+void WeatherManager::ChangeWeather(const WeatherType weather)
 {
-    WeatherType weatherType = WeatherType::CLEAR;
+    
+    
     float rainAmount = 0.0f;
     float fogAmount = 0.0f;
     float snowAmount = 0.0f;
     
-    int randVal = rand() % 100;
-    if (randVal < 50)
+    switch (weather)
     {
-        weatherType = WeatherType::CLEAR;
-        rainAmount = 0.0f;
-        fogAmount = 0.0f;
+        case WeatherType::CLEAR:
+            rainAmount = 0.0f;
+            fogAmount = 0.0f;
+            break;
+        case WeatherType::CLOUDY:
+            rainAmount = 0.0f;
+            fogAmount = 0.1f;
+            break;
+        case WeatherType::RAIN:
+            rainAmount = 0.4f;
+            fogAmount = 0.3f;
+            break;
+        case WeatherType::STORM:
+            rainAmount = 0.7f;
+            fogAmount = 0.4f;
+            break;
+        case WeatherType::SNOW:
+            rainAmount = 0.0f;
+            fogAmount = 0.7f;
+            snowAmount = 0.8f;
+            break;
+        default:
+            break;
     }
-    else if (randVal < 70)
-    {
-        weatherType = WeatherType::CLOUDY;
-        rainAmount = 0.0f;
-        fogAmount = 0.1f;
-    }
-    else if (randVal < 85)
-    {
-        weatherType = WeatherType::RAIN;
-        rainAmount = 0.4f;
-        fogAmount = 0.3f;
-    }
-    else if (randVal < 95)
-    {
-        weatherType = WeatherType::STORM;
-        rainAmount = 0.7f;
-        fogAmount = 0.4f;
-    }
-    else
-    {
-        weatherType = WeatherType::SNOW;
-        rainAmount = 0.0f;
-        fogAmount = 0.7f;
-        snowAmount = 0.8f;
-    }
+    mWeather = weather;
 
-    mWeatherDome->SetWeatherType(weatherType);
+    mWeatherDome->SetWeatherType(mWeather);
     mWeatherOverlay->SetRainAmount(rainAmount);
     mWeatherOverlay->SetFogAmount(fogAmount);
     mWeatherOverlay->SetSnowAmout(snowAmount);
-    
 }

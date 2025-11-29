@@ -54,64 +54,63 @@ float fbm(vec2 p)
     }
     return value;
 }
-/*
-// --- 空の色（時間帯に応じて） ---
-vec3 getSkyColor(float time)
-{
-    vec3 night = vec3(0.01, 0.02, 0.05);
-    vec3 day   = vec3(0.7, 0.8, 1.0);
-    vec3 dusk  = vec3(0.9, 0.4, 0.2);
 
-    time = fract(time);
-    if (time < 0.2)
-    {
-        return mix(night, dusk, smoothstep(0.0, 0.2, time));
-    }
-    else if (time < 0.4)
-    {
-        return mix(dusk, day, smoothstep(0.2, 0.4, time));
-    }
-    else if (time < 0.6)
-    {
-        return day;
-    }
-    else if (time < 0.8)
-    {
-        return mix(day, dusk, smoothstep(0.6, 0.8, time));
-    }
-    else
-    {
-        return mix(dusk, night, smoothstep(0.8, 1.0, time));
-    }
+// 3D ハッシュ
+float hash13(vec3 p)
+{
+    p = fract(p * 0.1031);
+    p += dot(p, p.yzx + 33.33);
+    return fract((p.x + p.y) * p.z);
 }
 
-// --- 雲の色（時間帯に応じて） ---
-vec3 getCloudColor(float time)
+// 3D value noise
+float vnoise3(vec3 p)
 {
-    time = fract(time);
-    vec3 dayColor   = vec3(1.0);
-    vec3 duskColor  = vec3(0.5, 0.2, 0.2);
-    vec3 nightColor = vec3(0.001, 0.001, 0.0015);
+    vec3 i = floor(p);
+    vec3 f = fract(p);
 
-    if (time < 0.2)
-        return mix(nightColor, duskColor, smoothstep(0.0, 0.2, time));
-    else if (time < 0.4)
-        return mix(duskColor, dayColor, smoothstep(0.2, 0.4, time));
-    else if (time < 0.6)
-        return dayColor;
-    else if (time < 0.8)
-        return mix(dayColor, duskColor, smoothstep(0.6, 0.8, time));
-    else
-        return mix(duskColor, nightColor, smoothstep(0.9, 1.0, time));
+    float n000 = hash13(i + vec3(0.0, 0.0, 0.0));
+    float n100 = hash13(i + vec3(1.0, 0.0, 0.0));
+    float n010 = hash13(i + vec3(0.0, 1.0, 0.0));
+    float n110 = hash13(i + vec3(1.0, 1.0, 0.0));
+    float n001 = hash13(i + vec3(0.0, 0.0, 1.0));
+    float n101 = hash13(i + vec3(1.0, 0.0, 1.0));
+    float n011 = hash13(i + vec3(0.0, 1.0, 1.0));
+    float n111 = hash13(i + vec3(1.0, 1.0, 1.0));
+
+    vec3 u = f * f * (3.0 - 2.0 * f);
+
+    float nx00 = mix(n000, n100, u.x);
+    float nx10 = mix(n010, n110, u.x);
+    float nx01 = mix(n001, n101, u.x);
+    float nx11 = mix(n011, n111, u.x);
+
+    float nxy0 = mix(nx00, nx10, u.y);
+    float nxy1 = mix(nx01, nx11, u.y);
+
+    return mix(nxy0, nxy1, u.z);
 }
-*/
+
+float fbm3(vec3 p)
+{
+    float value = 0.0;
+    float amp   = 0.5;
+
+    for (int i = 0; i < 5; ++i)
+    {
+        value += amp * vnoise3(p);
+        p *= 2.0;
+        amp *= 0.5;
+    }
+    return value;
+}
+
+
 void main()
 {
     float t = clamp(vWorldDir.y, 0.0, 1.0);
     float weatherFade = (uWeatherType == 0) ? 1.0 : 0.3;
 
-    //vec3 rawSky   = getSkyColor(uTimeOfDay);
-    //vec3 rawCloud = getCloudColor(uTimeOfDay);
     vec3 rawSky   = uRawSkyColor;
     vec3 rawCloud = uRawCloudColor;
     vec3 baseSky     = mix(vec3(0.4, 0.4, 0.5), rawSky, weatherFade);
@@ -124,9 +123,18 @@ void main()
     // --- 雲ノイズ ---
     if (uWeatherType >= 0) // ← CLEARも対象にする
     {
-        vec2 cloudUV = vWorldDir.xz * 10.0 + vec2(uTime * 0.05, 0.0);
-        float density = fbm(cloudUV);
+        //vec2 cloudUV = vWorldDir.xz * 10.0 + vec2(uTime * 0.05, 0.0);
+        //float density = fbm(cloudUV);
+        vec3 dir = normalize(vWorldDir);
 
+        // スケール（雲の大きさ）
+        vec3 p = dir * 8.0;
+
+        // 時間によるスクロール（XZ方向に流す）
+        p.xz += vec2(uTime * 0.03, uTime * 0.01);
+
+        float density = fbm3(p);
+        
         // 天気ごとに個別設定
         if (uWeatherType == 0)
         {
@@ -183,12 +191,6 @@ void main()
     // --- 太陽ハイライト（雲に応じて透過） ---
     if (uWeatherType <= 1)
     {
-        /*
-        float sunAmount = clamp(dot(normalize(vWorldDir), -normalize(uSunDir)), 0.0, 1.0);
-        vec3 sunGlow = vec3(1.2, 1.0, 0.8) * pow(sunAmount, 512.0);
-        finalColor += sunGlow * (1.0 - cloudAlpha); // 雲が薄いほど強く見える
-         */
-        
         
         // --- 太陽ハイライト（時間＋雲＋天気で調整） ---
         // uTimeOfDay: 0.0〜1.0 = 0:00〜24:00 前提
