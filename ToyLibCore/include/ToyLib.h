@@ -43,7 +43,6 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "VertexArray.h"
-#include "Font.h"
 #include "Polygon.h"
 #include "Mesh.h"
 #include "Material.h"
