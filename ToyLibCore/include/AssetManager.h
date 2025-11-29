@@ -31,7 +31,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<class Mesh>> mMeshes;
     std::unordered_map<std::string, std::shared_ptr<class SoundEffect>> mSoundEffects;
     std::unordered_map<std::string, std::shared_ptr<class Music>> mMusics;
-    std::unordered_map<std::string, std::shared_ptr<class TextFont>> mFonts;
+    std::unordered_map<std::string, std::shared_ptr<class TextFont>> mTextFonts;
     
     std::string mAssetsPath;
 };

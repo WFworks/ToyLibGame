@@ -23,7 +23,7 @@ void AssetManager::UnloadData()
     // BGM削除
     mMusics.clear();
     // フォント削除
-    mFonts.clear();
+    mTextFonts.clear();
 }
 
 // テクスチャ取り出し
@@ -128,8 +128,8 @@ std::shared_ptr<TextFont> AssetManager::GetFont(const std::string& fileName, int
     const std::string key = fileName + "#" + std::to_string(pointSize);
 
     // 既にロード済みならそれを返す
-    auto iter = mFonts.find(key);
-    if (iter != mFonts.end())
+    auto iter = mTextFonts.find(key);
+    if (iter != mTextFonts.end())
     {
         return iter->second;
     }
@@ -150,6 +150,6 @@ std::shared_ptr<TextFont> AssetManager::GetFont(const std::string& fileName, int
         return nullptr;
     }
 
-    mFonts.emplace(key, font);
+    mTextFonts.emplace(key, font);
     return font;
 }
