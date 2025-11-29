@@ -78,29 +78,6 @@ float WeatherDomeComponent::SmoothStep(float edge0, float edge1, float x)
 }
 
 
-float WeatherDomeComponent::NormalizeTimeOfDay(float hourFloat, float sunrise, float sunset)
-{
-    // 24時間を sunrise〜sunset にラップして扱いやすくする
-    float dayLength = sunset - sunrise;   // 例: 18 - 5 = 13時間
-    if (dayLength <= 0.0f) dayLength = 0.0001f;
-
-    // “日の出前”は前日の夕暮れからの距離とみなす
-    float relative = hourFloat - sunrise;
-    if (relative < 0.0f)
-    {
-        relative += 24.0f;
-    }
-
-    // 正規化（昼間0.0〜1.0、夜も連続した値にしたいならここで調整）
-    float t01 = relative / dayLength;
-
-    // 0〜1にクランプ（またはループ）
-    t01 = fmodf(t01, 1.0f);
-    if (t01 < 0.0f) t01 += 1.0f;
-
-    return t01;
-}
-
 
 void WeatherDomeComponent::Update(float deltaTime)
 {
@@ -111,6 +88,7 @@ void WeatherDomeComponent::Update(float deltaTime)
     mTime = t;
 
     ApplyTime();
+    
 }
 
 
@@ -126,16 +104,16 @@ Vector3 WeatherDomeComponent::GetSkyColor(float time)
     if (time < 0.0f) time += 1.0f;
 
     // 日の出/日の入り（時間単位）
-    const float sunriseHour  = 5.0f;   // 5:00
-    const float sunsetHour   = 18.0f;  // 18:00
-    const float dawnSpanHour = 1.0f;   // 日の出前後1時間をグラデーション
-    const float duskSpanHour = 1.0f;   // 日の入り前後1時間をグラデーション
+    const float sunriseHour  = 5.f;   // 5:00
+    const float sunsetHour   = 18.f;  // 18:00
+    const float dawnSpanHour = 1.f;   // 日の出前後1時間をグラデーション
+    const float duskSpanHour = 1.f;   // 日の入り前後1時間をグラデーション
 
     // 0〜1 に変換
-    const float sunriseT   = sunriseHour   / 24.0f;
-    const float sunsetT    = sunsetHour    / 24.0f;
-    const float dawnSpanT  = dawnSpanHour  / 24.0f;
-    const float duskSpanT  = duskSpanHour  / 24.0f;
+    const float sunriseT   = sunriseHour   / 24.f;
+    const float sunsetT    = sunsetHour    / 24.f;
+    const float dawnSpanT  = dawnSpanHour  / 24.f;
+    const float duskSpanT  = duskSpanHour  / 24.f;
 
     // 区間境界
     const float tNightEnd1    = sunriseT - dawnSpanT;   // 夜 → 朝焼け開始
@@ -250,7 +228,7 @@ Vector3 WeatherDomeComponent::GetCloudColor(float time)
 void WeatherDomeComponent::ApplyTime()
 {
     float timeOfDay = fmod(mTime, 1.0f);
-
+/*
     // --- 太陽方向 ---
     float angle = Math::Pi * timeOfDay; // 0.0〜π
 
@@ -261,6 +239,24 @@ void WeatherDomeComponent::ApplyTime()
         -cosf(angle),                   // 東→西の動き（そのまま）
         -sinf(angle) * elevationScale,  // ★ 高さを圧縮
         0.5f * sinf(angle)              // 南への傾きはそのままでもOK
+    );
+    mSunDir.Normalize();
+
+    mLightingManager->SetLightDirection(
+        Vector3(-mSunDir.x, -mSunDir.y, -mSunDir.z),
+        Vector3::Zero
+    );
+*/
+    // --- 太陽方向 ---
+    // ★ 0.0〜2πに変更して、一周するようにする
+    float angle = Math::TwoPi * timeOfDay; // 0.0〜2π
+
+    const float elevationScale = 0.8f;
+
+    mSunDir = Vector3(
+        -cosf(angle),
+        -sinf(angle) * elevationScale,
+        0.5f * sinf(angle)
     );
     mSunDir.Normalize();
 

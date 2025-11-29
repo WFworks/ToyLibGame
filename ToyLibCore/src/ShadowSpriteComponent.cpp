@@ -35,6 +35,7 @@ void ShadowSpriteComponent::SetTexture(std::shared_ptr<Texture> tex)
 void ShadowSpriteComponent::Draw()
 {
     if (!mIsVisible || mTexture == nullptr) return;
+    if (! mOwnerActor->GetApp()->GetRenderer()->GetEnableShadow()) return;
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     

@@ -89,6 +89,9 @@ public:
     
     bool IsDebugMode() const { return mIsDebugMode; }
     
+    void SetEnableShadow(const bool b) { mEnableShadow = b; }
+    bool GetEnableShadow() { return mEnableShadow; }
+    
 private:
     // セッティング読み込み
     bool LoadSettings(const std::string& filePath);
@@ -109,6 +112,8 @@ private:
     bool mIsDebugMode;
     // クリア色
     Vector3 mClearColor;
+    // シャドウマップするかどうか
+    bool mEnableShadow;
 
     // シャドウマップ
     float mShadowNear;

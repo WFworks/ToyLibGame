@@ -28,7 +28,6 @@ private:
     float   mFogDensity;
     
     float SmoothStep(float edge0, float edge1, float x);
-    float NormalizeTimeOfDay(float hourFloat, float sunrise, float sunset);
     void ApplyTime();
     
     void ComputeFogFromSky(float timeOfDay);

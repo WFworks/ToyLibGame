@@ -4,9 +4,9 @@
   "scale": 0.001,
 
   "mesh": {
-    "file": "hero_m.fbx",
+    "file": "hero_f.fbx",
     "animation_id": 0,
-    "toon_render": true,
+    "toon_render": false,
     "toon_outline": 1.005
   },
 

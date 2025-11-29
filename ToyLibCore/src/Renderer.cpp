@@ -34,6 +34,7 @@ Renderer::Renderer()
 , mWindow(nullptr)
 , mGLContext(nullptr)
 , mShaderPath("ToyLibCore/Shaders/")
+, mEnableShadow(true)
 {
     mLightingManager = std::make_shared<LightingManager>();
     LoadSettings("ToyLibCore/Settings/Renderer_Settings.json");
@@ -87,8 +88,6 @@ bool Renderer::Initialize()
         return false;
     }
    
-    // ライティングマネージャ生成
-    //mLightingManager = std::make_shared<LightingManager>();
     // シェーダー のロードなどはここでやる
     LoadShaders();
     // スプライト用頂点バッファ
@@ -116,7 +115,9 @@ void Renderer::Draw()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // シャドウマップレンダリング
     RenderShadowMap();
+
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
 
@@ -128,8 +129,6 @@ void Renderer::Draw()
     DrawVisualLayer(VisualLayer::Object3D);
     DrawVisualLayer(VisualLayer::Effect3D);
     DrawVisualLayer(VisualLayer::OverlayScreen);
-
-    //DrawWeatherOverlay();
     
     DrawVisualLayer(VisualLayer::UI);
 
@@ -235,13 +234,7 @@ bool Renderer::InitializeShadowMapping()
 
     // FBOにアタッチ
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mShadowMapTexture->GetTextureID(), 0);
-/*
-    // 確認用
-    GLint compareMode;
-    glBindTexture(GL_TEXTURE_2D, mShadowMapTexture->GetTextureID());
-    glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, &compareMode);
-    SDL_Log("Compare mode: %d", compareMode); // GL_COMPARE_REF_TO_TEXTUREでなければNG（値は 34894）
-  */
+
     // カラーバッファなし（深度のみ）
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
@@ -281,7 +274,7 @@ void Renderer::RenderShadowMap()
 
     for (auto& visual : mVisualComps)
     {
-        if (visual->IsEnableShadow() && visual->IsVisible())
+        if (mEnableShadow && visual->IsEnableShadow() && visual->IsVisible())
         {
             visual->DrawShadow();
         }
@@ -333,7 +326,7 @@ bool Renderer::LoadShaders()
     std::string fShaderName;
 
     
-    // 天気シェーダー（統合版）
+    // 天気シェーダー
     vShaderName = mShaderPath + "WeatherScreen.vert";
     fShaderName = mShaderPath + "WeatherScreen.frag";
     mShaders["WeatherOverlay"] = std::make_shared<Shader>();
