@@ -3,7 +3,7 @@
 #include "WeatherOverlayComponent.h"
 
 WeatherManager::WeatherManager()
-: mWeather(WeatherType::STORM)
+: mWeather(WeatherType::CLEAR)
 {
     
 }

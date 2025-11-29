@@ -128,46 +128,50 @@ void main()
 
     // --- 雲ノイズ ---
     {
-        vec3 p = dir * 8.0;
+        vec3 p = dir * 7.0; // 8 → 7 で少しだけスケール大きめ（雲が気持ち大きく）
         p.xz += vec2(uTime * 0.03, uTime * 0.01);
 
         float density = fbm3(p);
-        
-        if (uWeatherType == 0)
+
+        if (uWeatherType == 0)         // CLEAR
         {
-            cloudAlpha = smoothstep(0.5, 0.75, density); // CLEAR：薄め
+            // 0.5,0.75 → 0.38,0.7 くらいに下げて、ちょっと雲多めの快晴に
+            cloudAlpha = smoothstep(0.38, 0.70, density);
         }
-        else if (uWeatherType == 1)
+        else if (uWeatherType == 1)    // CLOUDY
         {
-            cloudAlpha = smoothstep(0.3, 0.6, density);  // CLOUDY：中程度
+            // 0.3,0.6 → 0.20,0.55 にして、かなり「曇天」寄りに
+            cloudAlpha = smoothstep(0.20, 0.55, density);
             cloudColor = vec3(0.6);
-            skyColor = mix(skyColor, vec3(0.3), 0.5);
+            skyColor   = mix(skyColor, vec3(0.3), 0.6); // 0.5 → 0.6 で空もさらに鈍く
         }
-        else if (uWeatherType == 2)
+        else if (uWeatherType == 2)    // RAIN
         {
-            cloudAlpha = smoothstep(0.2, 0.5, density);  // RAIN：濃いめ
-            skyColor *= 0.4;
+            // 0.2,0.5 → 0.15,0.45 でほぼ一面雲
+            cloudAlpha = smoothstep(0.15, 0.45, density);
+            skyColor *= 0.35;          // 0.4 → 0.35 で暗めに
             cloudColor = vec3(0.5);
         }
-        else if (uWeatherType == 3)
+        else if (uWeatherType == 3)    // STORM
         {
-            cloudAlpha = smoothstep(0.2, 0.5, density);  // STORM：濃いめ
-            skyColor = vec3(0.15);
+            cloudAlpha = smoothstep(0.15, 0.45, density);
+            skyColor   = vec3(0.12);
             cloudColor = vec3(0.7);
         }
-        else if (uWeatherType == 4)
+        else if (uWeatherType == 4)    // SNOW
         {
-            cloudAlpha = smoothstep(0.3, 0.6, density);  // SNOW：ふわっと
-            skyColor = vec3(0.30);
+            // 雪も「空の抜け」は少なめに
+            cloudAlpha = smoothstep(0.22, 0.50, density);
+            skyColor   = vec3(0.30);
             cloudColor = vec3(0.9);
         }
 
         if (uWeatherType >= 2)
         {
+            // ベース +0.4 は維持しつつ、あとで mix 係数も上げる
             cloudAlpha = min(cloudAlpha + 0.4, 1.0);
         }
     }
-
     // --- 雷 ---
     if (uWeatherType == 3)
     {
@@ -189,7 +193,7 @@ void main()
     // ======================
     // ★ 夜空の星
     // ======================
-    if (nightStrength > 0.01 && (uWeatherType == 0 || uWeatherType == 1))
+    if (nightStrength > 0.01 && uWeatherType == 0)
     {
         // 上方向ほど星が見えやすい（低緯度もそこそこ）
         float up = clamp(dir.y, 0.0, 1.0);
@@ -215,7 +219,7 @@ void main()
     // ======================
     // ★ 月 (Moon)
     // ======================
-    if (nightStrength > 0.01)
+    if (nightStrength > 0.01 && uWeatherType == 0)
     {
         // ひとまず固定方向（そのうち uniform にしてもOK）
         vec3 moonDir = normalize(vec3(-0.3, 0.9, 0.2));
@@ -226,8 +230,8 @@ void main()
         float moonDisk = smoothstep(0.985, 1.0, m);
 
         // グローとハロ（控えめ）
-        float moonGlow = pow(m, 50.0);
-        float halo     = pow(m, 8.0);
+        float moonGlow = pow(m, 4096.0);
+        float halo     = pow(m, 10.0);
 
         vec3 moonColor = vec3(1.2, 1.15, 1.0);
         float cloudBlock = 1.0 - cloudAlpha;
@@ -245,7 +249,7 @@ void main()
     // ======================
     // ★ 天の川 (Milky Way) ※継ぎ目対策済み
     // ======================
-    if (nightStrength > 0.05 && (uWeatherType == 0 || uWeatherType == 1))
+    if (nightStrength > 0.01 && uWeatherType == 0)
     {
         // 帯の方向（頭上を斜めに横切るイメージ）
         vec3 bandDir = normalize(vec3(0.5, -0.2, 0.0));
@@ -302,8 +306,8 @@ void main()
         {
             float sunAmount = clamp(dot(dir, -normalize(uSunDir)), 0.0, 1.0);
 
-            float sunCore  = pow(sunAmount, 5120.0);
-            float sunHalo  = pow(sunAmount, 1024.0);
+            float sunCore  = pow(sunAmount, 4096.0);
+            float sunHalo  = pow(sunAmount, 100.0);
             
             vec3 sunCoreColor = vec3(1.3, 1.1, 0.8);
             vec3 sunHaloColor = vec3(1.1, 0.9, 0.7);
