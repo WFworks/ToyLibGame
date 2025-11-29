@@ -77,7 +77,7 @@ void PhysWorld::Test()
 }
 
 // OBBの投影距離比較
-bool PhysWorld::CompareLengthOBB(const OBB* cA, const OBB* cB, const Vector3 vSep, const Vector3 vDistance)
+bool PhysWorld::CompareLengthOBB(const OBB* cA, const OBB* cB, const Vector3& vSep, const Vector3& vDistance)
 {
     // 分離軸上のAからBの距離
     float length = fabsf(Vector3::Dot(vSep, vDistance));
@@ -197,7 +197,7 @@ void PhysWorld::RemoveCollider(ColliderComponent* c)
 
 
 // XZ平面に投影し、点がポリゴン内に存在すればTrue
-bool PhysWorld::IsInPolygon(const Polygon* pl, const Vector3 p) const
+bool PhysWorld::IsInPolygon(const Polygon* pl, const Vector3& p) const
 {
 
     if(((pl->b.x - pl->a.x) * (p.z - pl->a.z) -
@@ -222,7 +222,7 @@ bool PhysWorld::IsInPolygon(const Polygon* pl, const Vector3 p) const
 
 
 // ポリゴン内のある座標における高さを返す
-float PhysWorld::PolygonHeight(const Polygon* pl, const Vector3 p) const
+float PhysWorld::PolygonHeight(const Polygon* pl, const Vector3& p) const
 {
 
     float wa, wb, wc;    // 平明方程式の係数

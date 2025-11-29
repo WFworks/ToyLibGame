@@ -35,7 +35,7 @@ public:
     // 終了
     void Shutdown();
     // クリア色を設定
-    void SetClearColor(const Vector3 color);
+    void SetClearColor(const Vector3& color);
 
     // ビューマトリックスを設定する
     void SetViewMatrix(const Matrix4& view) { mInvView = mViewMatrix = view; mInvView.Invert();}

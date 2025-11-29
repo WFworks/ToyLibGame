@@ -45,7 +45,7 @@ public:
 
 private:
     // 衝突判定
-    bool CompareLengthOBB(const struct OBB* cA, const struct OBB* cB, const Vector3 vSep, const Vector3 vDistance);
+    bool CompareLengthOBB(const struct OBB* cA, const struct OBB* cB, const Vector3& vSep, const Vector3& vDistance);
     bool JudgeWithOBB(class ColliderComponent* col1, class ColliderComponent* col2);
     bool IsCollideBoxOBB(const OBB* cA, const OBB* cB);
     bool JudgeWithRadius(class ColliderComponent* col1, class ColliderComponent* col2);
@@ -56,8 +56,8 @@ private:
     bool IsCollideBoxOBB_MTV(const OBB* cA, const OBB* cB, MTVResult& mtv);
 
     // 地表計算
-    bool IsInPolygon(const struct Polygon* pl, const struct Vector3 p) const;
-    float PolygonHeight(const struct Polygon* pl, const struct Vector3 p) const;
+    bool IsInPolygon(const struct Polygon* pl, const struct Vector3& p) const;
+    float PolygonHeight(const struct Polygon* pl, const struct Vector3& p) const;
     
     
     

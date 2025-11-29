@@ -13,7 +13,7 @@ public:
     void SetTexture(std::shared_ptr<class Texture> tex) override;
     void SetScale(float width, float height) { mScaleWidth = width; mScaleHeight = height; }
     
-    void SetOffsetPosition(const Vector3 v) { mOffsetPosition = v; }
+    void SetOffsetPosition(const Vector3& vPos) { mOffsetPosition = vPos; }
     void SetOffsetScale(const float f) { mOffsetScale = f; }
 
 private:

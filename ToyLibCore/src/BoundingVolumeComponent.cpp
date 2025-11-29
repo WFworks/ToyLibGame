@@ -137,7 +137,7 @@ void BoundingVolumeComponent::CreatePolygons()
 
 
 // Min Maxを直接指定
-void BoundingVolumeComponent::ComputeBoundingVolume(const Vector3 min, const Vector3 max)
+void BoundingVolumeComponent::ComputeBoundingVolume(const Vector3& min, const Vector3& max)
 {
     mBoundingBox->min = min;
     mBoundingBox->max = max;
@@ -146,7 +146,7 @@ void BoundingVolumeComponent::ComputeBoundingVolume(const Vector3 min, const Vec
 }
 
 // バウンディングボックスを手動調整する（場所とサイズ（倍率））
-void BoundingVolumeComponent::AdjustBoundingBox(const Vector3 pos, const Vector3 sc)
+void BoundingVolumeComponent::AdjustBoundingBox(const Vector3& pos, const Vector3& sc)
 {
     
     mBoundingBox->max += pos;

@@ -19,7 +19,7 @@ protected:
     Vector3 mCameraPosition;
     // ビューマトリックスを設定
 	void SetViewMatrix(const Matrix4& view);
-    void SetCameraPosition(const Vector3 pos);
+    void SetCameraPosition(const Vector3& pos);
     
     
     // カメラの場所計算用

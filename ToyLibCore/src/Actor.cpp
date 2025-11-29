@@ -116,7 +116,7 @@ void Actor::RemoveComponent(Component* component)
     }
 }
 
-void Actor::SetForward(const Vector3 dir)
+void Actor::SetForward(const Vector3& dir)
 {
     // Y成分を無視（XZ平面に投影）
     Vector3 flatDir = Vector3(dir.x, 0.0f, dir.z);

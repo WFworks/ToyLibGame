@@ -17,7 +17,7 @@ Texture::Texture()
 
 Texture::~Texture()
 {
-	
+
 }
 
 
@@ -39,8 +39,7 @@ bool Texture::Load(const std::string& fileName, AssetManager* assetManager)
 
     SDL_Surface* tmpImage = SDL_CreateRGBSurface(
         0, image->w, image->h, 32,
-        0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000
-    );
+        0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
     if (!tmpImage)
     {
         SDL_Log("Failed to create temporary surface: %s", SDL_GetError());
@@ -62,8 +61,7 @@ bool Texture::Load(const std::string& fileName, AssetManager* assetManager)
     glBindTexture(GL_TEXTURE_2D, mTextureID);
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_RGBA8, convertedImage->w, convertedImage->h,
-        0, GL_RGBA, GL_UNSIGNED_BYTE, convertedImage->pixels
-    );
+        0, GL_RGBA, GL_UNSIGNED_BYTE, convertedImage->pixels);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -100,8 +98,7 @@ bool Texture::LoadFromMemory(const void* data, int size)
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_RGBA8,
         image->w, image->h, 0,
-        GL_RGBA, GL_UNSIGNED_BYTE, image->pixels
-    );
+        GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -147,8 +144,7 @@ bool Texture::LoadFromMemory(const void* data, int width, int height)
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_RGBA8,  // ← 内部フォーマットを明示
         width, height, 0,
-        GL_RGBA, GL_UNSIGNED_BYTE, data
-    );
+        GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -180,14 +176,14 @@ void Texture::CreateForRendering(int w, int h, unsigned int format)
 void Texture::Unload()
 {
     glActiveTexture(GL_TEXTURE0); 
-	glDeleteTextures(1, &mTextureID);
+    glDeleteTextures(1, &mTextureID);
 }
 
 // アクティブ化（Bind）
 void Texture::SetActive(int unit)
 {
     glActiveTexture(GL_TEXTURE0 + unit);
-	glBindTexture(GL_TEXTURE_2D, mTextureID);
+    glBindTexture(GL_TEXTURE_2D, mTextureID);
 }
 
 void Texture::CreateShadowMap(int width, int height)
@@ -272,9 +268,9 @@ bool Texture::CreateRadialRays(int size, int numRays, float fadePow, float raySt
     float cy = size * 0.5f;
     float maxDist = size * 0.5f;
 
-    for (int y = 0; y < size; ++y)
+    for (int y = 0; y < size; y++)
     {
-        for (int x = 0; x < size; ++x)
+        for (int x = 0; x < size; x++)
         {
             float dx = x - cx;
             float dy = y - cy;

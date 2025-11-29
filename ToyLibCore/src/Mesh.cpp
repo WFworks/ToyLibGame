@@ -109,7 +109,7 @@ void Mesh::ComputeBoneHierarchy(float animationTime, const aiNode* pNode, const 
 }
 
 // アニメーションデータを取得
-const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* pAnimation, const std::string nodeName)
+const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* pAnimation, const std::string& nodeName)
 {
     for (unsigned int i = 0 ; i < pAnimation->mNumChannels ; i++)
     {

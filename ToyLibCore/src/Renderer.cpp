@@ -320,7 +320,7 @@ void Renderer::RegisterSkyDome(SkyDomeComponent* sky)
     }
 }
 
-void::Renderer::SetClearColor(const Vector3 color)
+void Renderer::SetClearColor(const Vector3& color)
 {
     mClearColor = color;
     glClearColor(mClearColor.x, mClearColor.y, mClearColor.z, 1.0f);

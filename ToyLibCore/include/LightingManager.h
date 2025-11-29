@@ -40,24 +40,24 @@ public:
     
     // 個別パラメーター設定
     // Directional Light
-    void SetLightPosition(const Vector3& pos)        { mDirLight.Position = pos; }
-    void SetLightTarget(const Vector3& target)       { mDirLight.Target = target; }
+    void SetLightPosition(const Vector3& pos) { mDirLight.Position = pos; }
+    void SetLightTarget(const Vector3& target) { mDirLight.Target = target; }
     void SetLightDirection(const Vector3& pos, const Vector3& target) { mDirLight.LookAt(pos, target); }
     void SetLightDiffuseColor(const Vector3& color) { mDirLight.DiffuseColor = color; }
-    void SetLightSpecColor(const Vector3& color)    { mDirLight.SpecColor = color; }
-    const Vector3& GetLightPosition() const                { return mDirLight.Position; }
-    Vector3 GetLightDirection() const               { return mDirLight.GetDirection(); }
+    void SetLightSpecColor(const Vector3& color) { mDirLight.SpecColor = color; }
+    const Vector3& GetLightPosition() const { return mDirLight.Position; }
+    Vector3 GetLightDirection() const { return mDirLight.GetDirection(); }
     // Ambient Color
-    void SetAmbientColor(const Vector3 color)       { mAmbientColor = color; }
-    const Vector3& GetAmbientColor()                { return mAmbientColor; };
+    void SetAmbientColor(const Vector3& color) { mAmbientColor = color; }
+    const Vector3& GetAmbientColor() { return mAmbientColor; };
     // Fog
-    void SetFogMinDist(float min)                   { mFog.MinDist = min; }
-    void SetFogMaxDist(float max)                   { mFog.MaxDist = max; }
-    void SetFogColor(const Vector3& color)          { mFog.Color = color; }
+    void SetFogMinDist(float min) { mFog.MinDist = min; }
+    void SetFogMaxDist(float max) { mFog.MaxDist = max; }
+    void SetFogColor(const Vector3& color) { mFog.Color = color; }
 
-    float GetFogMinDist() const                     { return mFog.MinDist; }
-    float GetFogMaxDist() const                     { return mFog.MaxDist; }
-    const Vector3& GetFogColor() const              { return mFog.Color; }
+    float GetFogMinDist() const { return mFog.MinDist; }
+    float GetFogMaxDist() const { return mFog.MaxDist; }
+    const Vector3& GetFogColor() const { return mFog.Color; }
 
 
     void  SetSunIntensity(const float i) { mSunIntensity = i; }

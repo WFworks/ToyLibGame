@@ -46,10 +46,10 @@ public:
     // VertexArrayからBaoundingボリューム生成
     void ComputeBoundingVolume(const std::vector<std::shared_ptr<class VertexArray>> va);
     // Min Maxを直接設定
-    void ComputeBoundingVolume(const Vector3 min, const Vector3 max);
+    void ComputeBoundingVolume(const Vector3& min, const Vector3& max);
     
     // バウンディングボックスを手動調整するヘルパー
-    void AdjustBoundingBox(const Vector3 pos, const Vector3 sc);
+    void AdjustBoundingBox(const Vector3& pos, const Vector3& sc);
     // デバッグ用
     void CreateVArray();
     

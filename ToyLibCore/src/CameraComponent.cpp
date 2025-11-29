@@ -15,7 +15,7 @@ void CameraComponent::SetViewMatrix(const Matrix4& view)
     mOwnerActor->GetApp()->GetRenderer()->SetViewMatrix(view);
 }
 
-void CameraComponent::SetCameraPosition(const Vector3 pos)
+void CameraComponent::SetCameraPosition(const Vector3& pos)
 {
     //mOwnerActor->GetApp()->GetRenderer()->SetCameraPosition(pos);
 }

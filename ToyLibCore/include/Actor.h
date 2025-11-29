@@ -48,7 +48,7 @@ public:
     void ComputeWorldTransform();
     // ワールドマトリックスを取得
     const Matrix4 GetWorldTransform() const { return mWorldTransform; }
-    void SetWorldTransform(const Matrix4 mat) { mWorldTransform = mat; }
+    void SetWorldTransform(const Matrix4& mat) { mWorldTransform = mat; }
  
     // 前方を取得（Z方向）
     virtual Vector3 GetForward() { return Vector3::Transform(Vector3::UnitZ, mRotation); }
@@ -58,7 +58,7 @@ public:
     virtual Vector3 GetUpward() { return Vector3::Transform(Vector3::UnitY, mRotation); }
     
     // 前方向（Z方向）をベクトルに合わせる
-    void SetForward(const Vector3 dir);
+    void SetForward(const Vector3& dir);
     
     // ステータスを操作
 	State GetState() const { return mStatus; }

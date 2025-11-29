@@ -7,7 +7,7 @@ class OrbitCameraComponent : public CameraComponent
 public:
     OrbitCameraComponent(class Actor* owner);
 
-	void Update(float deltaTime) override;
+    void Update(float deltaTime) override;
 
     float GetPitchSpeed() const { return mPitchSpeed; }
     float GetYawSpeed() const { return mYawSpeed; }
@@ -21,15 +21,14 @@ public:
 
 
 private:
-	// オフセット
-	Vector3 mOffset;
-	// Up vector（Y軸）
-	Vector3 mUpVector;
+    // オフセット
+    Vector3 mOffset;
+    // Up vector（Y軸）
+    Vector3 mUpVector;
     
     float mChangeOffset;
-	// ピッチ回転のスピード（X軸）
-	float mPitchSpeed;
-	// ヨー回転のスピード（U軸）
-	float mYawSpeed;
-
+    // ピッチ回転のスピード（X軸）
+    float mPitchSpeed;
+    // ヨー回転のスピード（U軸）
+    float mYawSpeed;
 };

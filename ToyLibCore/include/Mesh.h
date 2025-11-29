@@ -63,7 +63,7 @@ private:
     // ボーン階層を再帰的に計算
     void ComputeBoneHierarchy(float animationTime, const aiNode* pNode, const Matrix4& parentTransform, const aiAnimation* pAnimation);
     // 指定ノード名に一致するアニメーションチャネルを検索
-    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string nodeName);
+    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string& nodeName);
 
     // 補間計算：スケール / 回転 / 平行移動
     void CalcInterpolatedScaling(Vector3& outVec, float animationTime, const aiNodeAnim* pNodeAnim);

@@ -4,12 +4,13 @@
 #include "InputSystem.h"
 
 OrbitCameraComponent::OrbitCameraComponent(Actor* actor)
-    : CameraComponent(actor)
-    , mOffset(-0.0f, 4.0f, -15.0f)
-    , mUpVector(Vector3::UnitY)
-    , mPitchSpeed(0.0f)
-    , mYawSpeed(0.0f)
+: CameraComponent(actor)
+, mOffset(-0.0f, 4.0f, -15.0f)
+, mUpVector(Vector3::UnitY)
+, mPitchSpeed(0.0f)
+, mYawSpeed(0.0f)
 {
+    
 }
 
 void OrbitCameraComponent::ProcessInput( const struct InputState& state )
@@ -44,29 +45,29 @@ void OrbitCameraComponent::ProcessInput( const struct InputState& state )
 void OrbitCameraComponent::Update(float deltaTime)
 {
     
-	CameraComponent::Update(deltaTime);
-	// ヨー回転のクォータニオン
-	Quaternion yaw(Vector3::UnitY, mYawSpeed * deltaTime);
-	// オフセットを計算
+    CameraComponent::Update(deltaTime);
+    // ヨー回転のクォータニオン
+    Quaternion yaw(Vector3::UnitY, mYawSpeed * deltaTime);
+    // オフセットを計算
     mOffset = Vector3::Transform(mOffset, yaw);
-	mUpVector = Vector3::Transform(mUpVector, yaw);
+    mUpVector = Vector3::Transform(mUpVector, yaw);
 
-	// カメラのforwardとrightを計算
-	// Forward owner.position - (owner.position + offset) = -offset
+    // カメラのforwardとrightを計算
+    // Forward owner.position - (owner.position + offset) = -offset
     Vector3 forward = -1.0f * mOffset;
-	forward.Normalize();
-	Vector3 right = Vector3::Cross(mUpVector, forward);
-	right.Normalize();
-	
-	// ピッチ回転のクォータニオン
-	Quaternion pitch(right, mPitchSpeed * deltaTime);
-	// オフセットを計算
-	mOffset = Vector3::Transform(mOffset, pitch);
-	mUpVector = Vector3::Transform(mUpVector, pitch);
+    forward.Normalize();
+    Vector3 right = Vector3::Cross(mUpVector, forward);
+    right.Normalize();
 
-	// Ownerを向くビューマトリックスを生成
+    // ピッチ回転のクォータニオン
+    Quaternion pitch(right, mPitchSpeed * deltaTime);
+    // オフセットを計算
+    mOffset = Vector3::Transform(mOffset, pitch);
+    mUpVector = Vector3::Transform(mUpVector, pitch);
+
+    // Ownerを向くビューマトリックスを生成
     Vector3 target = mOwnerActor->GetPosition() + Vector3(0, 1, 0);
-	Vector3 cameraPos = target + mOffset;
+    Vector3 cameraPos = target + mOffset;
     
     
     mOffset.y += mChangeOffset;
@@ -94,9 +95,8 @@ void OrbitCameraComponent::Update(float deltaTime)
     mCameraPosition = cameraPos;
      
 
-	Matrix4 view = Matrix4::CreateLookAt(cameraPos, target, mUpVector);
-	SetViewMatrix(view);
-    
+    Matrix4 view = Matrix4::CreateLookAt(cameraPos, target, mUpVector);
+    SetViewMatrix(view);
     
     mCameraActor->SetPosition(cameraPos);
 }

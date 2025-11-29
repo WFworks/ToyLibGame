@@ -11,9 +11,9 @@ public:
     FollowCameraComponent(class Actor* owner);
 
     // Override
-	void Update(float deltaTime) override;
+    void Update(float deltaTime) override;
     // 理想の位置に向けて調整
-	void SnapToIdeal();
+    void SnapToIdeal();
 
     // カメラ位置の設定
     void SetHorzDist(float dist) { mHorzDist = dist; }
@@ -23,21 +23,21 @@ public:
     
 private:
     // カメラの位置を計算
-	Vector3 ComputeCameraPos() const;
+    Vector3 ComputeCameraPos() const;
     // 現在の位置
-	Vector3 mActualPos;
+    Vector3 mActualPos;
     // 速度
-	Vector3 mVelocity;
+    Vector3 mVelocity;
     
     // カメラ位置
     // 後ろ
-	float mHorzDist;
+    float mHorzDist;
     // 高さ
-	float mVertDist;
+    float mVertDist;
     // 視点とActorの距離
-	float mTargetDist;
-    
+    float mTargetDist;
+
     // バネ定数
-	float mSpringConstant;
+    float mSpringConstant;
 };
 
