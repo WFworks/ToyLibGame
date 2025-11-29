@@ -39,6 +39,4 @@ void TimeOfDaySystem::Update(float deltaTime)
         mTime.hour -= 24;
         ++mTime.day;
     }
-    
-    std::cout << mTime.hour << " : " << mTime.minute << " . " << mTime.second << std::endl;
 }
