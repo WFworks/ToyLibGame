@@ -32,7 +32,8 @@ public:
     void SetShader(std::shared_ptr<class Shader> shader) { mShader = shader; }
     void SetLightingManager(std::shared_ptr<LightingManager> light) { mLightingManager = light; }
 
-    bool IsEnableShadow() const { return mEnableShadow; }
+    bool GetEnableShadow() const { return mEnableShadow; }
+    void SetEnableShadow(const bool b) { mEnableShadow = b; }
 protected:
     std::shared_ptr<class Texture> mTexture;
     std::shared_ptr<class Shader> mShader;

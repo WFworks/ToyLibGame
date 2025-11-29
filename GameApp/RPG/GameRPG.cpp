@@ -12,7 +12,7 @@ GameRPG::GameRPG()
     SetIMEEnabled(false);
     SetAssetsPath("GameApp/Assets/RPG/");
     
-    GetTimeOfDaySystem()->SetTimeScale(6000.f);
+    GetTimeOfDaySystem()->SetTimeScale(2000.f);
 }
 
 GameRPG::~GameRPG()
@@ -206,6 +206,7 @@ void GameRPG::LoadData()
     b->SetPosition(Vector3(0,0,0));
     b->SetScale(1);
     g->SetToonRender(false, 1.0);
+    g->SetEnableShadow(false);
     
     auto groundMesh = GetAssetManager()->GetMesh("ground2.x");
     auto va = groundMesh->GetVertexArray();

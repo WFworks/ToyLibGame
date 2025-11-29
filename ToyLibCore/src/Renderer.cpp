@@ -281,7 +281,7 @@ void Renderer::RenderShadowMap()
 
     for (auto& visual : mVisualComps)
     {
-        if (visual->IsEnableShadow() && visual->IsVisible())
+        if (visual->GetEnableShadow() && visual->IsVisible())
         {
             visual->DrawShadow();
         }

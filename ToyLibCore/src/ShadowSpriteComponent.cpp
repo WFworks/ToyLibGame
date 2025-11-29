@@ -35,6 +35,12 @@ void ShadowSpriteComponent::SetTexture(std::shared_ptr<Texture> tex)
 void ShadowSpriteComponent::Draw()
 {
     if (!mIsVisible || mTexture == nullptr) return;
+    
+    float sunIntensity = mLightingManager->GetSunIntensity();
+    if (sunIntensity <= 0.01f)
+    {
+        return;
+    }
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     

@@ -276,7 +276,7 @@ void WeatherDomeComponent::ApplyTime()
 
     // --- アンビエント色 ---
     Vector3 dayAmbient   = Vector3(0.7f, 0.7f, 0.7f);
-    Vector3 nightAmbient = Vector3(0.3f, 0.3f, 0.4f);
+    Vector3 nightAmbient = Vector3(0.25f, 0.2f, 0.3f);
     Vector3 finalAmbient =
         (dayAmbient * dayStrength + nightAmbient * nightStrength) * weatherDim;
     mLightingManager->SetAmbientColor(finalAmbient);
