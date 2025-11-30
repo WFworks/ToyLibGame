@@ -11,7 +11,7 @@ WireframeComponent::WireframeComponent(Actor* owner, int drawOrder, VisualLayer 
 : VisualComponent(owner, drawOrder, layer)
 , mColor(Vector3(1.f, 1.f, 1.f))
 {
-    mShader = mOwnerActor->GetApp()->GetRenderer()->GetShader("Solid");
+    mShader = GetOwner()->GetApp()->GetRenderer()->GetShader("Solid");
 }
 
 
@@ -19,7 +19,7 @@ void WireframeComponent::Draw()
 {
     if (!mIsVisible) return;
     
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
     
@@ -30,7 +30,7 @@ void WireframeComponent::Draw()
     
     
     // WorldマトリックスをShaderに送る
-    mShader->SetMatrixUniform("uWorldTransform", mOwnerActor->GetWorldTransform());
+    mShader->SetMatrixUniform("uWorldTransform", GetOwner()->GetWorldTransform());
     mVertexArray->SetActive();
     glDrawElements(GL_LINE_STRIP,  mVertexArray->GetNumVerts() * 3, GL_UNSIGNED_INT, nullptr);
 

@@ -12,7 +12,7 @@ WeatherOverlayComponent::WeatherOverlayComponent(Actor* a, int drawOrder, Visual
 , mFogAmount(0.f)
 , mSnowAmount(0.f)
 {
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     mShader = renderer->GetShader("WeatherOverlay");
     mVertexArray = renderer->GetFullScreenQuad();
     mScreenWidth = renderer->GetScreenWidth();

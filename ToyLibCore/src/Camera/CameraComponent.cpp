@@ -7,22 +7,22 @@
 CameraComponent::CameraComponent(Actor* a, int updateOrder)
 : Component(a, updateOrder)
 {
-    mCameraActor = std::make_unique<Actor>(mOwnerActor->GetApp());
+    mCameraActor = std::make_unique<Actor>(GetOwner()->GetApp());
 }
 
 void CameraComponent::SetViewMatrix(const Matrix4& view)
 {
-    mOwnerActor->GetApp()->GetRenderer()->SetViewMatrix(view);
+    GetOwner()->GetApp()->GetRenderer()->SetViewMatrix(view);
 }
 
 void CameraComponent::SetCameraPosition(const Vector3& pos)
 {
-    //mOwnerActor->GetApp()->GetRenderer()->SetCameraPosition(pos);
+    //GetOwner()->GetApp()->GetRenderer()->SetCameraPosition(pos);
 }
 
 void CameraComponent::Update(float deltaTime)
 {
-    auto inView = mOwnerActor->GetApp()->GetRenderer()->GetInvViewMatrix();
+    auto inView = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix();
     mCameraPosition = inView.GetTranslation();
 }
 

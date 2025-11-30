@@ -36,15 +36,15 @@ void SoundComponent::Play()
         return; // 排他再生中は新しく鳴らさない
     }
 
-    auto sound = mOwnerActor->GetApp()->GetAssetManager()->GetSoundEffect(mSoundName);
+    auto sound = GetOwner()->GetApp()->GetAssetManager()->GetSoundEffect(mSoundName);
     if (!sound) return;
 
     float actualVolume = mVolume;
 
     if (mUseDistanceAttenuation)
     {
-        Vector3 camPos = mOwnerActor->GetApp()->GetRenderer()->GetViewMatrix().GetTranslation();
-        Vector3 pos = mOwnerActor->GetPosition();
+        Vector3 camPos = GetOwner()->GetApp()->GetRenderer()->GetViewMatrix().GetTranslation();
+        Vector3 pos = GetOwner()->GetPosition();
         float distance = (camPos - pos).Length();
 
         if (distance > 5.0f)

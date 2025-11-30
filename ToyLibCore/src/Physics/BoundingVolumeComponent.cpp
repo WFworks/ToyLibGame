@@ -24,9 +24,9 @@ BoundingVolumeComponent::BoundingVolumeComponent(Actor* a)
     mObb = std::make_shared<OBB>();
     mPolygons.reset(new Polygon[NUM_VERTEX]);
     
-    if (mOwnerActor->GetApp()->GetRenderer()->IsDebugMode())
+    if (GetOwner()->GetApp()->GetRenderer()->IsDebugMode())
     {
-        mWireframe = std::make_unique<WireframeComponent>(mOwnerActor, 1000);
+        mWireframe = std::make_unique<WireframeComponent>(GetOwner(), 1000);
         mWireframe->SetColor(Vector3(1,0,0.5f));
     }
 }
@@ -41,12 +41,12 @@ BoundingVolumeComponent::~BoundingVolumeComponent()
 void BoundingVolumeComponent::OnUpdateWorldTransform()
 {
     // バウンディングボックスパラメータをセット
-    mObb->pos = mOwnerActor->GetPosition();
-    float sc1 = mOwnerActor->GetScale();
+    mObb->pos = GetOwner()->GetPosition();
+    float sc1 = GetOwner()->GetScale();
     mObb->max = mBoundingBox->max * sc1;
     mObb->min = mBoundingBox->min * sc1;
     
-    Quaternion q1 = mOwnerActor->GetRotation();
+    Quaternion q1 = GetOwner()->GetRotation();
     Matrix4 mRot1 = Matrix4::CreateFromQuaternion(q1);
       
     mObb->axisX = mRot1.GetXAxis();
@@ -218,8 +218,8 @@ Cube BoundingVolumeComponent::GetWorldAABB() const
     Cube worldBox;
     if (!mBoundingBox) return worldBox;
 
-    Vector3 pos = mOwnerActor->GetPosition();
-    float scale = mOwnerActor->GetScale();
+    Vector3 pos = GetOwner()->GetPosition();
+    float scale = GetOwner()->GetScale();
 
     worldBox.min = mBoundingBox->min * scale + pos;
     worldBox.max = mBoundingBox->max * scale + pos;

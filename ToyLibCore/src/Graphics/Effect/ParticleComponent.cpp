@@ -23,7 +23,7 @@ ParticleComponent::ParticleComponent(Actor* owner, int drawOrder)
     , mParticleMode(P_SPARK)
 {
     mLayer = VisualLayer::Effect3D;
-    mShader = mOwnerActor->GetApp()->GetRenderer()->GetShader("Particle");
+    mShader = GetOwner()->GetApp()->GetRenderer()->GetShader("Particle");
 }
 
 ParticleComponent::~ParticleComponent()
@@ -118,16 +118,16 @@ void ParticleComponent::Draw()
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
     
-    Matrix4 mat = mOwnerActor->GetWorldTransform();
-    Matrix4 invView = mOwnerActor->GetApp()->GetRenderer()->GetInvViewMatrix();
+    Matrix4 mat = GetOwner()->GetWorldTransform();
+    Matrix4 invView = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix();
     invView.mat[3][0] = mat.mat[3][0];
     invView.mat[3][1] = mat.mat[3][1];
     invView.mat[3][2] = mat.mat[3][2];
 
     Matrix4 scaleMat = Matrix4::CreateScale(mPartSize, mPartSize, 1);
-    Matrix4 world = scaleMat * Matrix4::CreateScale(mOwnerActor->GetScale()) * invView;
+    Matrix4 world = scaleMat * Matrix4::CreateScale(GetOwner()->GetScale()) * invView;
 
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
     

@@ -24,7 +24,7 @@ MeshComponent::MeshComponent(Actor* a, int drawOrder, VisualLayer layer, bool is
 , mContourFactor(1.1014f)
 //, mIsBlendAdd(false)
 {
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     mShader = renderer->GetShader("Mesh");
     mShadowShader = renderer->GetShader("ShadowMesh");
     mLightingManger = renderer->GetLightingManager();
@@ -52,7 +52,7 @@ void MeshComponent::Draw()
     // シャドウマップテクスチャ有効化
     mShadowMapTexture->SetActive(1);
     
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
     Matrix4 light = renderer->GetLightSpaceMatrix();
@@ -71,7 +71,7 @@ void MeshComponent::Draw()
 
     
     // WorldマトリックスをShaderに送る
-    mShader->SetMatrixUniform("uWorldTransform", mOwnerActor->GetWorldTransform());
+    mShader->SetMatrixUniform("uWorldTransform", GetOwner()->GetWorldTransform());
 
     // Vertex Array
     auto va = mMesh->GetVertexArray();
@@ -91,7 +91,7 @@ void MeshComponent::Draw()
     {
         glFrontFace(GL_CW);
         Matrix4 m = Matrix4::CreateScale(mContourFactor);
-        mShader->SetMatrixUniform("uWorldTransform", m * mOwnerActor->GetWorldTransform());
+        mShader->SetMatrixUniform("uWorldTransform", m * GetOwner()->GetWorldTransform());
         for (auto v : va)
         {
             auto mat = mMesh->GetMaterial(v->GetTextureID());
@@ -124,13 +124,13 @@ void MeshComponent::DrawShadow()
 {
     if (!mMesh) return;
     
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 light = renderer->GetLightSpaceMatrix();
     mShadowShader->SetActive();
     
     
     // ワールドマトリックスを送る
-    mShadowShader->SetMatrixUniform("uWorldTransform", mOwnerActor->GetWorldTransform());
+    mShadowShader->SetMatrixUniform("uWorldTransform", GetOwner()->GetWorldTransform());
     mShadowShader->SetMatrixUniform("uLightSpaceMatrix", light);
     
     // Vertex Arrayを描画

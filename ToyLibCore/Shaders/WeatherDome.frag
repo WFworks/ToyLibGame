@@ -221,8 +221,8 @@ void main()
     // ======================
     if (nightStrength > 0.01 && uWeatherType == 0)
     {
-        // ひとまず固定方向（そのうち uniform にしてもOK）
-        vec3 moonDir = normalize(vec3(-0.3, 0.9, 0.2));
+        // ひとまず固定方向（そのうち uniform）
+        vec3 moonDir = normalize(vec3(-0.8, 0.2, 0.2));
 
         float m = clamp(dot(dir, moonDir), 0.0, 1.0);
 
@@ -230,8 +230,8 @@ void main()
         float moonDisk = smoothstep(0.985, 1.0, m);
 
         // グローとハロ（控えめ）
-        float moonGlow = pow(m, 4096.0);
-        float halo     = pow(m, 10.0);
+        float moonGlow = pow(m, 7680.0);
+        float halo     = pow(m, 60.0);
 
         vec3 moonColor = vec3(1.2, 1.15, 1.0);
         float cloudBlock = 1.0 - cloudAlpha;

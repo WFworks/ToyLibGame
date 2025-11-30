@@ -20,7 +20,7 @@ void GravityComponent::Update(float deltaTime)
     // 重力加速度を加算
     mVelocityY += mGravityAccel;
     // 現在座標を取得
-    Vector3 pos = mOwnerActor->GetPosition();
+    Vector3 pos = GetOwner()->GetPosition();
     // 設置判定に使うコライダーを取得（C_FOOT）
     ColliderComponent* collider = FindFootCollider();
     if (!collider) return;
@@ -28,8 +28,8 @@ void GravityComponent::Update(float deltaTime)
 
     // 地面の高さを取得
     float groundY = -FLT_MAX;
-    if (mOwnerActor->GetApp()->GetPhysWorld()
-        ->GetNearestGroundY(mOwnerActor, groundY))
+    if (GetOwner()->GetApp()->GetPhysWorld()
+        ->GetNearestGroundY(GetOwner(), groundY))
     {
         // 自分より下に地面がある
         // AABBから最低座標を取得
@@ -40,7 +40,7 @@ void GravityComponent::Update(float deltaTime)
             pos.y = groundY + offset+0.01;
             mVelocityY = 0.0f;
             mIsGrounded = true;
-            mOwnerActor->SetPosition(pos);
+            GetOwner()->SetPosition(pos);
             return;
         }
     }
@@ -50,7 +50,7 @@ void GravityComponent::Update(float deltaTime)
         mIsGrounded = false;
     }
     pos.y += mVelocityY * deltaTime;
-    mOwnerActor->SetPosition(pos);
+    GetOwner()->SetPosition(pos);
 }
 
 
@@ -64,7 +64,7 @@ void GravityComponent::Jump()
 }
 ColliderComponent* GravityComponent::FindFootCollider()
 {
-    for (auto* comp : mOwnerActor->GetAllComponents<ColliderComponent>())
+    for (auto* comp : GetOwner()->GetAllComponents<ColliderComponent>())
     {
         if (comp->HasFlag(C_FOOT))
         {

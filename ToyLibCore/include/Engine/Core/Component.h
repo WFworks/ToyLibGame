@@ -28,10 +28,11 @@ public:
     
     class Actor* GetOwner() const { return mOwnerActor; }
 
-    
-protected:
+private:
     // オーナーとなるActor
     class Actor* mOwnerActor;
+
+protected:
     // アップデートオーダー
     int mUpdateOrder;
 };

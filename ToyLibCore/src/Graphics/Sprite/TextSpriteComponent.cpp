@@ -54,7 +54,7 @@ void TextSpriteComponent::UpdateTexture()
         return;
     }
 
-    auto* app = mOwnerActor->GetApp();
+    auto* app = GetOwner()->GetApp();
     auto* renderer = app->GetRenderer();
 
     auto tex = renderer->CreateTextTexture(mText, mColor, mFont);

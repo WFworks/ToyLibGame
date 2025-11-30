@@ -19,30 +19,30 @@ MoveComponent::MoveComponent(class Actor* a, int updateOrder)
 
 void MoveComponent::Update(float deltaTime)
 {
-    Quaternion rot = mOwnerActor->GetRotation();
+    Quaternion rot = GetOwner()->GetRotation();
     if (!Math::NearZero(mAngularSpeed))
     {
         float angle = Math::ToRadians(mAngularSpeed * deltaTime);
         Quaternion inc(Vector3::UnitY, angle);
         rot = Quaternion::Concatenate(rot, inc);
-        mOwnerActor->SetRotation(rot);
+        GetOwner()->SetRotation(rot);
     }
 
-    Vector3 pos = mOwnerActor->GetPosition();
+    Vector3 pos = GetOwner()->GetPosition();
     if (!Math::NearZero(mForwardSpeed))
     {
-        pos += mOwnerActor->GetForward() * mForwardSpeed * deltaTime;
+        pos += GetOwner()->GetForward() * mForwardSpeed * deltaTime;
     }
     if (!Math::NearZero(mRightSpeed))
     {
-        pos += mOwnerActor->GetRight() * mRightSpeed * deltaTime;
+        pos += GetOwner()->GetRight() * mRightSpeed * deltaTime;
     }
     if (!Math::NearZero(mVerticalSpeed))
     {
-        pos += mOwnerActor->GetUpward() * mVerticalSpeed * deltaTime;
+        pos += GetOwner()->GetUpward() * mVerticalSpeed * deltaTime;
     }
 
-    mOwnerActor->SetPosition(pos);
+    GetOwner()->SetPosition(pos);
 }
 
 void MoveComponent::Reset()
@@ -56,23 +56,23 @@ void MoveComponent::Reset()
 
 bool MoveComponent::TryMoveWithRayCheck(const Vector3& moveVec, float deltaTime)
 {
-    if (!mOwnerActor || !mIsMovable) return false;
+    if (!GetOwner() || !mIsMovable) return false;
 
-    Vector3 start = mOwnerActor->GetPosition();
+    Vector3 start = GetOwner()->GetPosition();
     Vector3 goal = start + moveVec * deltaTime;
 
     Vector3 stopPos;
-    if (mOwnerActor->GetApp()->GetPhysWorld()->RayHitWall(start, goal, stopPos))
+    if (GetOwner()->GetApp()->GetPhysWorld()->RayHitWall(start, goal, stopPos))
     {
-        mOwnerActor->SetPosition(stopPos);
+        GetOwner()->SetPosition(stopPos);
     }
     else
     {
-        mOwnerActor->SetPosition(goal);
+        GetOwner()->SetPosition(goal);
     }
 
     // 念のための押し戻し（MTV）
-    mOwnerActor->GetApp()->GetPhysWorld()->CollideAndCallback(C_PLAYER, C_WALL, true, false);
+    GetOwner()->GetApp()->GetPhysWorld()->CollideAndCallback(C_PLAYER, C_WALL, true, false);
 
     return true;
 }

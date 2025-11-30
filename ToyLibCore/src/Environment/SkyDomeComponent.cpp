@@ -12,8 +12,8 @@ SkyDomeComponent::SkyDomeComponent(Actor* a)
 : Component(a)
 {
     mSkyVAO = SkyDomeMeshGenerator::CreateSkyDomeVAO(32, 16, 1.0f);
-    mOwnerActor->GetApp()->GetRenderer()->RegisterSkyDome(this);
-    mShader = mOwnerActor->GetApp()->GetRenderer()->GetShader("SkyDome");
+    GetOwner()->GetApp()->GetRenderer()->RegisterSkyDome(this);
+    mShader = GetOwner()->GetApp()->GetRenderer()->GetShader("SkyDome");
 }
 
 

@@ -18,8 +18,8 @@ WeatherDomeComponent::WeatherDomeComponent(Actor* a)
 , mWeatherType(WeatherType::CLEAR)
 {
     mSkyVAO = SkyDomeMeshGenerator::CreateSkyDomeVAO(32, 16, 1.0f);
-    mOwnerActor->GetApp()->GetRenderer()->RegisterSkyDome(this);
-    mShader = mOwnerActor->GetApp()->GetRenderer()->GetShader("SkyDome");
+    GetOwner()->GetApp()->GetRenderer()->RegisterSkyDome(this);
+    mShader = GetOwner()->GetApp()->GetRenderer()->GetShader("SkyDome");
 }
 
 void WeatherDomeComponent::SetTime(float t)
@@ -39,12 +39,12 @@ void WeatherDomeComponent::Draw()
     if (!mSkyVAO || !mShader) return;
     
 
-    Matrix4 invView = mOwnerActor->GetApp()->GetRenderer()->GetInvViewMatrix();
+    Matrix4 invView = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix();
     
     Vector3 camPos = invView.GetTranslation() + Vector3(0, 50, 0);
     Matrix4 model = Matrix4::CreateScale(200.0f) * Matrix4::CreateTranslation(camPos);
-    Matrix4 view = mOwnerActor->GetApp()->GetRenderer()->GetViewMatrix();
-    Matrix4 proj = mOwnerActor->GetApp()->GetRenderer()->GetProjectionMatrix();
+    Matrix4 view = GetOwner()->GetApp()->GetRenderer()->GetViewMatrix();
+    Matrix4 proj = GetOwner()->GetApp()->GetRenderer()->GetProjectionMatrix();
     Matrix4 mvp = model * view * proj;
 
 
@@ -81,7 +81,7 @@ float WeatherDomeComponent::SmoothStep(float edge0, float edge1, float x)
 
 void WeatherDomeComponent::Update(float deltaTime)
 {
-    auto timeSystem = mOwnerActor->GetApp()->GetTimeOfDaySystem();
+    auto timeSystem = GetOwner()->GetApp()->GetTimeOfDaySystem();
     
     float hour = timeSystem->GetHourFloat();;
     float t = hour / 24.f;
@@ -455,7 +455,7 @@ void WeatherDomeComponent::ApplyTime()
     // --- 太陽方向 ---
     float angle = Math::TwoPi * (timeOfDay - 0.25f);
 
-    const float elevationScale = 0.9f;     // 軌道が低いなら 1.0〜1.2 くらいに上げる
+    const float elevationScale = 0.6f;     // 軌道が低いなら 1.0〜1.2 くらいに上げる
     const float verticalOffset = -0.1f;    // 全体を少し上に持ち上げたい場合
 
     mSunDir = Vector3(

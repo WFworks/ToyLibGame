@@ -16,9 +16,9 @@ SpriteComponent::SpriteComponent(Actor* a, int drawOrder, VisualLayer layer)
 , mTexHeight(0)
 {
     mDrawOrder = drawOrder;
-    mShader = mOwnerActor->GetApp()->GetRenderer()->GetShader("Sprite");
-    mScreenWidth = mOwnerActor->GetApp()->GetRenderer()->GetScreenWidth();
-    mScreenHeight = mOwnerActor->GetApp()->GetRenderer()->GetScreenHeight();
+    mShader = GetOwner()->GetApp()->GetRenderer()->GetShader("Sprite");
+    mScreenWidth = GetOwner()->GetApp()->GetRenderer()->GetScreenWidth();
+    mScreenHeight = GetOwner()->GetApp()->GetRenderer()->GetScreenHeight();
 }
 
 SpriteComponent::~SpriteComponent()
@@ -59,11 +59,11 @@ void SpriteComponent::Draw()
     float height = static_cast<float>(mTexHeight) * mScaleHeight;
 
     Matrix4 scaleMat = Matrix4::CreateScale(width, height, 1.0f);
-    Matrix4 world = scaleMat * mOwnerActor->GetWorldTransform();
+    Matrix4 world = scaleMat * GetOwner()->GetWorldTransform();
 
 
     mShader->SetActive();
-    Matrix4 view = mOwnerActor->GetApp()->GetRenderer()->GetViewMatrix();
+    Matrix4 view = GetOwner()->GetApp()->GetRenderer()->GetViewMatrix();
     mShader->SetMatrixUniform("uViewProj", Matrix4::CreateSimpleViewProj(mScreenWidth, mScreenHeight));
     mTexture->SetActive(0);
     mShader->SetTextureUniform("uTexture", 0);

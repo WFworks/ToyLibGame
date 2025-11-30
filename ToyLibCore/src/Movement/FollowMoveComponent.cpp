@@ -17,7 +17,7 @@ void FollowMoveComponent::Update(float deltaTime)
 
     if (mTarget)
     {
-        Vector3 toTarget = mTarget->GetPosition() - mOwnerActor->GetPosition();
+        Vector3 toTarget = mTarget->GetPosition() - GetOwner()->GetPosition();
         float dist = toTarget.Length();
 
         if (dist > Math::NearZeroEpsilon)
@@ -25,7 +25,7 @@ void FollowMoveComponent::Update(float deltaTime)
             toTarget.Normalize();
 
             // 向きを合わせる
-            Vector3 forward = mOwnerActor->GetForward();
+            Vector3 forward = GetOwner()->GetForward();
             float dot = Vector3::Dot(forward, toTarget);
             dot = Math::Clamp(dot, -1.0f, 1.0f);
             float angle = Math::Acos(dot);
@@ -50,10 +50,10 @@ void FollowMoveComponent::Update(float deltaTime)
                 // 最終的な回転角
                 float yaw = Math::Clamp(signedAngle, -angle, angle);
 
-                Quaternion rot = mOwnerActor->GetRotation();
+                Quaternion rot = GetOwner()->GetRotation();
                 Quaternion inc(Vector3::UnitY, yaw);
                 rot = Quaternion::Concatenate(rot, inc);
-                mOwnerActor->SetRotation(rot);
+                GetOwner()->SetRotation(rot);
             }
             /*
             // 距離が一定以上なら前進
@@ -67,7 +67,7 @@ void FollowMoveComponent::Update(float deltaTime)
             // 壁回避付きの移動
             if (dist > mFollowDistance)
             {
-                Vector3 moveDir = mOwnerActor->GetForward();
+                Vector3 moveDir = GetOwner()->GetForward();
                 moveDir.y = 0.0f;
                 moveDir.Normalize();
                 TryMoveWithRayCheck(moveDir * (-mFollowSpeed), deltaTime);

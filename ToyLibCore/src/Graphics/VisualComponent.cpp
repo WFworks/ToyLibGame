@@ -13,13 +13,13 @@ VisualComponent::VisualComponent(Actor* owner, int drawOrder, VisualLayer layer)
 , mDrawOrder(drawOrder)
 , mEnableShadow(false)
 {
-    mOwnerActor->GetApp()->GetRenderer()->AddVisualComp(this);
-    mLightingManager = mOwnerActor->GetApp()->GetRenderer()->GetLightingManager();
-    mVertexArray = mOwnerActor->GetApp()->GetRenderer()->GetSpriteVerts();
+    GetOwner()->GetApp()->GetRenderer()->AddVisualComp(this);
+    mLightingManager = GetOwner()->GetApp()->GetRenderer()->GetLightingManager();
+    mVertexArray = GetOwner()->GetApp()->GetRenderer()->GetSpriteVerts();
     
 }
 
 VisualComponent::~VisualComponent()
 {
-    mOwnerActor->GetApp()->GetRenderer()->RemoveVisualComp(this);
+    GetOwner()->GetApp()->GetRenderer()->RemoveVisualComp(this);
 }

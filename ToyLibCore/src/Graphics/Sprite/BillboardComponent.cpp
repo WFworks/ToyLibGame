@@ -13,7 +13,7 @@ BillboardComponent::BillboardComponent(class Actor* a, int drawOrder)
 : VisualComponent(a, drawOrder, VisualLayer::Effect3D)
 , mScale(1.0f)
 {
-    mShader = mOwnerActor->GetApp()->GetRenderer()->GetShader("Mesh");
+    mShader = GetOwner()->GetApp()->GetRenderer()->GetShader("Mesh");
 }
 
 BillboardComponent::~BillboardComponent()
@@ -29,14 +29,14 @@ void BillboardComponent::Draw()
         glBlendFunc(GL_ONE, GL_ONE);
     }
     
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
     
     
     // カメラと位置取得
-    Vector3 pos = mOwnerActor->GetPosition();
-    Matrix4 invView = mOwnerActor->GetApp()->GetRenderer()->GetInvViewMatrix();
+    Vector3 pos = GetOwner()->GetPosition();
+    Matrix4 invView = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix();
     Vector3 cameraPos = invView.GetTranslation();
 
     // 回転角（Y軸）
@@ -48,7 +48,7 @@ void BillboardComponent::Draw()
     Matrix4 rotY = Matrix4::CreateRotationY(angle);
 
     // スケール＋平行移動
-    float scale = mScale * mOwnerActor->GetScale();
+    float scale = mScale * GetOwner()->GetScale();
     Matrix4 scaleMat = Matrix4::CreateScale(mTexture->GetWidth() * scale,
                                             mTexture->GetHeight() * scale, 1.0f);
     Matrix4 translate = Matrix4::CreateTranslation(pos);

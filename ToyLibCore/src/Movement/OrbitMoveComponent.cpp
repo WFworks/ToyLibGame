@@ -24,11 +24,11 @@ void OrbitMoveComponent::Update(float deltaTime)
         float newX = centerPos.x + mOrbitRadius * cosf(radians);
         float newZ = centerPos.z + mOrbitRadius * sinf(radians);
 
-        mOwnerActor->SetPosition(Vector3(newX, mOwnerActor->GetPosition().y, newZ));
+        GetOwner()->SetPosition(Vector3(newX, GetOwner()->GetPosition().y, newZ));
 
-        Vector3 toCenter = centerPos - mOwnerActor->GetPosition();
+        Vector3 toCenter = centerPos - GetOwner()->GetPosition();
         toCenter.Normalize();
         float angle = atan2f(toCenter.x, toCenter.z);
-        mOwnerActor->SetRotation(Quaternion(Vector3::UnitY, angle));
+        GetOwner()->SetRotation(Quaternion(Vector3::UnitY, angle));
     }
 }

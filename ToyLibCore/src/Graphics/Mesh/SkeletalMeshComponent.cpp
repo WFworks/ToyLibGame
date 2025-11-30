@@ -15,7 +15,7 @@ SkeletalMeshComponent::SkeletalMeshComponent(Actor* a, int drawOrder, VisualLaye
 , mAnimTime(0.0f)
 , mAnimPlayer(nullptr)
 {
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     mShader = renderer->GetShader("Skinned");
     mShadowShader = renderer->GetShader("ShadowSkinned");
 }
@@ -37,7 +37,7 @@ void SkeletalMeshComponent::Draw()
     }
 
     mShadowMapTexture->SetActive(1);
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
     Matrix4 light = renderer->GetLightSpaceMatrix();
@@ -49,7 +49,7 @@ void SkeletalMeshComponent::Draw()
     mShader->SetTextureUniform("uShadowMap", 1);
     mShader->SetFloatUniform("uShadowBias", 0.005);
     mShader->SetBooleanUniform("uUseToon", mIsToon);
-    mShader->SetMatrixUniform("uWorldTransform", mOwnerActor->GetWorldTransform());
+    mShader->SetMatrixUniform("uWorldTransform", GetOwner()->GetWorldTransform());
     
     
     // アニメーション行列取得
@@ -77,7 +77,7 @@ void SkeletalMeshComponent::Draw()
     {
         glFrontFace(GL_CW);
         Matrix4 m = Matrix4::CreateScale(mContourFactor);
-        mShader->SetMatrixUniform("uWorldTransform", m * mOwnerActor->GetWorldTransform());
+        mShader->SetMatrixUniform("uWorldTransform", m * GetOwner()->GetWorldTransform());
         for (auto v : va)
         {
             auto mat = mMesh->GetMaterial(v->GetTextureID());
@@ -103,11 +103,11 @@ void SkeletalMeshComponent::DrawShadow()
 {
     if (!mMesh) return;
 
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 light = renderer->GetLightSpaceMatrix();
 
     mShadowShader->SetActive();
-    mShadowShader->SetMatrixUniform("uWorldTransform", mOwnerActor->GetWorldTransform());
+    mShadowShader->SetMatrixUniform("uWorldTransform", GetOwner()->GetWorldTransform());
 
     static std::vector<Matrix4> gEmptyMatrixList;
     std::vector<Matrix4> transforms =

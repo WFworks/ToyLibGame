@@ -66,7 +66,7 @@ void OrbitCameraComponent::Update(float deltaTime)
     mUpVector = Vector3::Transform(mUpVector, pitch);
 
     // Ownerを向くビューマトリックスを生成
-    Vector3 target = mOwnerActor->GetPosition() + Vector3(0, 1, 0);
+    Vector3 target = GetOwner()->GetPosition() + Vector3(0, 1, 0);
     Vector3 cameraPos = target + mOffset;
     
     

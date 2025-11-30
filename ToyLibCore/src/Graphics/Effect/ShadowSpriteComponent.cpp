@@ -16,7 +16,7 @@ ShadowSpriteComponent::ShadowSpriteComponent(Actor* owner, int drawOrder)
     , mScaleHeight(1.0f)
 {
     mLayer = VisualLayer::Effect3D; // 足元に描く
-    mShader = mOwnerActor->GetApp()->GetRenderer()->GetShader("Sprite");
+    mShader = GetOwner()->GetApp()->GetRenderer()->GetShader("Sprite");
     
     mTexture = std::make_shared<Texture>();
     mTexture->CreateAlphaCircle(256, 0.5f, 0.3f, Vector3(0.f, 0.f, 0.f), 0.8f);
@@ -50,7 +50,7 @@ void ShadowSpriteComponent::Draw()
     Matrix4 scale = Matrix4::CreateScale(width * mOffsetScale, height * mOffsetScale*3, 1.0f);
 
     // 光の方向から回転角を計算（XZ平面）
-    Vector3 lightDir = mOwnerActor->GetApp()->GetRenderer()->GetLightingManager()->GetLightDirection();
+    Vector3 lightDir = GetOwner()->GetApp()->GetRenderer()->GetLightingManager()->GetLightDirection();
     lightDir.y = 0.0f;
     if (lightDir.LengthSq() < 0.0001f) lightDir = Vector3(0, 0, 1);
     lightDir.Normalize();
@@ -58,11 +58,11 @@ void ShadowSpriteComponent::Draw()
     Matrix4 rotY = Matrix4::CreateRotationY(angle);
 
     Matrix4 rotX = Matrix4::CreateRotationX(Math::ToRadians(90.0f));
-    Matrix4 trans = Matrix4::CreateTranslation(mOwnerActor->GetPosition() + mOffsetPosition);
+    Matrix4 trans = Matrix4::CreateTranslation(GetOwner()->GetPosition() + mOffsetPosition);
     Matrix4 world = scale * rotX * rotY * trans;
 
     mShader->SetActive();
-    auto renderer = mOwnerActor->GetApp()->GetRenderer();
+    auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
     mShader->SetMatrixUniform("uViewProj", view * proj);

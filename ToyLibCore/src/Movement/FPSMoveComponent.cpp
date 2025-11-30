@@ -50,14 +50,14 @@ void FPSMoveComponent::Update(float deltaTime)
     {
         float angle = Math::ToRadians(mAngularSpeed * deltaTime);
         Quaternion inc(Vector3::UnitY, angle);
-        Quaternion rot = Quaternion::Concatenate(mOwnerActor->GetRotation(), inc);
-        mOwnerActor->SetRotation(rot);
+        Quaternion rot = Quaternion::Concatenate(GetOwner()->GetRotation(), inc);
+        GetOwner()->SetRotation(rot);
     }
 
     // 前進・後退（RayCCD付き）
     if (!Math::NearZero(mForwardSpeed))
     {
-        Vector3 moveDir = mOwnerActor->GetForward();
+        Vector3 moveDir = GetOwner()->GetForward();
         moveDir.y = 0.0f;
         if (moveDir.LengthSq() > Math::NearZeroEpsilon)
         {

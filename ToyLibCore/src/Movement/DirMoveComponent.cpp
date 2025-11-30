@@ -24,8 +24,8 @@ void DirMoveComponent::Update(float deltaTime)
     //Vector3 pos = mOwnerActor->GetPosition();
 
     // カメラ基準の移動方向を計算
-    Vector3 forward = mOwnerActor->GetApp()->GetRenderer()->GetInvViewMatrix().GetZAxis();
-    Vector3 right = mOwnerActor->GetApp()->GetRenderer()->GetInvViewMatrix().GetXAxis();
+    Vector3 forward = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix().GetZAxis();
+    Vector3 right = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix().GetXAxis();
 
     forward.y = 0.0f;
     right.y = 0.0f;
@@ -42,7 +42,7 @@ void DirMoveComponent::Update(float deltaTime)
     }
 
     AdjustDir();
-    mPrevPosition = mOwnerActor->GetPosition();
+    mPrevPosition = GetOwner()->GetPosition();
 }
 
 void DirMoveComponent::ProcessInput(const struct InputState& state)
@@ -74,16 +74,16 @@ void DirMoveComponent::ProcessInput(const struct InputState& state)
 
 void DirMoveComponent::AdjustDir()
 {
-    Vector3 moveVal = mOwnerActor->GetPosition() - mPrevPosition;
+    Vector3 moveVal = GetOwner()->GetPosition() - mPrevPosition;
     moveVal.y = 0.f;
     if (moveVal.LengthSq() > 0.01f)
     {
         float rot = Math::Atan2(moveVal.x, moveVal.z);
         Quaternion targetRot = Quaternion(Vector3::UnitY, rot);
-        Quaternion currentRot = mOwnerActor->GetRotation();
+        Quaternion currentRot = GetOwner()->GetRotation();
 
         // 球面線形補間（スムーズな回転）
         Quaternion smoothRot = Quaternion::Slerp(currentRot, targetRot, 0.1f); // 0.1fは回転の追従速度
-        mOwnerActor->SetRotation(smoothRot);
+        GetOwner()->SetRotation(smoothRot);
     }
 }

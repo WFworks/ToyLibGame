@@ -10,7 +10,7 @@ LaserColliderComponent::LaserColliderComponent(Actor* a)
 
 Ray LaserColliderComponent::GetRay() const
 {
-    Vector3 start = mOwnerActor->GetPosition();
-    Vector3 dir = mOwnerActor->GetForward(); // 進行方向に伸びる
+    Vector3 start = GetOwner()->GetPosition();
+    Vector3 dir = GetOwner()->GetForward(); // 進行方向に伸びる
     return Ray(start, dir);
 }

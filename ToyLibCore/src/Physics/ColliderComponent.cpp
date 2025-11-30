@@ -14,13 +14,13 @@ ColliderComponent::ColliderComponent(Actor* a)
 , mIsDisp(true)
 //, targetType(C_NONE)
 {
-    mBoundingVolume = mOwnerActor->CreateComponent<BoundingVolumeComponent>();
-    mOwnerActor->GetApp()->GetPhysWorld()->AddCollider(this);
+    mBoundingVolume = GetOwner()->CreateComponent<BoundingVolumeComponent>();
+    GetOwner()->GetApp()->GetPhysWorld()->AddCollider(this);
 }
 
 ColliderComponent::~ColliderComponent()
 {
-    mOwnerActor->GetApp()->GetPhysWorld()->RemoveCollider(this);
+    GetOwner()->GetApp()->GetPhysWorld()->RemoveCollider(this);
 }
 
 void ColliderComponent::Update(float deltaTime)
