@@ -34,8 +34,8 @@
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			buildPhase = 7EDCE89C2ED72F7F0069EE3D /* Sources */;
 			membershipExceptions = (
-				include/StringUtil.h,
-				include/TextSpriteComponent.h,
+				include/Graphics/Sprite/TextSpriteComponent.h,
+				include/Utils/StringUtil.h,
 			);
 		};
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
@@ -52,8 +52,8 @@
 				7EDC06E02EDB86B60069EE3D /* Exceptions for "ToyLibCore" folder in "Compile Sources" phase from "ToyLibGame" target */,
 			);
 			explicitFileTypes = {
-				include/StringUtil.h = sourcecode.c.h;
-				include/TextSpriteComponent.h = sourcecode.c.h;
+				include/Graphics/Sprite/TextSpriteComponent.h = sourcecode.c.h;
+				include/Utils/StringUtil.h = sourcecode.c.h;
 			};
 			path = ToyLibCore;
 			sourceTree = "<group>";

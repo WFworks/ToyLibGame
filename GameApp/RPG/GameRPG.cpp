@@ -1,5 +1,5 @@
 #include "GameRPG.h"
-#include "ApplicationEntry.h"
+#include "Engine/Core/ApplicationEntry.h"
 #include "HeroActor.h"
 
 // ToyLibの起動Applicationとして登録
@@ -230,6 +230,7 @@ void GameRPG::LoadData()
     mWeather->SetWeatherDome(dome);
     mWeather->SetWeatherOverlay(overlay);
     skyActor->SetPosition(Vector3(0.f, -0.f, 0.f));
+    mWeather->ChangeWeather(WeatherType::CLEAR);
     
     
     // BGM
@@ -256,7 +257,6 @@ void GameRPG::UpdateGame(float deltaTime)
     mWeather->Update(deltaTime);
     auto h = GetTimeOfDaySystem()->GetHour();
     auto m = GetTimeOfDaySystem()->GetMinute();
-    auto s = GetTimeOfDaySystem()->GetSccond();
     mTextComp->SetFormat("<< : <<", h, m);
 }
 

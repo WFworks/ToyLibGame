@@ -135,6 +135,7 @@ elseif(APPLE)
     find_package(SDL2 REQUIRED HINTS /opt/homebrew/opt/sdl2)
     find_package(SDL2_image REQUIRED HINTS /opt/homebrew/opt/sdl2_image)
     find_package(SDL2_mixer REQUIRED HINTS /opt/homebrew/opt/sdl2_mixer)
+    find_package(SDL2_ttf REQUIRED HINTS /opt/homebrew/opt/sdl2_ttf)
     find_package(GLEW REQUIRED HINTS /opt/homebrew/opt/glew)
     find_package(ASSIMP REQUIRED HINTS /opt/homebrew/opt/assimp)
 
@@ -152,6 +153,7 @@ elseif(APPLE)
         SDL2::SDL2
         SDL2_image::SDL2_image
         SDL2_mixer::SDL2_mixer
+        SDL2_ttf::SDL2_ttf
         GLEW::GLEW
         assimp::assimp
         "-framework Cocoa"
