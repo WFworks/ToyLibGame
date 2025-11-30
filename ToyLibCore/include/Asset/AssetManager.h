@@ -21,11 +21,11 @@ public:
     // フォント
     std::shared_ptr<class TextFont> GetFont(const std::string& fileName, int pointSize);
     
-    std::string GetAssetsPath() const { return mAssetsPath; };
+    std::string GetAssetsPath() const { return mAssetsPath; }
     
     void UnloadData();
     
-    void SetAssetsPath(const std::string &path) { mAssetsPath = path; };
+    void SetAssetsPath(const std::string &path) { mAssetsPath = path; }
 private:
     std::unordered_map<std::string, std::shared_ptr<class Texture>> mTextures;
     std::unordered_map<std::string, std::shared_ptr<class Mesh>> mMeshes;

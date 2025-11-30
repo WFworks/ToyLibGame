@@ -429,15 +429,19 @@ bool Mesh::Load(const std::string& fileName, AssetManager* assetMamager, bool is
                                      aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices |
                                      aiProcess_OptimizeMeshes;
 
-    if (isRightHanded) {
+    if (isRightHanded)
+    {
         ASSIMP_LOAD_FLAGS |= aiProcess_FlipWindingOrder;
-    } else {
+    }
+    else
+    {
         ASSIMP_LOAD_FLAGS |= aiProcess_MakeLeftHanded;
     }
 
     std::string fullName = assetMamager->GetAssetsPath() + fileName;
     mScene = mImporter.ReadFile(fullName, ASSIMP_LOAD_FLAGS);
-    if (!mScene) {
+    if (!mScene)
+    {
         std::cerr << "Assimp Load Error: " << mImporter.GetErrorString() << std::endl;
         return false;
     }
@@ -455,7 +459,8 @@ bool Mesh::Load(const std::string& fileName, AssetManager* assetMamager, bool is
 
 void Mesh::LoadMeshData()
 {
-    for (int cnt = 0; cnt < mScene->mNumMeshes; cnt++) {
+    for (int cnt = 0; cnt < mScene->mNumMeshes; cnt++)
+    {
         aiMesh* m = mScene->mMeshes[cnt];
         if (m->HasBones()) {
             CreateMeshBone(m);
@@ -467,28 +472,40 @@ void Mesh::LoadMeshData()
 
 void Mesh::LoadMaterials(AssetManager* assetMamager)
 {
-    for (unsigned int cnt = 0; cnt < mScene->mNumMaterials; cnt++) {
+    for (unsigned int cnt = 0; cnt < mScene->mNumMaterials; cnt++)
+    {
         aiMaterial* pMaterial = mScene->mMaterials[cnt];
         std::shared_ptr<Material> mat = std::make_shared<Material>();
 
         aiColor3D color(0.f, 0.f, 0.f);
         if (AI_SUCCESS == pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color))
+        {
             mat->SetAmbientColor(Vector3(color.r, color.g, color.b));
+        }
         if (AI_SUCCESS == pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color))
+        {
             mat->SetDiffuseColor(Vector3(color.r, color.g, color.b));
+        }
         if (AI_SUCCESS == pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color))
+        {
             mat->SetSpecularColor(Vector3(color.r, color.g, color.b));
+        }
 
         float shininess = 32.0f;
         if (AI_SUCCESS == pMaterial->Get(AI_MATKEY_SHININESS, shininess))
+        {
             mat->SetSpecPower(shininess);
+        }
 
         aiString path;
-        if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
+        if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS)
+        {
             std::string texPath = path.C_Str();
-            if (texPath[0] == '*') {
+            if (texPath[0] == '*')
+            {
                 int index = std::atoi(texPath.c_str() + 1);
-                if (index >= 0 && index < (int)mScene->mNumTextures) {
+                if (index >= 0 && index < (int)mScene->mNumTextures)
+                {
                     aiTexture* aiTex = mScene->mTextures[index];
                     std::string key = "_EMBED_" + std::to_string(index);
 
@@ -498,9 +515,14 @@ void Mesh::LoadMaterials(AssetManager* assetMamager)
                         : aiTex->mWidth * aiTex->mHeight * 4;
 
                     auto tex = assetMamager->GetEmbeddedTexture(key, imageData, imageSize);
-                    if (tex) mat->SetDiffuseMap(tex);
+                    if (tex)
+                    {
+                        mat->SetDiffuseMap(tex);
+                    }
                 }
-            } else {
+            }
+            else
+            {
                 std::string textureFile = texPath;
                 auto tex = assetMamager->GetTexture(textureFile);
                 if (tex) mat->SetDiffuseMap(tex);

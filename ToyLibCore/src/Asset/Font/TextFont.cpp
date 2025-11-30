@@ -3,6 +3,9 @@
 #include <iostream>
 
 TextFont::TextFont()
+: mFont(nullptr)
+, mFilePath("")
+, mPointSize(0)
 {
 }
 

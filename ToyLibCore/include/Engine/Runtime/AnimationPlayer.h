@@ -24,7 +24,7 @@ public:
     void SetPlayRate(float rate) { mPlayRate = rate; }
     void Pause(bool paused) { mIsPaused = paused; }
 
-    const std::vector<Matrix4>& GetFinalMatrices() const { return mFinalMatrices; };
+    const std::vector<Matrix4>& GetFinalMatrices() const { return mFinalMatrices; }
     
     void PlayOnce(int animID, int nextAnimID);
     void PlayBlend(int fromAnimID, int toAnimID, float duration);

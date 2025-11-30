@@ -27,16 +27,16 @@ void TimeOfDaySystem::Update(float deltaTime)
     while (mTime.second >= 60.0f)
     {
         mTime.second -= 60.0f;
-        ++mTime.minute;
+        mTime.minute++;
     }
     while (mTime.minute >= 60)
     {
         mTime.minute -= 60;
-        ++mTime.hour;
+        mTime.hour++;
     }
     while (mTime.hour >= 24)
     {
         mTime.hour -= 24;
-        ++mTime.day;
+        mTime.day++;
     }
 }

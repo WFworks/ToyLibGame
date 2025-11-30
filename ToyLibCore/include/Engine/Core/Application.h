@@ -52,9 +52,9 @@ public:
     
     
 protected:
-    virtual void UpdateGame(float deltaTime) { };
-    virtual void InitGame() {};
-    virtual void ShutdownGame() {};
+    virtual void UpdateGame(float deltaTime) { }
+    virtual void InitGame() {}
+    virtual void ShutdownGame() {}
     
     // WindowsのIME制御
     void SetIMEEnabled(bool enabled);

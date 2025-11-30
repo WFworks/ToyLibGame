@@ -111,7 +111,8 @@ void Application::Shutdown()
 }
 
 // 入力受付
-void Application::ProcessInput(){
+void Application::ProcessInput()
+{
     
     // 前の状態を保存
     mInputSys->PrepareForUpdate();

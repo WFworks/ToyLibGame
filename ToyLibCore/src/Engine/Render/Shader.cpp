@@ -18,8 +18,8 @@ Shader::~Shader()
 }
 
 // シェーダー読み込み
-bool Shader::Load(const std::string& vertName, const std::string& fragName){
-    
+bool Shader::Load(const std::string& vertName, const std::string& fragName)
+{    
     // シェーダー コンパイル
     if (!CompileShader(vertName, GL_VERTEX_SHADER, mVertexShaderID))
     {
