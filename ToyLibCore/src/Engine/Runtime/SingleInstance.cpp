@@ -15,7 +15,7 @@ SingleInstance::SingleInstance()
 : mIsLocked(false)
 {
 #ifdef _WIN32
-    mMutex = CreateMutexA(NULL, FALSE, "Global\ToyLib_Sample_SingleInstance_Mutex");
+    mMutex = CreateMutexA(NULL, FALSE, "Global:ToyLib_Sample_SingleInstance_Mutex");
     if (mMutex == NULL)
     {
         std::cerr << "CreateMutex failed: " << GetLastError() << std::endl;
