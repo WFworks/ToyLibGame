@@ -2,10 +2,12 @@
 #include "Engine/Core/Actor.h"
 #include "Physics/ColliderComponent.h"
 #include "Engine/Runtime/InputSystem.h"
+#include "Physics/PhysWorld.h"
+#include "Engine/Core/Application.h"
 
 OrbitCameraComponent::OrbitCameraComponent(Actor* actor)
 : CameraComponent(actor)
-, mOffset(-0.0f, 4.0f, -15.0f)
+, mOffset(-0.0f, 4.0f, -5.0f)
 , mUpVector(Vector3::UnitY)
 , mPitchSpeed(0.0f)
 , mYawSpeed(0.0f)
@@ -44,59 +46,66 @@ void OrbitCameraComponent::ProcessInput( const struct InputState& state )
 
 void OrbitCameraComponent::Update(float deltaTime)
 {
-    
     CameraComponent::Update(deltaTime);
-    // ヨー回転のクォータニオン
+
+    // --- いつもの回転処理 ---
     Quaternion yaw(Vector3::UnitY, mYawSpeed * deltaTime);
-    // オフセットを計算
-    mOffset = Vector3::Transform(mOffset, yaw);
+    mOffset   = Vector3::Transform(mOffset, yaw);
     mUpVector = Vector3::Transform(mUpVector, yaw);
 
-    // カメラのforwardとrightを計算
-    // Forward owner.position - (owner.position + offset) = -offset
     Vector3 forward = -1.0f * mOffset;
     forward.Normalize();
     Vector3 right = Vector3::Cross(mUpVector, forward);
     right.Normalize();
 
-    // ピッチ回転のクォータニオン
     Quaternion pitch(right, mPitchSpeed * deltaTime);
-    // オフセットを計算
-    mOffset = Vector3::Transform(mOffset, pitch);
+    mOffset   = Vector3::Transform(mOffset, pitch);
     mUpVector = Vector3::Transform(mUpVector, pitch);
 
-    // Ownerを向くビューマトリックスを生成
-    Vector3 target = GetOwner()->GetPosition() + Vector3(0, 1, 0);
-    Vector3 cameraPos = target + mOffset;
-    
-    
+    // 高さの手動調整
     mOffset.y += mChangeOffset;
-    /*// 縦移動の範囲を絞る
-    if(cameraPos.y < 0)
+
+    Vector3 target    = GetOwner()->GetPosition() + Vector3(0.0f, 1.0f, 0.0f);
+    Vector3 cameraPos = target + mOffset;
+
+    //========================
+    // 地面との当たり補正
+    //========================
+    Application* app = GetOwner()->GetApp();
+    if (app)
     {
-        cameraPos.y = 0;
-        if( mChangeOffset < 0.0f)
-        {
-            mOffset.y -= mChangeOffset;
-        }
+        PhysWorld* phys = app->GetPhysWorld();
         
-    }
-    // 縦移動の範囲を絞る
-    if(cameraPos.y > mOwnerActor->GetPosition().y + 10)
-    {
-        cameraPos.y = mOwnerActor->GetPosition().y + 10;
-        if( mChangeOffset > 0.0f)
-        {
-            mOffset.y -= mChangeOffset;
-        }
+        // まずカメラActorの仮の位置を更新しておく
+        mCameraActor->SetPosition(cameraPos);
         
+        float groundY = phys->GetGroundHeightAt(mCameraActor->GetPosition());
+        if (groundY != -FLT_MAX)
+        {
+            const float margin = 0.5f; // 地面から少しだけ浮かせる
+            float minY = groundY + margin;
+            
+            if (cameraPos.y < minY)
+            {
+                cameraPos.y = minY;
+                
+                // ユーザー入力による縦移動をちょっと打ち消しておくならここ
+                if (mChangeOffset < 0.0f)
+                {
+                    mOffset.y -= mChangeOffset;
+                }
+            }
+        }
     }
-*/
+
+    //========================
+
     mCameraPosition = cameraPos;
-     
 
     Matrix4 view = Matrix4::CreateLookAt(cameraPos, target, mUpVector);
     SetViewMatrix(view);
-    
+
+    // 最終的な位置をActorにも反映
     mCameraActor->SetPosition(cameraPos);
+   
 }
