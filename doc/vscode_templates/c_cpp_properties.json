@@ -4,6 +4,7 @@
       "name": "Windows",
       "includePath": [
         "${workspaceFolder}/ToyLibCore/include",
+        "${workspaceFolder}/ToyLibCore/include/**",
         "${workspaceFolder}/GameApp",
         "C:/tools/vcpkg/installed/x64-windows/include",
         "${workspaceFolder}/**"
@@ -16,10 +17,10 @@
     {
       "name": "macOS",
       "includePath": [
-        "${workspaceFolder}/ToyLibCore/include",
-        "${workspaceFolder}/GameApp",
+        "${workspaceFolder}/ToyLibCore/include/**",
+        "${workspaceFolder}/GameApp/**",
         "/usr/local/include",
-        "${workspaceFolder}/**"
+        "/opt/homebrew/include"
       ],
       "compilerPath": "/usr/bin/clang++",
       "cStandard": "c17",
@@ -30,6 +31,7 @@
       "name": "Linux",
       "includePath": [
         "${workspaceFolder}/ToyLibCore/include",
+        "${workspaceFolder}/ToyLibCore/include/**",
         "${workspaceFolder}/GameApp",
         "/usr/include",
         "${workspaceFolder}/**"
