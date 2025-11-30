@@ -291,7 +291,10 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				HEADER_SEARCH_PATHS = /opt/homebrew/include;
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					"$(SRCROOT)/ToyLibCore/include",
+				);
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
 				OTHER_LDFLAGS = (
 					"-lSDL2",
@@ -313,7 +316,10 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				HEADER_SEARCH_PATHS = /opt/homebrew/include;
+				HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					"$(SRCROOT)/ToyLibCore/include",
+				);
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
 				OTHER_LDFLAGS = (
 					"-lSDL2",
