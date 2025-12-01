@@ -1,116 +1,187 @@
 #include "Camera/OrbitCameraComponent.h"
 #include "Engine/Core/Actor.h"
-#include "Physics/ColliderComponent.h"
 #include "Engine/Runtime/InputSystem.h"
-#include "Physics/PhysWorld.h"
 #include "Engine/Core/Application.h"
+#include "Physics/PhysWorld.h"
 
-OrbitCameraComponent::OrbitCameraComponent(Actor* actor)
-: CameraComponent(actor)
-, mOffset(-0.0f, 4.0f, -5.0f)
-, mUpVector(Vector3::UnitY)
-, mPitchSpeed(0.0f)
-, mYawSpeed(0.0f)
+#include <cmath>
+#include <cfloat>
+
+OrbitCameraComponent::OrbitCameraComponent(Actor* owner)
+    : CameraComponent(owner)
+    , mOffset(0.0f, 4.0f, -5.0f)   // ちょっと上＋後ろ
+    , mUpVector(Vector3::UnitY)
+    , mYawSpeed(0.0f)
+    , mDistance(0.0f)
+    , mTargetDistance(0.0f)
+    , mMinDistance(5.0f)
+    , mMaxDistance(30.0f)
+    , mMinOffsetY(-2.0f)
+    , mMaxOffsetY(8.0f)
+    , mHeightInput(0.0f)
 {
-    
+    mDistance       = mOffset.Length();
+    if (mDistance < mMinDistance) mDistance = mMinDistance;
+    if (mDistance > mMaxDistance) mDistance = mMaxDistance;
+    mTargetDistance = mDistance;
+
+    if (mOffset.y < mMinOffsetY) mOffset.y = mMinOffsetY;
+    if (mOffset.y > mMaxOffsetY) mOffset.y = mMaxOffsetY;
 }
 
-void OrbitCameraComponent::ProcessInput( const struct InputState& state )
+void OrbitCameraComponent::ProcessInput(const InputState& state)
 {
-    float angularSpeed = 2.0f;
-    
-    SetYawSpeed( angularSpeed * state.Controller.GetRightStick().x );
-    ChangeHeight( angularSpeed * state.Controller.GetRightStick().y );
+    // 時間はここでは使わない（Updateで掛ける）
 
+    const float yawSpeedBase = Math::ToRadians(120.0f);
 
-    // キーボード（カメラ）
+    float yawInput    = 0.0f;
+    float heightInput = 0.0f;   // 上を +1 とする
+
+    // 右スティック
+    //const Vector2 rs = state.Controller.GetRightStick();
+    //yawInput   += rs.x;
+    //heightInput += -rs.y;   // 上を + にしたいので反転
+
+    // キーボード
     if (state.IsButtonDown(GameButton::KeyD))
     {
-        SetYawSpeed( -angularSpeed );
+        yawInput += 1.0f;
     }
     if (state.IsButtonDown(GameButton::KeyA))
     {
-        SetYawSpeed( angularSpeed );
-    }
-    if (state.IsButtonDown(GameButton::KeyW))
-    {
-        ChangeHeight(-0.2);
+        yawInput -= 1.0f;
     }
     if (state.IsButtonDown(GameButton::KeyS))
     {
-        ChangeHeight(0.2);
+        heightInput += 1.0f;   // 上
     }
-    
+    if (state.IsButtonDown(GameButton::KeyW))
+    {
+        heightInput -= 1.0f;   // 下
+    }
 
+    // 実際の角速度に変換
+    mYawSpeed    = yawInput * yawSpeedBase;
+    mHeightInput = heightInput;
 }
 
 void OrbitCameraComponent::Update(float deltaTime)
 {
     CameraComponent::Update(deltaTime);
 
-    // --- いつもの回転処理 ---
-    Quaternion yaw(Vector3::UnitY, mYawSpeed * deltaTime);
-    mOffset   = Vector3::Transform(mOffset, yaw);
-    mUpVector = Vector3::Transform(mUpVector, yaw);
+    //----------------------
+    // 1. ヨー回転（水平公転）
+    //----------------------
+    Quaternion yawRot(Vector3::UnitY, mYawSpeed * deltaTime);
+    mOffset   = Vector3::Transform(mOffset, yawRot);
+    mUpVector = Vector3::Transform(mUpVector, yawRot);
 
-    Vector3 forward = -1.0f * mOffset;
-    forward.Normalize();
-    Vector3 right = Vector3::Cross(mUpVector, forward);
-    right.Normalize();
+    //----------------------
+    // 2. 高さの更新（距離は高さから決める）
+    //----------------------
+    const float heightSpeed = 7.0f;  // 高さの速さ（調整ポイント）
 
-    Quaternion pitch(right, mPitchSpeed * deltaTime);
-    mOffset   = Vector3::Transform(mOffset, pitch);
-    mUpVector = Vector3::Transform(mUpVector, pitch);
+    if (std::fabs(mHeightInput) > 1e-4f)
+    {
+        // 高さを直接オフセットYに反映
+        mOffset.y += mHeightInput * heightSpeed * deltaTime;
 
-    // 高さの手動調整
-    mOffset.y += mChangeOffset;
+        // 高さクランプ
+        if (mOffset.y < mMinOffsetY) mOffset.y = mMinOffsetY;
+        if (mOffset.y > mMaxOffsetY) mOffset.y = mMaxOffsetY;
+    }
 
-    Vector3 target    = GetOwner()->GetPosition() + Vector3(0.0f, 2.5f, 0.0f);
+    // 次フレームのために入力をリセット
+    mHeightInput = 0.0f;
+
+    // ここで「高さから距離を決定」する
+    //   低い（mMinOffsetY） → 近い（mMinDistance）
+    //   高い（mMaxOffsetY） → 遠い（mMaxDistance）
+    float t = (mOffset.y - mMinOffsetY) / (mMaxOffsetY - mMinOffsetY);
+    if (t < 0.0f) t = 0.0f;
+    if (t > 1.0f) t = 1.0f;
+
+    float nearDist = mMinDistance;
+    float farDist  = mMaxDistance;
+    mTargetDistance = nearDist + (farDist - nearDist) * t;
+
+    //----------------------
+    // 3. 距離をターゲットに寄せる
+    //----------------------
+    const float zoomLerpSpeed = 10.0f; // 追従の速さ（大きいほどキビキビ）
+    mDistance += (mTargetDistance - mDistance) * zoomLerpSpeed * deltaTime;
+
+    if (mDistance < mMinDistance) mDistance = mMinDistance;
+    if (mDistance > mMaxDistance) mDistance = mMaxDistance;
+
+    // オフセット方向を正規化し、距離を反映
+    Vector3 dir = mOffset;
+    dir.Normalize();
+    mOffset = dir * mDistance;
+
+    //----------------------
+    // 4. カメラ位置決定
+    //----------------------
+    Vector3 target = GetOwner()->GetPosition() + Vector3(0.0f, 2.5f, 0.0f);
     Vector3 cameraPos = target + mOffset;
 
-    //========================
-    // 地面との当たり補正
-    //========================
-    Application* app = GetOwner()->GetApp();
-    if (app)
+    //----------------------
+    // 5. 地面との当たり補正
+    //----------------------
+    if (Application* app = GetOwner()->GetApp())
     {
-        PhysWorld* phys = app->GetPhysWorld();
-        
-        // まずカメラActorの仮の位置を更新しておく
-        mCameraActor->SetPosition(cameraPos);
-        
-        float groundY = phys->GetGroundHeightAt(mCameraActor->GetPosition());
-        if (groundY != -FLT_MAX)
+        if (PhysWorld* phys = app->GetPhysWorld())
         {
-            const float margin = 0.5f; // 地面から少しだけ浮かせる
-            float minY = groundY + margin;
-            
-            if (cameraPos.y < minY)
+            mCameraActor->SetPosition(cameraPos);
+
+            float groundY = phys->GetGroundHeightAt(mCameraActor->GetPosition());
+            if (groundY != -FLT_MAX)
             {
-                cameraPos.y = minY;
-                
-                // ユーザー入力による縦移動をちょっと打ち消しておくならここ
-                if (mChangeOffset < 0.0f)
+                const float margin = 0.1f;
+                float minY = groundY + margin;
+
+                if (cameraPos.y < minY)
                 {
-                    mOffset.y -= mChangeOffset;
+                    cameraPos.y = minY;
                 }
             }
         }
     }
 
-    //========================
-    float maxY = 8.f;
-    if (cameraPos.y > maxY)
-    {
-        cameraPos.y = maxY;
-    }
 
+    //----------------------
+    // 6. 補正された位置から内部状態を同期
+    //----------------------
+    Vector3 toCam = cameraPos - target;
+    mOffset = toCam;
+
+    // 距離再計算
+    mDistance = mOffset.Length();
+    if (mDistance < mMinDistance) mDistance = mMinDistance;
+    if (mDistance > mMaxDistance) mDistance = mMaxDistance;
+
+    // 高さも再クランプ
+    if (mOffset.y < mMinOffsetY) mOffset.y = mMinOffsetY;
+    if (mOffset.y > mMaxOffsetY) mOffset.y = mMaxOffsetY;
+
+    // オフセットを距離付きで再構築
+    Vector3 n = mOffset;
+    n.Normalize();
+    mOffset = n * mDistance;
+    cameraPos = target + mOffset;
+
+    //----------------------
+    // 7. ビュー行列セット
+    //----------------------
     mCameraPosition = cameraPos;
 
-    Matrix4 view = Matrix4::CreateLookAt(cameraPos, target, mUpVector);
+    Matrix4 view = Matrix4::CreateLookAt(
+        cameraPos,
+        target,
+        mUpVector
+    );
     SetViewMatrix(view);
 
-    // 最終的な位置をActorにも反映
     mCameraActor->SetPosition(cameraPos);
-   
 }
