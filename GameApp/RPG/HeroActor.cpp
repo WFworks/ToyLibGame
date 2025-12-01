@@ -52,13 +52,13 @@ HeroActor::HeroActor(Application* a)
 
     // --- 移動コンポーネント ---
     //mMoveComp = CreateComponent<MoveComponent>();
-    mMoveComp = CreateComponent<FPSMoveComponent>();
-    //mMoveComp = CreateComponent<DirMoveComponent>();
+    //mMoveComp = CreateComponent<FPSMoveComponent>();
+    mMoveComp = CreateComponent<DirMoveComponent>();
     
     
     // --- カメラコンポーネント ---
-    //mCameraComp = CreateComponent<OrbitCameraComponent>();
-    mCameraComp = CreateComponent<FollowCameraComponent>();
+    mCameraComp = CreateComponent<OrbitCameraComponent>();
+    //mCameraComp = CreateComponent<FollowCameraComponent>();
     
 
     mGravComp = CreateComponent<GravityComponent>();
@@ -91,17 +91,17 @@ void HeroActor::ActorInput(const InputState& state)
     if (mMovable)
     {
         // 攻撃入力（入力優先度付きで判定）
-        if (state.Keyboard.GetKeyState(SDL_SCANCODE_X) == EPressed)
+        if (state.IsButtonPressed(GameButton::B))
         {
             animPlayer->PlayOnce(H_Slash, H_Stand);
             inputAttack = true;
         }
-        else if (state.Keyboard.GetKeyState(SDL_SCANCODE_C) == EPressed)
+        else if (state.IsButtonPressed(GameButton::X))
         {
             animPlayer->PlayOnce(H_Spin, H_Stand);
             inputAttack = true;
         }
-        else if (state.Keyboard.GetKeyState(SDL_SCANCODE_V) == EPressed)
+        else if (state.IsButtonPressed(GameButton::Y))
         {
             animPlayer->PlayOnce(H_Stab, H_Stand);
             inputAttack = true;
@@ -114,7 +114,7 @@ void HeroActor::ActorInput(const InputState& state)
         else
         {
             // ジャンプ（移動ロックしない）
-            if (state.Keyboard.GetKeyState(SDL_SCANCODE_Z) == EPressed)
+            if (state.IsButtonPressed(GameButton::A))
             {
                 mGravComp->Jump();
                 animPlayer->PlayOnce(H_Jump, H_Stand);

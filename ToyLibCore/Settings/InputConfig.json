@@ -1,25 +1,36 @@
 {
-  "actions": {
-    "Quit": {
-      "keyboard": ["Escape"]
+  "buttons": {
+    "A": {
+      "keyboard": ["Z"],
+      "gamepad": ["A"]
     },
-    "Pause": {
-      "keyboard": ["Space", "P"]
+    "B": {
+      "keyboard": ["X"],
+      "gamepad": ["B"]
     },
-    "MoveForward": {
-      "keyboard": ["W", "Up"]
+    "X": {
+      "keyboard": ["C"],
+      "gamepad": ["X"]
     },
-    "MoveBackward": {
-      "keyboard": ["S", "Down"]
+    "Y": {
+      "keyboard": ["V"],
+      "gamepad": ["Y"]
     },
-    "MoveLeft": {
-      "keyboard": ["A", "Left"]
-    },
-    "MoveRight": {
-      "keyboard": ["D", "Right"]
-    },
-    "Jump": {
-      "keyboard": ["Space"]
-    }
+
+    "L1": { "gamepad": ["LeftShoulder"] },
+    "R1": { "gamepad": ["RightShoulder"] },
+
+    "Start":  { "keyboard": ["Enter"],  "gamepad": ["Start"] },
+    "Select": { "keyboard": ["Escape"], "gamepad": ["Back"] },
+
+    "DPadUp":    { "keyboard": ["Up"],    "gamepad": ["DPadUp"] },
+    "DPadDown":  { "keyboard": ["Down"],  "gamepad": ["DPadDown"] },
+    "DPadLeft":  { "keyboard": ["Left"],  "gamepad": ["DPadLeft"] },
+    "DPadRight": { "keyboard": ["Right"], "gamepad": ["DPadRight"] },
+
+    "KeyW": { "keyboard": ["W"] },
+    "KeyA": { "keyboard": ["A"] },
+    "KeyS": { "keyboard": ["S"] },
+    "KeyD": { "keyboard": ["D"] }
   }
 }

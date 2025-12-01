@@ -53,19 +53,19 @@ void DirMoveComponent::ProcessInput(const struct InputState& state)
 
     mForwardSpeed = mSpeed * state.Controller.GetLeftStick().y;
     mRightSpeed = mSpeed * state.Controller.GetLeftStick().x;
-    if (state.Keyboard.GetKeyState(SDL_SCANCODE_LEFT) == EHeld)
+    if (state.IsButtonDown(GameButton::DPadLeft))
     {
         mRightSpeed = -mSpeed;
     }
-    if (state.Keyboard.GetKeyState(SDL_SCANCODE_RIGHT) == EHeld)
+    if (state.IsButtonDown(GameButton::DPadRight))
     {
         mRightSpeed = mSpeed;
     }
-    if (state.Keyboard.GetKeyState(SDL_SCANCODE_UP) == EHeld)
+    if (state.IsButtonDown(GameButton::DPadUp))
     {
         mForwardSpeed = mSpeed;
     }
-    if (state.Keyboard.GetKeyState(SDL_SCANCODE_DOWN) == EHeld)
+    if (state.IsButtonDown(GameButton::DPadDown))
     {
         mForwardSpeed = -mSpeed;
     }

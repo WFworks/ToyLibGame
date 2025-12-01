@@ -1,4 +1,6 @@
 #include "Utils/JsonHelper.h"
+#include <iostream>
+#include <fstream>
 
 namespace JsonHelper
 {
@@ -119,6 +121,39 @@ namespace JsonHelper
 
             // クォータニオンの結合 (順番が重要)
             out =  Quaternion::Concatenate(qz, Quaternion::Concatenate(qy, qx));
+            return true;
+        }
+        return false;
+    }
+
+    bool LoadFromFile(const std::string& path, nlohmann::json& out)
+    {
+        std::ifstream ifs(path);
+        if (!ifs)
+        {
+            std::cerr << "[JsonHelper] Failed to open json file: " << path << std::endl;
+            return false;
+        }
+
+        try
+        {
+            ifs >> out;
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << "[JsonHelper] JSON parse error in " << path
+                      << ": " << e.what() << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    bool GetObject(const nlohmann::json& obj, const char* key, nlohmann::json& out)
+    {
+        if (obj.contains(key) && obj[key].is_object())
+        {
+            out = obj[key];
             return true;
         }
         return false;

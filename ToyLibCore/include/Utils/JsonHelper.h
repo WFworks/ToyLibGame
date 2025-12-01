@@ -19,4 +19,11 @@ namespace JsonHelper
     bool GetVector2(const nlohmann::json& obj, const char* key, Vector2& out);
     bool GetVector3(const nlohmann::json& obj, const char* key, Vector3& out);
     bool GetQuaternionFromEuler(const nlohmann::json& obj, const char* key, Quaternion& out);
+
+
+    // JSONファイルを開いてパース（完全に汎用）
+    bool LoadFromFile(const std::string& path, nlohmann::json& out);
+
+    // オブジェクト型のサブ要素取得（actions みたいな）
+    bool GetObject(const nlohmann::json& obj, const char* key, nlohmann::json& out);
 }

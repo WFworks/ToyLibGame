@@ -24,19 +24,19 @@ void OrbitCameraComponent::ProcessInput( const struct InputState& state )
 
 
     // キーボード（カメラ）
-    if (state.Keyboard.GetKeyState(SDL_SCANCODE_D) == EHeld)
+    if (state.IsButtonDown(GameButton::KeyD))
     {
         SetYawSpeed( -angularSpeed );
     }
-    if (state.Keyboard.GetKeyState(SDL_SCANCODE_A) == EHeld)
+    if (state.IsButtonDown(GameButton::KeyA))
     {
         SetYawSpeed( angularSpeed );
     }
-    if (state.Keyboard.GetKeyState(SDL_SCANCODE_W) == EHeld)
+    if (state.IsButtonDown(GameButton::KeyW))
     {
         ChangeHeight(-0.2);
     }
-    if (state.Keyboard.GetKeyState(SDL_SCANCODE_S) == EHeld)
+    if (state.IsButtonDown(GameButton::KeyS))
     {
         ChangeHeight(0.2);
     }
@@ -99,6 +99,11 @@ void OrbitCameraComponent::Update(float deltaTime)
     }
 
     //========================
+    float maxY = 8.f;
+    if (cameraPos.y > maxY)
+    {
+        cameraPos.y = maxY;
+    }
 
     mCameraPosition = cameraPos;
 
