@@ -1,0 +1,25 @@
+{
+  "actions": {
+    "Quit": {
+      "keyboard": ["Escape"]
+    },
+    "Pause": {
+      "keyboard": ["Space", "P"]
+    },
+    "MoveForward": {
+      "keyboard": ["W", "Up"]
+    },
+    "MoveBackward": {
+      "keyboard": ["S", "Down"]
+    },
+    "MoveLeft": {
+      "keyboard": ["A", "Left"]
+    },
+    "MoveRight": {
+      "keyboard": ["D", "Right"]
+    },
+    "Jump": {
+      "keyboard": ["Space"]
+    }
+  }
+}

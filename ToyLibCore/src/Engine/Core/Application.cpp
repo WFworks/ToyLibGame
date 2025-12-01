@@ -53,6 +53,7 @@ bool Application::Initialize()
 
     // 入力システム初期化
     mInputSys->Initialize();
+    mInputSys->LoadActionConfig("ToyLibCore/Settings/InputConfig.json");
     
     // データ ロード、主にRendererに登録されるもの。
     LoadData();
@@ -131,7 +132,14 @@ void Application::ProcessInput()
 
     mInputSys->Update();
     const InputState& state = mInputSys->GetState();
-        
+    if (mInputSys->IsActionReleased("Quit"))
+    {
+        mIsActive = false;
+    }
+
+    mIsPause = mInputSys->IsActionDown("Pause");
+    
+    /*
     if (state.Keyboard.GetKeyState(SDL_SCANCODE_ESCAPE) == EReleased)
     {
         mIsActive = false;
@@ -145,7 +153,7 @@ void Application::ProcessInput()
     {
         mIsPause = false;
     }
-    
+    */
     // 配下のActorsに渡す
     for (auto& actor : mActors)
     {

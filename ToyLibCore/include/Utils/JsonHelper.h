@@ -11,6 +11,9 @@ namespace JsonHelper
     bool GetFloat(const nlohmann::json& obj, const char* key, float& out);
     bool GetBool(const nlohmann::json& obj, const char* key, bool& out);
     bool GetString(const nlohmann::json& obj, const char* key, std::string& out);
+    
+    // 文字列配列
+    bool GetStringArray(const nlohmann::json& obj, const char* key, std::vector<std::string>& out);
 
     // 数学型（Vectorなど）
     bool GetVector2(const nlohmann::json& obj, const char* key, Vector2& out);

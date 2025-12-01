@@ -41,6 +41,30 @@ namespace JsonHelper
         }
         return false;
     }
+
+    // 文字列配列
+    bool GetStringArray(const nlohmann::json& obj, const char* key, std::vector<std::string>& out)
+    {
+        if (!obj.contains(key) || !obj[key].is_array())
+        {
+            return false;
+        }
+
+        const auto& arr = obj[key];
+        out.clear();
+        out.reserve(arr.size());
+
+        for (const auto& v : arr)
+        {
+            if (v.is_string())
+            {
+                out.emplace_back(v.get<std::string>());
+            }
+        }
+
+        return !out.empty();
+    }
+
     // Vector2
     bool GetVector2(const nlohmann::json& obj, const char* key, Vector2& out)
     {

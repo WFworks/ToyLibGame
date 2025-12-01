@@ -3,7 +3,10 @@
 #include "Utils/MathUtil.h"
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_gamecontroller.h>
-//#include <SDL2/SDL_mouse.h>
+
+#include <string>
+#include <vector>
+#include <unordered_map>
 
 // ボタンステータスの定義
 enum ButtonState
@@ -14,29 +17,40 @@ enum ButtonState
     EHeld
 };
 
+//======================
+// アクションバインディング
+//======================
+
+struct KeyboardBinding
+{
+    SDL_Scancode Scancode = SDL_SCANCODE_UNKNOWN;
+};
+
+struct ActionBinding
+{
+    std::string Name;                          // "Jump" など
+    std::vector<KeyboardBinding> KeyBindings;  // 複数キー対応
+};
+
 
 // キーボード用
 class KeyboardState
 {
 public:
-    // InputSystemにフレンド
     friend class InputSystem;
-    // boolで応答
     bool GetKeyValue(SDL_Scancode keyCode) const;
-    // ステータスで応答
     ButtonState GetKeyState(SDL_Scancode keyCode) const;
 private:
     const Uint8* mCurrState;
     Uint8 mPrevState[SDL_NUM_SCANCODES];
 };
 
-// コントローラー用
+// コントローラー用（現状そのまま）
 class ControllerState
 {
 public:
     friend class InputSystem;
 
-    // ボタン
     bool GetButtonValue(SDL_GameControllerButton button) const;
     ButtonState GetButtonState(SDL_GameControllerButton button) const;
 
@@ -49,20 +63,15 @@ public:
 private:
     Uint8 mCurrButtons[SDL_CONTROLLER_BUTTON_MAX];
     Uint8 mPrevButtons[SDL_CONTROLLER_BUTTON_MAX];
-    // 左右のスティック
     Vector2 mLeftStick;
     Vector2 mRightStick;
-    // 左右のトリガー
     float mLeftTrigger;
     float mRightTrigger;
-    // 接続されているか
     bool mIsConnected;
 };
 
 
-
 // 入力情報のラッパー
-// マウス、ジョイコントローラーなどもここでラップ
 struct InputState
 {
     KeyboardState Keyboard;
@@ -77,21 +86,31 @@ public:
     bool Initialize();
     void Shutdown();
 
-    // SDL_PollEvents前に呼ぶ、状態を記録
     void PrepareForUpdate();
-    // SDL_PollEventsの後に呼ぶ
     void Update();
     
-    // 状態を返す
     const InputState& GetState() const { return mState; }
 
+    //=======================
+    // 追加したい高レベルAPI
+    //=======================
+
+    // JSONからアクション設定を読み込む
+    bool LoadActionConfig(const std::string& filePath);
+
+    // アクション状態問い合わせ（キーボードのみ）
+    bool IsActionDown(const std::string& actionName) const;     // Held or Pressed
+    bool IsActionPressed(const std::string& actionName) const;  // このフレームで押された
+    bool IsActionReleased(const std::string& actionName) const; // このフレームで離された
+    
+    
 private:
     float Filter1D(int input);
     Vector2 Filter2D(int inputX, int inputY);
+
     SDL_GameController* mController;
     InputState mState;
-    
 
+    // アクション名 → バインディング
+    std::unordered_map<std::string, ActionBinding> mActionBindings;
 };
-
-
