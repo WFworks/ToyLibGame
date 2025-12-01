@@ -4,14 +4,14 @@
   "screen": {
     "width": 1600.0,
     "height": 900.0,
-    "fullscreen": true
+    "fullscreen": false
   },
   "perspectiveFOV": 60.0,
   "camera": {
     "position": [0.0, 0.0, 5.0]
   },
   "debug": {
-    "enabled": true
+    "enabled": false
   },
   "clearColor": [0.2, 0.5, 0.8],
   "ambient": [0.5, 0.5, 0.5],
