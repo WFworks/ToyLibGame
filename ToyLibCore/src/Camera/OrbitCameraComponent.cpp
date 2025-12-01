@@ -65,7 +65,7 @@ void OrbitCameraComponent::Update(float deltaTime)
     // 高さの手動調整
     mOffset.y += mChangeOffset;
 
-    Vector3 target    = GetOwner()->GetPosition() + Vector3(0.0f, 1.0f, 0.0f);
+    Vector3 target    = GetOwner()->GetPosition() + Vector3(0.0f, 2.5f, 0.0f);
     Vector3 cameraPos = target + mOffset;
 
     //========================
