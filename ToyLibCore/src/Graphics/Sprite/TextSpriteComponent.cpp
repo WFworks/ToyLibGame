@@ -15,7 +15,7 @@ TextSpriteComponent::TextSpriteComponent(Actor* owner, int drawOrder, VisualLaye
 
 TextSpriteComponent::~TextSpriteComponent()
 {
-    // mTexture は SpriteComponent / VisualComponent 側で shared_ptr 管理なので特に何もしなくてOK
+
 }
 
 void TextSpriteComponent::SetText(const std::string& text)

@@ -17,7 +17,7 @@ std::unique_ptr<VertexArray> CreateSkyDomeVAO(int slices, int stacks, float radi
     for (int y = 0; y <= stacks; y++)
     {
         float v   = static_cast<float>(y) / stacks;
-        float phi = v * Math::Pi;        // ★ 0〜π に変更：フルスフィア
+        float phi = v * Math::Pi;        // フルスフィア
 
         for (int x = 0; x <= slices; x++)
         {

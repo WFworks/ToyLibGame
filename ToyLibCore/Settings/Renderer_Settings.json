@@ -4,7 +4,7 @@
   "screen": {
     "width": 1600.0,
     "height": 900.0,
-    "fullscreen": false
+    "fullscreen": true
   },
   "perspectiveFOV": 60.0,
   "camera": {

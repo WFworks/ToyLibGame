@@ -497,17 +497,21 @@ bool PhysWorld::IntersectRayOBB(const Ray& ray, const OBB* obb, float& outT) con
             float t1 = (e + r) / f;
             float t2 = (e - r) / f;
             if (t1 > t2) std::swap(t1, t2);
-
+            
             tMin = std::max(tMin, t1);
             tMax = std::min(tMax, t2);
-
+            
             if (tMin > tMax)
+            {
                 return false;
+            }
         }
         else
         {
             if (-e - r > 0.0f || -e + r < 0.0f)
+            {
                 return false;
+            }
         }
     }
 

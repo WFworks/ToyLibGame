@@ -205,11 +205,13 @@ void Application::UpdateFrame()
     }
     mTicksCount = SDL_GetTicks();
     
-    mTimeOfDaySys->Update(deltaTime);
 
     // ポーズ中以降の処理キャンセル
     if(mIsPause) return;
     
+    // 時間を進める
+    mTimeOfDaySys->Update(deltaTime);
+
     // 派生先のUpdateを呼ぶ
     UpdateGame(deltaTime);
     

@@ -12,7 +12,7 @@ GameRPG::GameRPG()
     SetIMEEnabled(false);
     SetAssetsPath("GameApp/Assets/RPG/");
     
-    GetTimeOfDaySystem()->SetTimeScale(6000.f);
+    GetTimeOfDaySystem()->SetTimeScale(600.f);
     //GetTimeOfDaySystem()->SetTimeScale(0.f);
     //GetTimeOfDaySystem()->SetTime(0);
 }
