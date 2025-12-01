@@ -179,7 +179,7 @@ void Renderer::DrawVisualLayer(VisualLayer layer)
     }
     
     
-    for (auto comp : mVisualComps)
+    for (auto& comp : mVisualComps)
     {
         if (comp->IsVisible() && comp->GetLayer() == layer)
         {

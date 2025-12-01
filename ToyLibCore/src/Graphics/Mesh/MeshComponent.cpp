@@ -75,7 +75,7 @@ void MeshComponent::Draw()
 
     // Vertex Array
     auto va = mMesh->GetVertexArray();
-    for (auto v : va)
+    for (auto& v : va)
     {
         auto mat = mMesh->GetMaterial(v->GetTextureID());
         if (mat)
@@ -92,7 +92,7 @@ void MeshComponent::Draw()
         glFrontFace(GL_CW);
         Matrix4 m = Matrix4::CreateScale(mContourFactor);
         mShader->SetMatrixUniform("uWorldTransform", m * GetOwner()->GetWorldTransform());
-        for (auto v : va)
+        for (auto& v : va)
         {
             auto mat = mMesh->GetMaterial(v->GetTextureID());
             if (mat)
@@ -135,7 +135,7 @@ void MeshComponent::DrawShadow()
     
     // Vertex Arrayを描画
     auto va = mMesh->GetVertexArray();
-    for (auto v : va)
+    for (auto& v : va)
     {
         v->SetActive();
         glDrawElements(GL_TRIANGLES, v->GetNumIndices(), GL_UNSIGNED_INT, nullptr);

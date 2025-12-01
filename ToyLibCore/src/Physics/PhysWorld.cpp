@@ -22,7 +22,7 @@ PhysWorld::~PhysWorld()
 void PhysWorld::Test()
 {
     
-    for (auto c : mColliders)
+    for (auto& c : mColliders)
     {
         c->ClearCollidBuffer();
     }
@@ -31,14 +31,14 @@ void PhysWorld::Test()
     CollideAndCallback(C_PLAYER, C_BULLET);                      // ヒットのみ
     CollideAndCallback(C_ENEMY, C_WALL, true, false);           // 敵の壁押し戻し
     // Laser vs Enemy（Ray vs Mesh）
-    for (auto c1 : mColliders)
+    for (auto& c1 : mColliders)
     {
         if (!c1->HasFlag(C_LASER)) continue;
         if (!c1->GetDisp()) continue;
 
         Ray ray = c1->GetRay();  // Laserが保持するRay（要実装）
 
-        for (auto c2 : mColliders)
+        for (auto& c2 : mColliders)
         {
             if (c1 == c2) continue;
             if (!c2->HasFlag(C_ENEMY)) continue;
@@ -355,7 +355,7 @@ bool PhysWorld::GetNearestGroundY(const Actor* a, float& outY) const
     float footY = box.min.y;
 
     // C_GROUND コライダーから、一番高い地面を探す
-    for (auto c : mColliders)
+    for (auto& c : mColliders)
     {
         if (!c->HasFlag(C_GROUND)) continue;
         if (c->GetOwner() == a) continue;
@@ -418,14 +418,14 @@ void PhysWorld::CollideAndCallback(uint32_t flagA,
                                    bool allowY,
                                    bool stopVerticalSpeed)
 {
-    for (auto* c1 : mColliders)
+    for (auto& c1 : mColliders)
     {
         if (!c1->GetDisp() || !c1->HasFlag(flagA)) continue;
 
         Vector3 totalPush = Vector3::Zero;
         bool collided = false;
 
-        for (auto* c2 : mColliders)
+        for (auto& c2 : mColliders)
         {
             if (!c2->GetDisp() || !c2->HasFlag(flagB)) continue;
             if (c1->GetOwner() == c2->GetOwner()) continue;
@@ -527,7 +527,7 @@ bool PhysWorld::RayHitWall(const Vector3& start, const Vector3& end, Vector3& hi
     float closestT = rayLen;
     bool hit = false;
 
-    for (auto* col : mColliders)
+    for (auto& col : mColliders)
     {
         if (!col->HasFlag(C_WALL)) continue;
         auto obb = col->GetBoundingVolume()->GetOBB();

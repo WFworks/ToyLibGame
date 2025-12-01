@@ -213,7 +213,7 @@ void GameRPG::LoadData()
     auto groundMesh = GetAssetManager()->GetMesh("ground2.x");
     auto va = groundMesh->GetVertexArray();
     auto vaList = groundMesh->GetVertexArray();
-    for (auto va : vaList)
+    for (auto& va : vaList)
     {
         b->ComputeWorldTransform();
         const auto& polys = va->GetWorldPolygons(b->GetWorldTransform());
