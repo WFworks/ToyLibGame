@@ -31,7 +31,7 @@ private:
     TextFont(const TextFont&) = delete;
     TextFont& operator=(const TextFont&) = delete;
 
-    TTF_Font*   mFont;
+    TTF_Font* mFont;
     std::string mFilePath;
-    int         mPointSize;
+    int mPointSize;
 };

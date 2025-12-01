@@ -52,13 +52,13 @@ HeroActor::HeroActor(Application* a)
 
     // --- 移動コンポーネント ---
     //mMoveComp = CreateComponent<MoveComponent>();
-    //mMoveComp = CreateComponent<FPSMoveComponent>();
-    mMoveComp = CreateComponent<DirMoveComponent>();
+    mMoveComp = CreateComponent<FPSMoveComponent>();
+    //mMoveComp = CreateComponent<DirMoveComponent>();
     
     
     // --- カメラコンポーネント ---
-    mCameraComp = CreateComponent<OrbitCameraComponent>();
-    //mCameraComp = CreateComponent<FollowCameraComponent>();
+    //mCameraComp = CreateComponent<OrbitCameraComponent>();
+    mCameraComp = CreateComponent<FollowCameraComponent>();
     
 
     mGravComp = CreateComponent<GravityComponent>();
