@@ -16,7 +16,6 @@ Application::Application()
 : mIsActive(false)
 , mIsUpdatingActors(false)
 , mIsPause(false)
-, mNativeWindowHandle(nullptr)
 {
     mRenderer = std::make_unique<Renderer>();
     mInputSys = std::make_unique<InputSystem>();

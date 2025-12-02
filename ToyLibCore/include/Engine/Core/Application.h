@@ -103,13 +103,6 @@ private:
 
     // pause
     bool mIsPause;
-    
-    // IME 制御のためにハンドル保存（Windows以外はnullptrで良い）
-    void* mNativeWindowHandle;
-    
-    
-    
-
 
 };
 
