@@ -15,17 +15,49 @@ Actor::Actor(Application* a)
 , mApp(a)
 , mIsRecomputeWorldTransform(true)
 , mActorID("Unnamed Actor")
+, mParent(nullptr)
 {
-
 }
 
-// デストラクタ
 Actor::~Actor()
 {
-   
+    // 親の子リストから自分を外す
+    if (mParent)
+    {
+        auto& siblings = mParent->mChildren;
+        siblings.erase(
+            std::remove(siblings.begin(), siblings.end(), this),
+            siblings.end()
+        );
+    }
 
+    // 子の親参照をクリア（ここでは子は孤児にする方針）
+    for (auto* child : mChildren)
+    {
+        if (child)
+        {
+            child->mParent = nullptr;
+            child->MarkWorldDirty();
+        }
+    }
 }
 
+void Actor::MarkWorldDirty()
+{
+    if (!mIsRecomputeWorldTransform)
+    {
+        mIsRecomputeWorldTransform = true;
+
+        // 子へも伝播
+        for (auto* child : mChildren)
+        {
+            if (child)
+            {
+                child->MarkWorldDirty();
+            }
+        }
+    }
+}
 // メインルーチン
 void Actor::Update(float deltaTime)
 {
@@ -74,6 +106,51 @@ void Actor::ActorInput(const struct InputState& state)
 // ワールドマトリックス
 void Actor::ComputeWorldTransform()
 {
+    if (!mIsRecomputeWorldTransform)
+        return;
+
+    // 親がいるなら、まず親のWorldTransformを確定させる
+    if (mParent)
+    {
+        mParent->ComputeWorldTransform();
+    }
+
+    // ローカル行列（SRT）
+    Matrix4 local = Matrix4::CreateScale(mScale);
+    local *= Matrix4::CreateFromQuaternion(mRotation);
+    local *= Matrix4::CreateTranslation(mPosition);
+
+    if (mParent)
+    {
+        // 親ワールドのコピーを作る
+        Matrix4 parentNoScale = mParent->mWorldTransform;
+        
+        // 親の軸は GetXAxis/Y/Z が「正規化済みの向き」を返してくれるので、
+        // それをそのまま書き戻せばスケール成分が 1 にリセットされる
+        parentNoScale.SetXAxis(mParent->mWorldTransform.GetXAxis());
+        parentNoScale.SetYAxis(mParent->mWorldTransform.GetYAxis());
+        parentNoScale.SetZAxis(mParent->mWorldTransform.GetZAxis());
+        // 平行移動はそのまま使うので触らない
+        
+        // 親のスケールなし行列 * 自分のローカル
+        mWorldTransform = local * parentNoScale;
+    }
+    else
+    {
+        mWorldTransform = local;
+    }
+
+    mIsRecomputeWorldTransform = false;
+
+    // 各Componentにも通知
+    for (auto& comp : mComponents)
+    {
+        comp->OnUpdateWorldTransform();
+    }
+}
+/*
+void Actor::ComputeWorldTransform()
+{
     if (mIsRecomputeWorldTransform)
     {
         mIsRecomputeWorldTransform = false;
@@ -90,7 +167,7 @@ void Actor::ComputeWorldTransform()
         }
     }
 }
-
+*/
 // コンポーネントを追加
 void Actor::AddComponent(std::unique_ptr<Component> component)
 {
@@ -133,4 +210,39 @@ void Actor::SetForward(const Vector3& dir)
     Quaternion rot = Quaternion::FromEulerDegrees(Vector3(0.0f, yaw, 0.f));
 
     SetRotation(rot);
+}
+
+void Actor::SetPosition(const Vector3& pos)
+{
+    // 親がいるなら「親からのオフセット（ローカル）」として解釈する
+    // 親がいないなら「ワールド座標」として解釈する
+    mPosition = pos;
+    MarkWorldDirty();
+}
+
+
+void Actor::SetParent(Actor* newParent)
+{
+    if (mParent == newParent)
+        return;
+
+    // 古い親から外す
+    if (mParent)
+    {
+        auto& siblings = mParent->mChildren;
+        siblings.erase(
+            std::remove(siblings.begin(), siblings.end(), this),
+            siblings.end()
+        );
+    }
+
+    mParent = newParent;
+
+    if (mParent)
+    {
+        mParent->mChildren.push_back(this);
+    }
+
+    // ローカル値として扱うだけ（ワールド維持とかはしない）
+    MarkWorldDirty();
 }

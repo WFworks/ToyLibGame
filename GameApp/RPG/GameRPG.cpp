@@ -65,7 +65,7 @@ void GameRPG::InitGame()
     auto fireMesh = fireActor->CreateComponent<MeshComponent>();
     fireMesh->SetMesh(GetAssetManager()->GetMesh("campfile.x"));
   
-    fireActor->SetPosition(Vector3(-15, 0, 15));
+    fireActor->SetPosition(Vector3(-8, 0, -10));
     fireActor->SetScale(0.03f);
     auto fireCollider = fireActor->CreateComponent<ColliderComponent>();
     fireCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("campfile.x")->GetVertexArray());
@@ -75,7 +75,7 @@ void GameRPG::InitGame()
     
     // 炎
     auto particleActor = CreateActor<Actor>();
-    particleActor->SetPosition(Vector3(-15, 0, 15));
+    particleActor->SetPosition(Vector3(-8, 0, -10));
     auto particleComp = particleActor->CreateComponent<ParticleComponent>();
     particleComp->SetTexture(GetAssetManager()->GetTexture("fire.png"));
     particleComp->CreateParticles(Vector3(0, 0, 0),
@@ -87,19 +87,7 @@ void GameRPG::InitGame()
     particleComp->SetAddBlend(true);
 
     
-    // 先行者
-    auto sksActor = CreateActor<Actor>();
-    auto sksMesh = sksActor->CreateComponent<MeshComponent>();
-    sksMesh->SetMesh(GetAssetManager()->GetMesh("sks.x"));
 
-    sksActor->SetPosition(Vector3(-45, -100, 25));
-    sksActor->SetScale(0.0015f);
-    auto sksCollider = sksActor->CreateComponent<ColliderComponent>();
-    sksCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("sks.x")->GetVertexArray());
-    sksCollider->SetDisp(true);
-    sksCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
-    sksActor->CreateComponent<GravityComponent>();
-    
     
     /*
     auto sunlightActor = CreateActor<Actor>();
@@ -135,6 +123,26 @@ void GameRPG::LoadData()
     
 
     
+    // 先行者
+    auto sksActor = CreateActor<Actor>();
+    auto sksMesh = sksActor->CreateComponent<MeshComponent>();
+    sksMesh->SetMesh(GetAssetManager()->GetMesh("sks.x"));
+
+    sksActor->SetPosition(Vector3(0.8f, 2.5f, -2));
+    sksActor->SetScale(0.00025f);
+    q = Quaternion(Vector3::UnitY, Math::ToRadians(180));
+    sksActor->SetRotation(q);
+    //auto sksCollider = sksActor->CreateComponent<ColliderComponent>();
+    //sksCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("sks.x")->GetVertexArray());
+    //sksCollider->SetDisp(true);
+    //sksCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
+    //sksActor->CreateComponent<GravityComponent>();
+    sksActor->SetParent(hero);
+    
+    
+    
+    
+    
     auto stanMove = stanActor->CreateComponent<FollowMoveComponent>();
     stanMove->SetTarget(hero);
     stanMove->SetFollowSpeed(1);
@@ -152,7 +160,7 @@ void GameRPG::LoadData()
     towerCollider->SetDisp(true);
     towerCollider->SetFlags(C_WALL | C_GROUND | C_FOOT);
     towerCollider->GetBoundingVolume()->AdjustBoundingBox(Vector3(0,0,0), Vector3(0.9, 0.9, 0.9));
-    towerActor->SetPosition(Vector3(15, 0, 15));
+    towerActor->SetPosition(Vector3(-60, 0, 15));
     towerActor->SetScale(0.003f);
     q = Quaternion(Vector3::UnitY, Math::ToRadians(150));
     towerActor->SetRotation(q);
@@ -236,6 +244,7 @@ void GameRPG::LoadData()
     // BGM
     GetSoundMixer()->LoadBGM("MusMus-BGM-112.mp3");
     GetSoundMixer()->PlayBGM();
+    GetSoundMixer()->SetVolume(0.01);
     
     
     

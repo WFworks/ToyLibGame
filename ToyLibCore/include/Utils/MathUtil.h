@@ -706,7 +706,36 @@ public:
     {
         return Vector3::Normalize(Vector3(mat[2][0], mat[2][1], mat[2][2]));
     }
+    // Ssetter追加
+    void SetTranslation(const Vector3& t)
+    {
+        mat[3][0] = t.x;
+        mat[3][1] = t.y;
+        mat[3][2] = t.z;
+    }
 
+    void SetXAxis(const Vector3& v)
+    {
+        mat[0][0] = v.x;
+        mat[0][1] = v.y;
+        mat[0][2] = v.z;
+    }
+
+    void SetYAxis(const Vector3& v)
+    {
+        mat[1][0] = v.x;
+        mat[1][1] = v.y;
+        mat[1][2] = v.z;
+    }
+
+    void SetZAxis(const Vector3& v)
+    {
+        mat[2][0] = v.x;
+        mat[2][1] = v.y;
+        mat[2][2] = v.z;
+    }
+    
+    
     // Extract the scale component from the matrix
     Vector3 GetScale() const
     {

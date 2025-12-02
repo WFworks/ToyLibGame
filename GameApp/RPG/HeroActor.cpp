@@ -67,7 +67,7 @@ HeroActor::HeroActor(Application* a)
     
     mSound = CreateComponent<SoundComponent>();
     mSound->SetSound("Walk.mp3");
-    mSound->SetVolume(0.7f);
+    mSound->SetVolume(0.1f);
     
     
 }
@@ -140,8 +140,11 @@ void HeroActor::ActorInput(const InputState& state)
                 {
                     mSound->Play();
                 }
-
             }
+        }
+        if (mGravComp->GetVelocityY() != 0.0f)
+        {
+            mSound->Stop();
         }
     }
     else
