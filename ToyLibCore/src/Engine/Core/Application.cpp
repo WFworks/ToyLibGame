@@ -3,7 +3,7 @@
 #include "Engine/Render/Renderer.h"
 #include "Engine/Runtime/InputSystem.h"
 #include "Physics/PhysWorld.h"
-#include "Utils/IMEUtil.h"
+//#include "Utils/IMEUtil.h"
 #include "Asset/AssetManager.h"
 #include "Audio/SoundMixer.h"
 #include "Engine/Runtime/TimeOfDaySystem.h"
@@ -64,7 +64,7 @@ bool Application::Initialize()
     mIsActive = true;
     mTicksCount = SDL_GetTicks();
     
-    
+/*
     // IME制御
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
@@ -76,7 +76,7 @@ bool Application::Initialize()
         mNativeWindowHandle = nullptr;
 #endif
     }
-
+*/
     return true;
 }
 
@@ -245,7 +245,7 @@ void Application::UpdateFrame()
 // IME制御
 void Application::SetIMEEnabled(bool enabled)
 {
-    IMEUtil::SetIMEEnabled(mNativeWindowHandle, enabled);
+    //IMEUtil::SetIMEEnabled(mNativeWindowHandle, enabled);
 }
 
 // アセットディレクトリの設定

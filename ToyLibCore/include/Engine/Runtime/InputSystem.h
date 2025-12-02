@@ -152,6 +152,10 @@ public:
     bool IsButtonDown(GameButton button) const;      // Held or Pressed
     bool IsButtonPressed(GameButton button) const;   // このフレームで押された
     bool IsButtonReleased(GameButton button) const;  // このフレームで離された
+    
+    
+    void SetTextInputMode(bool enabled);
+    bool IsTextInputMode() const { return mTextInputMode; }
 
 private:
     float   Filter1D(int input);
@@ -162,6 +166,9 @@ private:
 
     // 論理ボタン → 実キー/ボタン
     std::array<ButtonBinding, static_cast<size_t>(GameButton::Count)> mButtonBindings;
+    
+    // テキスト入力を受け付けるか
+    bool mTextInputMode = false;
 };
 
 

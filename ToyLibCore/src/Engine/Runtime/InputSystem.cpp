@@ -247,6 +247,10 @@ bool InputSystem::Initialize()
     // 内部呼び出しようにInputSystemのポインタだけ記憶
     mState.SetOwner(this);
     
+    // テキスト入力モードをオフ
+    mTextInputMode = false;
+    SDL_StopTextInput();
+    
     // ボタンバインディングは LoadButtonConfig で設定される
     return true;
 }
@@ -541,6 +545,27 @@ bool InputSystem::IsButtonReleased(GameButton button) const
     }
     return false;
 }
+
+
+void InputSystem::SetTextInputMode(bool enabled)
+{
+    if (enabled == mTextInputMode)
+    {
+        return; // 状態変わらないなら何もしない
+    }
+
+    mTextInputMode = enabled;
+
+    if (enabled)
+    {
+        SDL_StartTextInput();
+    }
+    else
+    {
+        SDL_StopTextInput();
+    }
+}
+
 
 /*
 #include "Engine/Runtime/InputSystem.h"
