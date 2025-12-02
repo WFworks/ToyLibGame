@@ -1,5 +1,5 @@
 #include "Asset/Geometry/VertexArray.h"
-#include "Asset/Geometry/Polygon.h"
+#include "Utils/Polygon.h"
 
 #include <GL/glew.h>
 

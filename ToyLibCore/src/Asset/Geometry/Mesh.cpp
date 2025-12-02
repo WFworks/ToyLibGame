@@ -3,7 +3,7 @@
 #include "Asset/AssetManager.h"
 #include "Asset/Geometry/VertexArray.h"
 #include "Asset/Geometry/Bone.h"
-#include "Asset/Geometry/Polygon.h"
+#include "Utils/Polygon.h"
 #include "Asset/Material/Material.h"
 // Assimp用
 #include <assimp/scene.h>

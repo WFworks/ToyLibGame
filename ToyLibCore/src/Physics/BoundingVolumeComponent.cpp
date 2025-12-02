@@ -1,14 +1,14 @@
 #include "Physics/BoundingVolumeComponent.h"
 #include "Graphics/Effect/WireframeComponent.h"
 #include "Engine/Core/Actor.h"
-#include "Asset/Geometry/Polygon.h"
+#include "Utils/Polygon.h"
 #include "Asset/Geometry/VertexArray.h"
 #include "Engine/Render/Shader.h"
 
 #include "Engine/Core/Application.h"
 #include "Engine/Render/Renderer.h"
 #include "Asset/Material/Texture.h"
-#include "Asset/Geometry/Polygon.h"
+#include "Utils/Polygon.h"
 
 #include <vector>
 #include <algorithm>

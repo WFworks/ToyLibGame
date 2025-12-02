@@ -4,7 +4,7 @@
 #include "Engine/Core/Actor.h"
 #include "Camera/CameraComponent.h"
 #include "Physics/BoundingVolumeComponent.h"
-#include "Asset/Geometry/Polygon.h"
+#include "Utils/Polygon.h"
 #include "Physics/ColliderComponent.h"
 #include "Movement/MoveComponent.h"
 #include "Utils/MathUtil.h"

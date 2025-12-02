@@ -176,9 +176,24 @@ void Application::LoadData()
 
 }
 
+int fps = 0;
+int fpscnt = 0;
+unsigned int tick = 0;
+
+
 // ゲームメインルーチン
 void Application::UpdateFrame()
 {
+    fpscnt++;
+    unsigned int now = SDL_GetTicks();
+    if (tick + 1000 < now)
+    {
+        tick = now;
+        fps = fpscnt;
+        fpscnt = 0;
+    }
+    std::cout << "fps = " << fps << std::endl;
+    
     
     // FPS60固定
     while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16))

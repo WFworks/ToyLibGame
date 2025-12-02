@@ -168,8 +168,6 @@ void GameRPG::LoadData()
     towerActor->CreateComponent<GravityComponent>();
     
 
-
-
     for (int i = 0; i < 15; i++)
     {
         for (int j = 0; j < 10; j++)
@@ -186,7 +184,8 @@ void GameRPG::LoadData()
             //brickActor->CreateComponent<GravityComponent>();
         }
     }
-    for (int i = 0; i < 5; i++)
+ 
+    for (int i = 0; i < 1000; i++)
     {
         auto brickActor = CreateActor<Actor>();
         auto brickMesh = brickActor->CreateComponent<MeshComponent>();
@@ -331,6 +330,7 @@ void GameRPG::LoadData()
     textComp->SetColor(Vector3(1.0f, 1.0f, 0.0f)); // 黄
     mTextComp = textComp;
 }
+
 
 void GameRPG::UpdateGame(float deltaTime)
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Physics/ColliderComponent.h"
-#include "Asset/Geometry/Polygon.h"
+#include "Utils/Polygon.h"
 
 class LaserColliderComponent : public ColliderComponent
 {

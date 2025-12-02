@@ -13,6 +13,10 @@
 #include "Environment/SkyDomeComponent.h"
 #include "Graphics/Effect/WireframeComponent.h"
 #include "Asset/Font/TextFont.h"
+#include "Utils/FrustumUtil.h"
+#include "Physics/BoundingVolumeComponent.h"
+#include "Engine/Core/Actor.h"
+#include "Utils/Polygon.h"
 #include <GL/glew.h>
 #include <algorithm>
 #include <string>
@@ -162,6 +166,70 @@ void Renderer::RemoveVisualComp(VisualComponent* comp)
 
 void Renderer::DrawVisualLayer(VisualLayer layer)
 {
+    bool is3DLayer = (layer == VisualLayer::Object3D ||
+                      layer == VisualLayer::Effect3D);
+    
+    Frustum frustum;
+    if (is3DLayer)
+    {
+        Matrix4 vp = mViewMatrix * mProjectionMatrix;
+        //Matrix4 vp = mProjectionMatrix * mViewMatrix;
+        frustum = BuildFrustumFromMatrix(vp);
+    }
+
+    
+    
+    if (layer == VisualLayer::UI || layer == VisualLayer::Background2D)
+    {
+        glDisable(GL_DEPTH_TEST);     // Zテスト不要
+        glDepthMask(GL_FALSE);        // 書き込みも不要（2D要素）
+    }
+    else if (layer == VisualLayer::Effect3D)
+    {
+        glEnable(GL_DEPTH_TEST);     // 粒同士のZ隠し合いを防ぐ
+        glDepthMask(GL_FALSE);        // Zバッファ汚さない
+    }
+    else
+    {
+        glEnable(GL_DEPTH_TEST);      // 通常描画
+        glDepthMask(GL_TRUE);         // 書き込みON
+    }
+    
+    
+    for (auto& comp : mVisualComps)
+    {
+        if (!comp->IsVisible() || comp->GetLayer() != layer)
+            continue;
+
+        if (is3DLayer)
+        {
+            // ★ ここで Actor の AABB を取得する
+            Actor* owner = comp->GetOwner();
+            if (owner)
+            {
+                auto bv = owner->GetComponent<BoundingVolumeComponent>();
+                if (bv)
+                {
+                    // World AABB を取得
+                    Cube aabb = bv->GetWorldAABB();
+
+                    // カリング
+                    if (!FrustumIntersectsAABB(frustum, aabb))
+                        continue;
+                }
+            }
+        }
+
+        comp->Draw();
+    }
+
+    glEnable(GL_DEPTH_TEST); // 念のため戻す
+    glDepthMask(GL_TRUE);
+}
+
+/*
+void Renderer::DrawVisualLayer(VisualLayer layer)
+{
     if (layer == VisualLayer::UI || layer == VisualLayer::Background2D)
     {
         glDisable(GL_DEPTH_TEST);     // Zテスト不要
@@ -190,7 +258,7 @@ void Renderer::DrawVisualLayer(VisualLayer layer)
     glEnable(GL_DEPTH_TEST); // 念のため戻す
     glDepthMask(GL_TRUE);
 }
-
+*/
 
 //スプライト用ポリゴン
 void Renderer::CreateSpriteVerts()
@@ -254,6 +322,69 @@ bool Renderer::InitializeShadowMapping()
 // シャドウマップのレンダリング
 void Renderer::RenderShadowMap()
 {
+    // 太陽が極端に弱いなら影を描かない
+    float sunIntensity = mLightingManager->GetSunIntensity();
+    if (sunIntensity <= 0.01f)
+        return;
+
+    // シャドウ FBO バインド
+    glBindFramebuffer(GL_FRAMEBUFFER, mShadowFBO);
+    glViewport(0, 0, (GLsizei)mShadowFBOWidth, (GLsizei)mShadowFBOHeight);
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    // ---- ライト視点行列 ----
+    Vector3 camCenter = mInvView.GetTranslation() + mInvView.GetZAxis() * 30.0f;
+    Vector3 lightDir  = mLightingManager->GetLightDirection();
+    Vector3 lightPos  = camCenter - lightDir * 50.0f;
+
+    Matrix4 lightView  = Matrix4::CreateLookAt(lightPos, camCenter, Vector3::UnitY);
+    Matrix4 lightProj  = Matrix4::CreateOrtho(
+        mShadowOrthoWidth, mShadowOrthoHeight,
+        mShadowNear, mShadowFar
+    );
+    
+    // ★ OpenGL では proj * view の順
+    Matrix4 lightVP = lightView * lightProj;
+    mLightSpaceMatrix = lightVP;
+
+    // ★ ライト用フラスタムを生成
+    Frustum shadowFrustum = BuildFrustumFromMatrix(lightVP);
+
+    // ---- 描画ループ ----
+    for (auto& visual : mVisualComps)
+    {
+        if (!visual->GetEnableShadow() || !visual->IsVisible())
+            continue;
+
+        // ★ カリング追加ポイント
+        Actor* owner = visual->GetOwner();
+        if (owner)
+        {
+            auto bv = owner->GetComponent<BoundingVolumeComponent>();
+            if (bv)
+            {
+                Cube aabb = bv->GetWorldAABB();
+
+                // ※必要なら少し拡張 aabb.Expand(0.2f);
+                
+                if (!FrustumIntersectsAABB(shadowFrustum, aabb))
+                    continue; // ★ 影描画スキップ
+            }
+        }
+
+        visual->DrawShadow();
+    }
+
+    // スクリーン用に戻す
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, (GLsizei)mScreenWidth, (GLsizei)mScreenHeight);
+}
+
+
+/*
+ void Renderer::RenderShadowMap()
+{
 
     // ★ 追加：太陽がほぼゼロならシャドウパスをスキップ
     float sunIntensity = mLightingManager->GetSunIntensity();
@@ -292,7 +423,7 @@ void Renderer::RenderShadowMap()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, static_cast<GLsizei>(mScreenWidth), static_cast<GLsizei>(mScreenHeight));
 }
-
+*/
 // 雨エフェクトの初期化
 void Renderer::CreateFullScreenQuad()
 {
