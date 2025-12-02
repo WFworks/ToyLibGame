@@ -169,6 +169,26 @@ void GameRPG::LoadData()
     
 
 
+
+    for (int i = 0; i < 100; i++)
+    {
+        auto brickActor = CreateActor<Actor>();
+        auto brickMesh = brickActor->CreateComponent<MeshComponent>();
+        brickMesh->SetMesh(GetAssetManager()->GetMesh("brick.x"));
+        
+        brickActor->SetPosition(Vector3(5*i, 10*i, -15));
+        brickActor->SetScale(5.f);
+        auto brickCollider = brickActor->CreateComponent<ColliderComponent>();
+        brickCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("brick.x")->GetVertexArray());
+        brickCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
+        brickActor->CreateComponent<GravityComponent>();
+
+    }
+
+
+
+    /*
+
     // レンガ
     auto brickActor = CreateActor<Actor>();
     auto brickMesh = brickActor->CreateComponent<MeshComponent>();
@@ -180,7 +200,9 @@ void GameRPG::LoadData()
     brickCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("brick.x")->GetVertexArray());
     brickCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
     brickActor->CreateComponent<GravityComponent>();
-    
+
+
+
 
     // レンガ２
     auto brickActor2 = CreateActor<Actor>();
@@ -207,8 +229,42 @@ void GameRPG::LoadData()
     brickCollider3->SetFlags(C_GROUND | C_WALL | C_FOOT);
     brickActor3->CreateComponent<GravityComponent>();
 
+    // レンガ4
+    auto brickActor4 = CreateActor<Actor>();
+    auto brickMesh4 = brickActor4->CreateComponent<MeshComponent>();
+    brickMesh4->SetMesh(GetAssetManager()->GetMesh("brick.x"));
+    
+    brickActor4->SetPosition(Vector3(-5, 30, -5));
+    brickActor4->SetScale(5.f);
+    auto brickCollider4 = brickActor4->CreateComponent<ColliderComponent>();
+    brickCollider4->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("brick.x")->GetVertexArray());
+    brickCollider4->SetFlags(C_GROUND | C_WALL | C_FOOT);
+    brickActor4->CreateComponent<GravityComponent>();
 
+    // レンガ5
+    auto brickActor5 = CreateActor<Actor>();
+    auto brickMesh5 = brickActor5->CreateComponent<MeshComponent>();
+    brickMesh5->SetMesh(GetAssetManager()->GetMesh("brick.x"));
+    
+    brickActor5->SetPosition(Vector3(0, 40, -5));
+    brickActor5->SetScale(5.f);
+    auto brickCollider5 = brickActor5->CreateComponent<ColliderComponent>();
+    brickCollider5->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("brick.x")->GetVertexArray());
+    brickCollider5->SetFlags(C_GROUND | C_WALL | C_FOOT);
+    brickActor5->CreateComponent<GravityComponent>();
 
+    // レンガ6
+    auto brickActor6 = CreateActor<Actor>();
+    auto brickMesh6 = brickActor6->CreateComponent<MeshComponent>();
+    brickMesh6->SetMesh(GetAssetManager()->GetMesh("brick.x"));
+    
+    brickActor6->SetPosition(Vector3(5, 50, -5));
+    brickActor6->SetScale(5.f);
+    auto brickCollider6 = brickActor6->CreateComponent<ColliderComponent>();
+    brickCollider6->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("brick.x")->GetVertexArray());
+    brickCollider6->SetFlags(C_GROUND | C_WALL | C_FOOT);
+    brickActor6->CreateComponent<GravityComponent>();
+    */
 
     // 地面
     auto b = CreateActor<Actor>();
