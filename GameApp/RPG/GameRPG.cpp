@@ -170,21 +170,35 @@ void GameRPG::LoadData()
 
 
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 15; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            auto brickActor = CreateActor<Actor>();
+            auto brickMesh = brickActor->CreateComponent<MeshComponent>();
+            brickMesh->SetMesh(GetAssetManager()->GetMesh("brick.x"));
+            
+            brickActor->SetPosition(Vector3(-100 + 10*i, 20, -20 + 5*j));
+            brickActor->SetScale(5.f);
+            auto brickCollider = brickActor->CreateComponent<ColliderComponent>();
+            brickCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("brick.x")->GetVertexArray());
+            brickCollider->SetFlags(C_GROUND);// | C_WALL | C_FOOT);
+            //brickActor->CreateComponent<GravityComponent>();
+        }
+    }
+    for (int i = 0; i < 5; i++)
     {
         auto brickActor = CreateActor<Actor>();
         auto brickMesh = brickActor->CreateComponent<MeshComponent>();
         brickMesh->SetMesh(GetAssetManager()->GetMesh("brick.x"));
         
-        brickActor->SetPosition(Vector3(5*i, 10*i, -15));
+        brickActor->SetPosition(Vector3(0, i*10, -50 + i*5));
         brickActor->SetScale(5.f);
         auto brickCollider = brickActor->CreateComponent<ColliderComponent>();
         brickCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("brick.x")->GetVertexArray());
         brickCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
         brickActor->CreateComponent<GravityComponent>();
-
     }
-
 
 
     /*
