@@ -1,6 +1,7 @@
 #include "GameRPG.h"
 #include "Engine/Core/ApplicationEntry.h"
 #include "HeroActor.h"
+#include "MinionActor.h"
 
 // ToyLibの起動Applicationとして登録
 TOYLIB_REGISTER_APP(GameRPG)
@@ -65,7 +66,7 @@ void GameRPG::InitGame()
     auto fireMesh = fireActor->CreateComponent<MeshComponent>();
     fireMesh->SetMesh(GetAssetManager()->GetMesh("campfile.x"));
   
-    fireActor->SetPosition(Vector3(-8, 0, -10));
+    fireActor->SetPosition(Vector3(-8, 0, -30));
     fireActor->SetScale(0.03f);
     auto fireCollider = fireActor->CreateComponent<ColliderComponent>();
     fireCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("campfile.x")->GetVertexArray());
@@ -75,7 +76,7 @@ void GameRPG::InitGame()
     
     // 炎
     auto particleActor = CreateActor<Actor>();
-    particleActor->SetPosition(Vector3(-8, 0, -10));
+    particleActor->SetPosition(Vector3(0, 0, 0));
     auto particleComp = particleActor->CreateComponent<ParticleComponent>();
     particleComp->SetTexture(GetAssetManager()->GetTexture("fire.png"));
     particleComp->CreateParticles(Vector3(0, 0, 0),
@@ -85,6 +86,7 @@ void GameRPG::InitGame()
                                   5.5,
                                   ParticleComponent::P_SMOKE);
     particleComp->SetAddBlend(true);
+    particleActor->SetParent(fireActor);
 
     
 
@@ -122,23 +124,23 @@ void GameRPG::LoadData()
     stanCllider->SetFlags(C_WALL | C_ENEMY | C_FOOT | C_GROUND);
     
 
+    auto minionActor = CreateActor<MinionActor>();
+    minionActor->SetParent(hero);
     
     // 先行者
     auto sksActor = CreateActor<Actor>();
     auto sksMesh = sksActor->CreateComponent<MeshComponent>();
     sksMesh->SetMesh(GetAssetManager()->GetMesh("sks.x"));
 
-    sksActor->SetPosition(Vector3(0.8f, 2.5f, -2));
-    sksActor->SetScale(0.00025f);
+    sksActor->SetPosition(Vector3(-20, 0.f, -10));
+    sksActor->SetScale(0.0015f);
     q = Quaternion(Vector3::UnitY, Math::ToRadians(180));
     sksActor->SetRotation(q);
-    //auto sksCollider = sksActor->CreateComponent<ColliderComponent>();
-    //sksCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("sks.x")->GetVertexArray());
-    //sksCollider->SetDisp(true);
-    //sksCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
-    //sksActor->CreateComponent<GravityComponent>();
-    sksActor->SetParent(hero);
-    
+    auto sksCollider = sksActor->CreateComponent<ColliderComponent>();
+    sksCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("sks.x")->GetVertexArray());
+    sksCollider->SetDisp(true);
+    sksCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
+    sksActor->CreateComponent<GravityComponent>();
     
     
     
