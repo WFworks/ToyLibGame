@@ -6,7 +6,12 @@
 #pragma comment(lib, "imm32.lib")
 
 #elif defined(__APPLE__)
+// Carbon周りの古いAPI/enumから出る警告をこのファイル内だけ抑制
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-anon-enum-enum-conversion"
 #include <Carbon/Carbon.h>
+#pragma clang diagnostic pop
 
 #elif defined(__linux__)
 #include <SDL.h>
@@ -32,8 +37,10 @@ void IMEUtil::SetIMEEnabled(void* nativeWindowHandle, bool enabled)
             CFIndex count = CFArrayGetCount(sources);
             for (CFIndex i = 0; i < count; i++)
             {
-                TISInputSourceRef source = (TISInputSourceRef)CFArrayGetValueAtIndex(sources, i);
-                CFStringRef sourceID = (CFStringRef)TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
+                TISInputSourceRef source =
+                    (TISInputSourceRef)CFArrayGetValueAtIndex(sources, i);
+                CFStringRef sourceID =
+                    (CFStringRef)TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
                 if (!sourceID) continue;
 
                 // US配列 or ABC（JIS）を使う
