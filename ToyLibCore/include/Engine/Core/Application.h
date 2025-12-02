@@ -46,19 +46,11 @@ public:
     // 時間取得
     class TimeOfDaySystem* GetTimeOfDaySystem() const { return mTimeOfDaySys.get(); }
     
-    // IMEをオフにする
-    void InitIMEControl(SDL_Window* sdlWindow);
-
-    
-    
 protected:
     virtual void UpdateGame(float deltaTime) { }
     virtual void InitGame() {}
     virtual void ShutdownGame() {}
-    
-    // WindowsのIME制御
-    void SetIMEEnabled(bool enabled);
-    
+   
     // アセットディレクトリのパスの設定
     void SetAssetsPath(const std::string& path);
     

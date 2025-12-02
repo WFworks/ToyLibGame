@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7EDCE9C02ED72FD00069EE3D /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EDCE9BF2ED72FD00069EE3D /* Carbon.framework */; };
 		7EDCE9C22ED72FE00069EE3D /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EDCE9C12ED72FE00069EE3D /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
@@ -65,7 +64,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7EDCE9C02ED72FD00069EE3D /* Carbon.framework in Frameworks */,
 				7EDCE9C22ED72FE00069EE3D /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
