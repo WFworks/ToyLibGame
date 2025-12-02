@@ -127,21 +127,23 @@ void GameRPG::LoadData()
     auto minionActor = CreateActor<MinionActor>();
     minionActor->SetParent(hero);
     
-    // 先行者
-    auto sksActor = CreateActor<Actor>();
-    auto sksMesh = sksActor->CreateComponent<MeshComponent>();
-    sksMesh->SetMesh(GetAssetManager()->GetMesh("sks.x"));
+    // wolf
+    auto wolfActor = CreateActor<Actor>();
+    auto wolfMesh = wolfActor->CreateComponent<SkeletalMeshComponent>();
+    wolfMesh->SetMesh(GetAssetManager()->GetMesh("wolf.fbx"));
 
-    sksActor->SetPosition(Vector3(-20, 0.f, -10));
-    sksActor->SetScale(0.0015f);
+    wolfActor->SetPosition(Vector3(-20, 0.f, 0));
+    wolfActor->SetScale(0.1f);
     q = Quaternion(Vector3::UnitY, Math::ToRadians(180));
-    sksActor->SetRotation(q);
-    auto sksCollider = sksActor->CreateComponent<ColliderComponent>();
-    sksCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("sks.x")->GetVertexArray());
-    sksCollider->SetDisp(true);
-    sksCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
-    sksActor->CreateComponent<GravityComponent>();
-    
+    wolfActor->SetRotation(q);
+    auto wolfCollider = wolfActor->CreateComponent<ColliderComponent>();
+    wolfCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("wolf.fbx")->GetVertexArray());
+    wolfCollider->GetBoundingVolume()->AdjustBoundingBox(Vector3(0.0f, 35, 30), Vector3(0.9, 0.9, 0.6));
+    wolfCollider->SetDisp(true);
+    wolfCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
+    wolfActor->CreateComponent<GravityComponent>();
+    auto animPlayer = wolfMesh->GetAnimPlayer();
+    animPlayer->Play(2);
     
     
     
