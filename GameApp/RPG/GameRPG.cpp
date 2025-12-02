@@ -37,7 +37,7 @@ void GameRPG::InitGame()
     
     // 木（ビルボード）
     auto treeActor = CreateActor<Actor>();
-    treeActor->SetPosition(Vector3(0.0f, 5.f, 0.0f));
+    treeActor->SetPosition(Vector3(0.0f, 4.5f, 0.0f));
     treeActor->SetScale(0.02);
     auto treeBillboard = treeActor->CreateComponent<BillboardComponent>(100);
     treeBillboard->SetTexture(GetAssetManager()->GetTexture("tree.png"));
@@ -45,6 +45,7 @@ void GameRPG::InitGame()
     treeActor->CreateComponent<GravityComponent>();
     auto treeCollider = treeActor->CreateComponent<ColliderComponent>();
     treeCollider->GetBoundingVolume()->ComputeBoundingVolume(Vector3(-256, -256, -4), Vector3(256,256,4));
+    treeCollider->GetBoundingVolume()->AdjustBoundingBox(Vector3(0, 0, 0), Vector3(1, 1.2, 1));
     treeCollider->SetFlags(C_WALL | C_FOOT);
     
     // シャドウ用スプライト
@@ -185,7 +186,7 @@ void GameRPG::LoadData()
         }
     }
  
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         auto brickActor = CreateActor<Actor>();
         auto brickMesh = brickActor->CreateComponent<MeshComponent>();
@@ -198,7 +199,15 @@ void GameRPG::LoadData()
         brickCollider->SetFlags(C_GROUND | C_WALL | C_FOOT);
         brickActor->CreateComponent<GravityComponent>();
     }
-
+    auto brickActor = CreateActor<Actor>();
+    auto brickMesh = brickActor->CreateComponent<MeshComponent>();
+    brickMesh->SetMesh(GetAssetManager()->GetMesh("brick.x"));
+    
+    brickActor->SetPosition(Vector3(0, -1, -50));
+    brickActor->SetScale(5.f);
+    auto brickCollider = brickActor->CreateComponent<ColliderComponent>();
+    brickCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("brick.x")->GetVertexArray());
+    brickCollider->SetFlags(C_GROUND | C_WALL );
 
     /*
 
