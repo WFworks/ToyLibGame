@@ -156,10 +156,6 @@ elseif(APPLE)
         SDL2_ttf::SDL2_ttf
         GLEW::GLEW
         assimp::assimp
-        "-framework Cocoa"
-        "-framework IOKit"
-        "-framework CoreVideo"
-        "-framework Carbon"
     )
 
     set_target_properties(${PROJECT_NAME} PROPERTIES
