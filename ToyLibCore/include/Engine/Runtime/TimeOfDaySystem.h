@@ -28,7 +28,7 @@ public:
 
     void SetTime(int hour, int minute = 0, float second = 0.0f);
 
-    void SetTimeScale(float scale) { mTimeScale = scale; } // 0で停止
+    void SetTimeScale(float scale) { mTimeScale = scale; } // 0で停止,
     void SetRunning(bool r) { mRunning = r; }
 
     const GameTime& GetGameTime()  const { return mTime; }

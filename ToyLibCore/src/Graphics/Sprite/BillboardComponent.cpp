@@ -64,9 +64,6 @@ void BillboardComponent::Draw()
     mTexture->SetActive(0);
     mShader->SetTextureUniform("uTexture", 0);
     
-    // アクターに反映
-    GetOwner()->SetWorldTransform(world);
-    
 
     // VAO有効化
     mVertexArray->SetActive();

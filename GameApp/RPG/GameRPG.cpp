@@ -12,7 +12,7 @@ GameRPG::GameRPG()
 {
     SetAssetsPath("GameApp/Assets/RPG/");
     
-    GetTimeOfDaySystem()->SetTimeScale(600.f);
+    GetTimeOfDaySystem()->SetTimeScale(30.f);
 }
 
 GameRPG::~GameRPG()
@@ -44,8 +44,7 @@ void GameRPG::InitGame()
     treeBillboard->SetVisible(true);
     treeActor->CreateComponent<GravityComponent>();
     auto treeCollider = treeActor->CreateComponent<ColliderComponent>();
-    treeCollider->GetBoundingVolume()->ComputeBoundingVolume(Vector3(-256, -256, -4), Vector3(256,256,4));
-    treeCollider->GetBoundingVolume()->AdjustBoundingBox(Vector3(0, 0, 0), Vector3(1, 1.2, 1));
+    treeCollider->GetBoundingVolume()->ComputeBoundingVolume(Vector3(20, -256, -4), Vector3(40,200,4));
     treeCollider->SetFlags(C_WALL | C_FOOT);
     
     // シャドウ用スプライト
