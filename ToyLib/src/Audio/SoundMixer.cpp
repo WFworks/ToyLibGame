@@ -4,11 +4,13 @@
 #include "Asset/Audio/SoundEffect.h"
 #include <SDL2/SDL_mixer.h>
 
+namespace toy {
+
 SoundMixer::SoundMixer(AssetManager* assetManager)
-    : mAssetManager(assetManager)
-    , mBgmEnabled(true)
-    , mSoundEnabled(true)
-    , mVolume(0.3f)
+: mAssetManager(assetManager)
+, mBgmEnabled(true)
+, mSoundEnabled(true)
+, mVolume(0.3f)
 {
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
     Mix_VolumeMusic(static_cast<int>(mVolume * MIX_MAX_VOLUME));
@@ -32,7 +34,7 @@ void SoundMixer::SetSoundEnable(bool enable)
 void SoundMixer::SetVolume(float volume)
 {
     mVolume = volume;
-
+    
     Mix_VolumeMusic(static_cast<int>(mVolume * MIX_MAX_VOLUME));
     // 効果音のボリュームは、個別再生時に適用する設計にしてる
 }
@@ -68,3 +70,5 @@ void SoundMixer::PlaySoundEffect(const std::string& fileName)
         }
     }
 }
+
+} // namespace toy

@@ -5,6 +5,8 @@
 #include "Physics/PhysWorld.h"
 #include "Engine/Core/Application.h"
 
+namespace toy {
+
 GravityComponent::GravityComponent(Actor* a)
 : Component(a)
 , mVelocityY(0.0f)
@@ -24,8 +26,8 @@ void GravityComponent::Update(float deltaTime)
     // 設置判定に使うコライダーを取得（C_FOOT）
     ColliderComponent* collider = FindFootCollider();
     if (!collider) return;
-
-
+    
+    
     // 地面の高さを取得
     float groundY = -FLT_MAX;
     if (GetOwner()->GetApp()->GetPhysWorld()
@@ -74,4 +76,4 @@ ColliderComponent* GravityComponent::FindFootCollider()
     return nullptr;
 }
 
-
+} // namespace toy

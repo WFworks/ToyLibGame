@@ -2,6 +2,8 @@
 
 #include "Utils/MathUtil.h"
 
+namespace toy {
+
 // ポリゴンデータの格納用（三角形）
 struct Polygon
 {
@@ -32,12 +34,12 @@ struct Ray
 {
     Vector3 start;  // 始点
     Vector3 dir;    // 正規化された方向ベクトル
-
+    
     Ray()
     {}
     Ray(const Vector3& s, const Vector3& d)
-        : start(s)
-        , dir(Vector3::Normalize(d))
+    : start(s)
+    , dir(Vector3::Normalize(d))
     {}
 };
 
@@ -51,20 +53,20 @@ struct RaycastHit
 };
 
 inline bool IntersectRayTriangle(
-    const Ray& ray,
-    const Vector3& v0,
-    const Vector3& v1,
-    const Vector3& v2,
-    float& outT)
+                                 const Ray& ray,
+                                 const Vector3& v0,
+                                 const Vector3& v1,
+                                 const Vector3& v2,
+                                 float& outT)
 {
     const float epsilon = 1e-5f;
-
+    
     Vector3 edge1 = v1 - v0;
     Vector3 edge2 = v2 - v0;
-
+    
     Vector3 h = Vector3::Cross(ray.dir, edge2);
     float a = Vector3::Dot(edge1, h);
-
+    
     if (fabs(a) < epsilon)
     {
         return false;
@@ -90,6 +92,8 @@ inline bool IntersectRayTriangle(
         outT = t;
         return true;
     }
-
+    
     return false;
 }
+
+} //  namespace toy

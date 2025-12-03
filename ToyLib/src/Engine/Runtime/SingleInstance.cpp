@@ -9,7 +9,11 @@
     #include <cstring>
 #endif
 
+
+
 const char* LOCK_FILE_NAME = "/tmp/my_program.lock";
+
+namespace toy {
 
 SingleInstance::SingleInstance()
 : mIsLocked(false)
@@ -36,7 +40,7 @@ SingleInstance::SingleInstance()
         perror("ロックファイルを開けませんでした");
         return;
     }
-
+    
     if (lockf(mFd, F_TLOCK, 0) == -1)
     {
         std::cerr << "プログラムはすでに起動しています: " << strerror(errno) << std::endl;
@@ -66,3 +70,4 @@ SingleInstance::~SingleInstance()
     }
 }
 
+} // namespace toy

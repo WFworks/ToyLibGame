@@ -4,6 +4,8 @@
 #include "Engine/Render/Renderer.h"
 #include "Engine/Render/LightingManager.h"
 
+namespace toy {
+
 VisualComponent::VisualComponent(Actor* owner, int drawOrder, VisualLayer layer)
 : Component(owner)
 , mTexture(nullptr)
@@ -23,3 +25,5 @@ VisualComponent::~VisualComponent()
 {
     GetOwner()->GetApp()->GetRenderer()->RemoveVisualComp(this);
 }
+
+} // namespace toy

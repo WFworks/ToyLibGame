@@ -1,19 +1,20 @@
 #include "Physics/BoundingVolumeComponent.h"
 #include "Graphics/Effect/WireframeComponent.h"
 #include "Engine/Core/Actor.h"
-#include "Utils/Polygon.h"
+#include "Asset/Geometry/Polygon.h"
 #include "Asset/Geometry/VertexArray.h"
 #include "Engine/Render/Shader.h"
 
 #include "Engine/Core/Application.h"
 #include "Engine/Render/Renderer.h"
 #include "Asset/Material/Texture.h"
-#include "Utils/Polygon.h"
 
 #include <vector>
 #include <algorithm>
 
 const int NUM_VERTEX = 12;
+
+namespace toy {
 
 // コンストラクタ
 BoundingVolumeComponent::BoundingVolumeComponent(Actor* a)
@@ -34,7 +35,7 @@ BoundingVolumeComponent::BoundingVolumeComponent(Actor* a)
 // デストラクタ
 BoundingVolumeComponent::~BoundingVolumeComponent()
 {
-
+    
 }
 
 
@@ -48,18 +49,18 @@ void BoundingVolumeComponent::OnUpdateWorldTransform()
     
     Quaternion q1 = GetOwner()->GetRotation();
     Matrix4 mRot1 = Matrix4::CreateFromQuaternion(q1);
-      
+    
     mObb->axisX = mRot1.GetXAxis();
     mObb->axisY = mRot1.GetYAxis();
     mObb->axisZ = mRot1.GetZAxis();
-
+    
     // 半径を設定
     mObb->radius = //Vector3::Dot(comp1->GetBoundingBox()->max, comp1->GetBoundingBox()->min);
-              Vector3((fabsf(mObb->max.x) + fabsf(mObb->min.x)) / 2,
-                        (fabsf(mObb->max.y) + fabsf(mObb->min.y)) / 2,
-                        (fabsf(mObb->max.z) + fabsf(mObb->min.z)) / 2);
+    Vector3((fabsf(mObb->max.x) + fabsf(mObb->min.x)) / 2,
+            (fabsf(mObb->max.y) + fabsf(mObb->min.y)) / 2,
+            (fabsf(mObb->max.z) + fabsf(mObb->min.z)) / 2);
     
-
+    
     // 角度、AXIS、ちょっと怪しいかも。。。
     mObb->rot = Vector3(mObb->axisX.x, mObb->axisY.y, mObb->axisZ.z);
     // バウンディングスフィア
@@ -79,13 +80,13 @@ void BoundingVolumeComponent::ComputeBoundingVolume(const std::vector<std::share
         for (const auto& poly : polygons)
         {
             //const auto poly = p;
-
+            
             mBoundingBox->min.x = std::min({mBoundingBox->min.x, poly.a.x, poly.b.x, poly.c.x});
             mBoundingBox->max.x = std::max({mBoundingBox->max.x, poly.a.x, poly.b.x, poly.c.x});
-
+            
             mBoundingBox->min.y = std::min({mBoundingBox->min.y, poly.a.y, poly.b.y, poly.c.y});
             mBoundingBox->max.y = std::max({mBoundingBox->max.y, poly.a.y, poly.b.y, poly.c.y});
-
+            
             mBoundingBox->min.z = std::min({mBoundingBox->min.z, poly.a.z, poly.b.z, poly.c.z});
             mBoundingBox->max.z = std::max({mBoundingBox->max.z, poly.a.z, poly.b.z, poly.c.z});
         }
@@ -108,31 +109,31 @@ void BoundingVolumeComponent::CreatePolygons()
     Vector3 V5(mBoundingBox->max.x, mBoundingBox->max.y, mBoundingBox->min.z);
     Vector3 V6(mBoundingBox->max.x, mBoundingBox->max.y, mBoundingBox->max.z);
     Vector3 V7(mBoundingBox->min.x, mBoundingBox->max.y, mBoundingBox->max.z);
-
+    
     // Z- 面（前）
     mPolygons[0] = { V0, V4, V5 };
     mPolygons[1] = { V0, V5, V1 };
-
+    
     // X+ 面（右）
     mPolygons[2] = { V1, V5, V6 };
     mPolygons[3] = { V1, V6, V2 };
-
+    
     // Z+ 面（背）
     mPolygons[4] = { V2, V6, V7 };
     mPolygons[5] = { V2, V7, V3 };
-
+    
     // X- 面（左）
     mPolygons[6] = { V3, V7, V4 };
     mPolygons[7] = { V3, V4, V0 };
-
+    
     // Y+ 面（上）
     mPolygons[8] = { V4, V7, V6 };
     mPolygons[9] = { V4, V6, V5 };
-
+    
     // Y- 面（下）
     mPolygons[10] = { V3, V0, V1 };
     mPolygons[11] = { V3, V1, V2 };
-
+    
 }
 
 
@@ -160,7 +161,7 @@ void BoundingVolumeComponent::AdjustBoundingBox(const Vector3& pos, const Vector
     mBoundingBox->min.z *= sc.z;
     CreateVArray();
     CreatePolygons();
-
+    
 }
 
 
@@ -202,14 +203,14 @@ void BoundingVolumeComponent::CreateVArray()
         2, 4, 6,
         6, 0, 2
         
-
+        
     };
     
     if (mWireframe)
     {
         mWireframe->SetVertexArray(std::make_shared<VertexArray>(verts, 8, (unsigned int*)index, (unsigned int)36));
     }
-
+    
 }
 
 // ワールド空間でのバウンディングボックスを取得
@@ -217,12 +218,14 @@ Cube BoundingVolumeComponent::GetWorldAABB() const
 {
     Cube worldBox;
     if (!mBoundingBox) return worldBox;
-
+    
     Vector3 pos = GetOwner()->GetPosition();
     float scale = GetOwner()->GetScale();
-
+    
     worldBox.min = mBoundingBox->min * scale + pos;
     worldBox.max = mBoundingBox->max * scale + pos;
-
+    
     return worldBox;
 }
+
+} // namespace toy

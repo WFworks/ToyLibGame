@@ -1,6 +1,8 @@
 #pragma once
 #include "Graphics/VisualComponent.h"
 
+namespace toy {
+
 class WeatherOverlayComponent : public VisualComponent
 {
 public:
@@ -25,3 +27,5 @@ private:
     float mScreenWidth;
     float mScreenHeight;
 };
+
+} // namespace toy

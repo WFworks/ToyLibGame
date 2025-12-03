@@ -3,6 +3,7 @@
 #include "Graphics/VisualComponent.h"
 #include <memory>
 
+namespace toy {
 
 // ワイヤーフレームの表示用
 class WireframeComponent : public VisualComponent
@@ -19,3 +20,5 @@ private:
     Vector3 mColor;
     
 };
+
+} // namespace toy

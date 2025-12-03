@@ -51,6 +51,7 @@
 #include "Asset/Geometry/Bone.h"
 #include "Asset/Geometry/Mesh.h"
 #include "Asset/Geometry/VertexArray.h"
+#include "Asset/Geometry/Polygon.h"
 
 // --- Material Assets ---
 #include "Asset/Material/Material.h"
@@ -124,5 +125,5 @@
 #include "Utils/MathUtil.h"
 #include "Utils/JsonHelper.h"
 #include "Utils/StringUtil.h"
-#include "Utils/Polygon.h"
+
 

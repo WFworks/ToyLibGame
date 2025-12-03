@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <iostream>
 
+namespace toy {
+
 TimeOfDaySystem::TimeOfDaySystem()
 : mTimeScale(60.f) // 60.f　1秒で1分進む
 , mRunning(true)
@@ -20,10 +22,10 @@ void TimeOfDaySystem::SetTime(int hour, int minute, float second)
 void TimeOfDaySystem::Update(float deltaTime)
 {
     if (!mRunning) return;
-
+    
     float scaled = deltaTime * mTimeScale; // 倍速/スロー
     mTime.second += scaled;
-
+    
     while (mTime.second >= 60.0f)
     {
         mTime.second -= 60.0f;
@@ -40,3 +42,5 @@ void TimeOfDaySystem::Update(float deltaTime)
         mTime.day++;
     }
 }
+
+} // namespace toy

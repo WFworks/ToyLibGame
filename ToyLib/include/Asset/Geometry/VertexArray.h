@@ -4,11 +4,13 @@
 #include <memory>
 #include <vector>
 
+namespace toy {
+
 // 頂点データ管理
 class VertexArray
 {
 public:
-
+    
     // コンストラクタ（フォーマットごとに３種類）
     
     // 主にスプライト用(4)
@@ -16,7 +18,7 @@ public:
                 unsigned int num_verts,
                 const unsigned int* indices,
                 unsigned int num_indices);
-
+    
     // メッシュ用(6)
     VertexArray(unsigned int num_verts,
                 const float* verts,
@@ -24,8 +26,8 @@ public:
                 const float* uvs,
                 unsigned int num_indices,
                 const unsigned int* indices);
-
-
+    
+    
     // アニメーションメッシュ用(8)
     VertexArray(unsigned int num_verts,
                 const float* verts,
@@ -51,7 +53,7 @@ public:
     // テクスチャIDを設定
     void SetTextureID(unsigned int id) { mTextureID = id; }
     unsigned int GetTextureID() const { return mTextureID; }
-
+    
     // インデックス数
     unsigned int GetNumIndices() const { return mNumIndices; }
     // 頂点数
@@ -59,7 +61,7 @@ public:
     // 面データ
     const std::vector<struct Polygon>& GetPolygons() const { return mPolygons; }
     std::vector<struct Polygon> GetWorldPolygons(const Matrix4& worldTransform) const;
-
+    
 private:
     // 頂点の
     unsigned int mNumVerts;
@@ -67,7 +69,7 @@ private:
     unsigned int mNumIndices;
     // 頂点バッファVBO
     unsigned int mVertexBuffer[5];
-
+    
     
     // 頂点データID
     unsigned int mVertexBufferID;
@@ -85,3 +87,4 @@ private:
 };
 
 
+} // namespace toy

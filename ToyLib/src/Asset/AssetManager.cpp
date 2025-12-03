@@ -4,8 +4,9 @@
 #include "Asset/Audio/SoundEffect.h"
 #include "Asset/Audio/Music.h"
 #include "Asset/Font/TextFont.h"
-
 #include <iostream>
+
+namespace toy {
 
 AssetManager::AssetManager()
 : mAssetsPath("GameApp/Assets") // デフォルト値
@@ -54,14 +55,14 @@ std::shared_ptr<Texture> AssetManager::GetEmbeddedTexture(const std::string& nam
     {
         return iter->second;
     }
-
+    
     auto tex = std::make_shared<Texture>();
     if (tex->LoadFromMemory(data, static_cast<unsigned int>(dataSize)))
     {
         mTextures[nameKey] = tex;
         return tex;
     }
-
+    
     return nullptr;
 }
 
@@ -73,15 +74,15 @@ std::shared_ptr<Mesh> AssetManager::GetMesh(const std::string& fileName, bool is
     {
         return iter->second;
     }
-
+    
     auto mesh = std::make_shared<Mesh>();
- 
+    
     if (mesh->Load(fileName, this, isRightHanded))
     {
         mMeshes[fileName] = mesh;
         return mesh;
     }
-
+    
     return nullptr;
 }
 
@@ -93,7 +94,7 @@ std::shared_ptr<SoundEffect> AssetManager::GetSoundEffect(const std::string& fil
     {
         return iter->second;
     }
-
+    
     auto se = std::make_shared<SoundEffect>();
     if (se->Load(fileName, this))
     {
@@ -111,7 +112,7 @@ std::shared_ptr<Music> AssetManager::GetMusic(const std::string& fileName)
     {
         return iter->second;
     }
-
+    
     auto music = std::make_shared<Music>();
     if (music->Load(fileName, this))
     {
@@ -126,17 +127,17 @@ std::shared_ptr<TextFont> AssetManager::GetFont(const std::string& fileName, int
 {
     // フォントはサイズ違いもあるので key にサイズ情報を含める
     const std::string key = fileName + "#" + std::to_string(pointSize);
-
+    
     // 既にロード済みならそれを返す
     auto iter = mTextFonts.find(key);
     if (iter != mTextFonts.end())
     {
         return iter->second;
     }
-
+    
     // 新規ロード
     auto font = std::make_shared<TextFont>();
-
+    
     // Texture::Load と同じく AssetsPath を前につける
     // GetTexture の実装と同じ感覚で：
     //   fullPath = mAssetsPath + fileName;
@@ -145,11 +146,13 @@ std::shared_ptr<TextFont> AssetManager::GetFont(const std::string& fileName, int
     if (!font->Load(fullPath, pointSize))
     {
         std::cerr << "[AssetManager] Failed to load font: "
-                  << fullPath << " (size: " << pointSize << ")"
-                  << std::endl;
+        << fullPath << " (size: " << pointSize << ")"
+        << std::endl;
         return nullptr;
     }
-
+    
     mTextFonts.emplace(key, font);
     return font;
 }
+
+} // namespace toy

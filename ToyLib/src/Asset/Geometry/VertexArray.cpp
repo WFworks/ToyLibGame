@@ -1,7 +1,8 @@
 #include "Asset/Geometry/VertexArray.h"
-#include "Utils/Polygon.h"
-
+#include "Asset/Geometry/Polygon.h"
 #include <GL/glew.h>
+
+namespace toy {
 
 VertexArray::VertexArray(unsigned int num_verts,
                          const float* verts,
@@ -12,25 +13,25 @@ VertexArray::VertexArray(unsigned int num_verts,
                          unsigned int num_indices,
                          const unsigned int* indices)
 {
-
+    
     mNumVerts  = num_verts;
     mNumIndices = num_indices;
-       
-       
+    
+    
     glGenVertexArrays(1, &mVertexBufferID);
     glBindVertexArray(mVertexBufferID);
-       
+    
     // インデックスバッファー
     glGenBuffers(1, &mIndexBufferID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBufferID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * num_indices, indices, GL_STATIC_DRAW);
-       
-       
+    
+    
     glGenBuffers(5, mVertexBuffer);
     // 頂点バッファー転送
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts[0]) * num_verts * 3, verts, GL_STATIC_DRAW);
-
+    
     // 法線バッファー転送
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(norms[0]) * num_verts * 3, norms, GL_STATIC_DRAW);
@@ -38,21 +39,21 @@ VertexArray::VertexArray(unsigned int num_verts,
     // UVバッファー転送
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[2]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(uvs[0]) * num_verts * 2, uvs, GL_STATIC_DRAW);
-
+    
     // BoneID転送
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[3]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(bonids[0]) * num_verts * 4, bonids, GL_STATIC_DRAW);
     // Weight転送
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[4]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(weights[0]) * num_verts * 4, weights, GL_STATIC_DRAW);
-
-
+    
+    
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
     glEnableVertexAttribArray(3);
     glEnableVertexAttribArray(4);
-
+    
     // Position
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[0]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -70,7 +71,7 @@ VertexArray::VertexArray(unsigned int num_verts,
     glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 0, 0);
     
     CreatePolygons(verts, indices, mNumIndices);
-
+    
 }
 
 
@@ -81,7 +82,7 @@ VertexArray::VertexArray(unsigned int num_verts,
                          unsigned int num_indices,
                          const unsigned int* indices)
 {
-
+    
     mNumVerts  = num_verts;
     mNumIndices = num_indices;
     
@@ -100,16 +101,16 @@ VertexArray::VertexArray(unsigned int num_verts,
     glGenBuffers(3, mVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * num_verts * 3, verts, GL_STATIC_DRAW);
-
+    
     // 法線バッファー転送
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * num_verts * 3, norms, GL_STATIC_DRAW);
- 
+    
     // UVバッファー転送
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[2]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * num_verts * 2, uvs, GL_STATIC_DRAW);
-
-
+    
+    
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
@@ -123,12 +124,12 @@ VertexArray::VertexArray(unsigned int num_verts,
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
     
     CreatePolygons(verts, indices, mNumIndices);
-
+    
 }
 
 // VBO作成
-VertexArray::VertexArray(const float* verts,unsigned int i_verts, 
-                           const unsigned int* indices, unsigned int i_indices)
+VertexArray::VertexArray(const float* verts,unsigned int i_verts,
+                         const unsigned int* indices, unsigned int i_indices)
 {
     
     mNumVerts  = i_verts;
@@ -137,20 +138,20 @@ VertexArray::VertexArray(const float* verts,unsigned int i_verts,
     // vertex array生成
     glGenVertexArrays(1, &mVertexBufferID);
     glBindVertexArray(mVertexBufferID);
-
+    
     unsigned vertexSize = 8 * sizeof(float);
-
+    
     
     // 頂点バッファー
     glGenBuffers(1, &mVertexBuffer[0]);
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[0]);
     glBufferData(GL_ARRAY_BUFFER, mNumVerts * vertexSize, verts, GL_STATIC_DRAW);
-
+    
     // インデックスバッファー
     glGenBuffers(1, &mIndexBufferID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBufferID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mNumIndices * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-
+    
     // 頂点Index用アトリビュート
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexSize, 0);
@@ -163,7 +164,7 @@ VertexArray::VertexArray(const float* verts,unsigned int i_verts,
     
     
     CreatePolygons(verts, indices, mNumIndices);
-
+    
 }
 
 // ポリゴンデータ生成
@@ -177,17 +178,17 @@ void VertexArray::CreatePolygons(const float* verts, const unsigned int* indices
         poly.a.x = verts[(indices[i*3] * 3)];
         poly.a.y = verts[(indices[i*3] * 3)+1];
         poly.a.z = verts[(indices[i*3] * 3)+2];
-
+        
         poly.b.x = verts[(indices[i*3+1] * 3)];
         poly.b.y = verts[(indices[i*3+1] * 3)+1];
         poly.b.z = verts[(indices[i*3+1] * 3)+2];
-
+        
         poly.c.x = verts[(indices[i*3+2] * 3)];
         poly.c.y = verts[(indices[i*3+2] * 3)+1];
         poly.c.z = verts[(indices[i*3+2] * 3)+2];
         
         mPolygons.emplace_back(poly);
-
+        
     }
 }
 
@@ -195,7 +196,7 @@ std::vector<Polygon> VertexArray::GetWorldPolygons(const Matrix4& worldTransform
 {
     std::vector<Polygon> result;
     result.reserve(mPolygons.size());
-
+    
     for (const auto& poly : mPolygons)
     {
         Polygon wp;
@@ -204,14 +205,14 @@ std::vector<Polygon> VertexArray::GetWorldPolygons(const Matrix4& worldTransform
         wp.c = Vector3::Transform(poly.c, worldTransform);
         result.emplace_back(wp);
     }
-
+    
     return result;
 }
 
 VertexArray::~VertexArray()
 {
     mPolygons.clear();
-
+    
     glDeleteBuffers(1, mVertexBuffer);
     glDeleteBuffers(1, &mIndexBufferID);
     glDeleteVertexArrays(1, &mVertexBufferID);
@@ -231,18 +232,20 @@ VertexArray::VertexArray(const float* verts, unsigned int numVerts,
 {
     mNumVerts = numVerts;
     mNumIndices = numIndices;
-
+    
     glGenVertexArrays(1, &mVertexBufferID);
     glBindVertexArray(mVertexBufferID);
-
+    
     glGenBuffers(1, &mVertexBuffer[0]);
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * numVerts, verts, GL_STATIC_DRAW);
-
+    
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
-
+    
     glGenBuffers(1, &mIndexBufferID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBufferID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * numIndices, indices, GL_STATIC_DRAW);
 }
+
+} // namespace toy

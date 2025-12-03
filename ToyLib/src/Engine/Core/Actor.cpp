@@ -6,6 +6,8 @@
 #include <iostream>
 #include <memory>
 
+namespace toy {
+
 //コンストラクタ
 Actor::Actor(Application* a)
 : mStatus(EActive)
@@ -26,11 +28,11 @@ Actor::~Actor()
     {
         auto& siblings = mParent->mChildren;
         siblings.erase(
-            std::remove(siblings.begin(), siblings.end(), this),
-            siblings.end()
-        );
+                       std::remove(siblings.begin(), siblings.end(), this),
+                       siblings.end()
+                       );
     }
-
+    
     // 子の親参照をクリア（ここでは子は孤児にする方針）
     for (auto* child : mChildren)
     {
@@ -47,7 +49,7 @@ void Actor::MarkWorldDirty()
     if (!mIsRecomputeWorldTransform)
     {
         mIsRecomputeWorldTransform = true;
-
+        
         // 子へも伝播
         for (auto* child : mChildren)
         {
@@ -108,18 +110,18 @@ void Actor::ComputeWorldTransform()
 {
     if (!mIsRecomputeWorldTransform)
         return;
-
+    
     // 親がいるなら、まず親のWorldTransformを確定させる
     if (mParent)
     {
         mParent->ComputeWorldTransform();
     }
-
+    
     // ローカル行列（SRT）
     Matrix4 local = Matrix4::CreateScale(mScale);
     local *= Matrix4::CreateFromQuaternion(mRotation);
     local *= Matrix4::CreateTranslation(mPosition);
-
+    
     if (mParent)
     {
         // 親ワールドのコピーを作る
@@ -139,35 +141,16 @@ void Actor::ComputeWorldTransform()
     {
         mWorldTransform = local;
     }
-
+    
     mIsRecomputeWorldTransform = false;
-
+    
     // 各Componentにも通知
     for (auto& comp : mComponents)
     {
         comp->OnUpdateWorldTransform();
     }
 }
-/*
-void Actor::ComputeWorldTransform()
-{
-    if (mIsRecomputeWorldTransform)
-    {
-        mIsRecomputeWorldTransform = false;
-        // Scale → rotate → translate
-        mWorldTransform = Matrix4::CreateScale(mScale);
-        mWorldTransform *= Matrix4::CreateFromQuaternion(mRotation);
-        mWorldTransform *= Matrix4::CreateTranslation(mPosition);
 
-
-        // 各Componentも計算する
-        for (auto& comp : mComponents)
-        {
-            comp->OnUpdateWorldTransform();
-        }
-    }
-}
-*/
 // コンポーネントを追加
 void Actor::AddComponent(std::unique_ptr<Component> component)
 {
@@ -185,8 +168,8 @@ void Actor::AddComponent(std::unique_ptr<Component> component)
 void Actor::RemoveComponent(Component* component)
 {
     auto iter = std::find_if(mComponents.begin(), mComponents.end(),
-        [component](const std::unique_ptr<Component>& c) { return c.get() == component; });
-
+                             [component](const std::unique_ptr<Component>& c) { return c.get() == component; });
+    
     if (iter != mComponents.end())
     {
         mComponents.erase(iter);
@@ -197,18 +180,18 @@ void Actor::SetForward(const Vector3& dir)
 {
     // Y成分を無視（XZ平面に投影）
     Vector3 flatDir = Vector3(dir.x, 0.0f, dir.z);
-
+    
     if (flatDir.LengthSq() == 0.0f)
         return; // 方向なし
-
+    
     flatDir = Vector3::Normalize(flatDir);
-
+    
     // atan2(x, z) で Yaw を取得（Zが前提、Xが右）
     float yaw = std::atan2(flatDir.x, flatDir.z);
-
+    
     // YawからQuaternion生成（Pitch = 0, Roll = 0）
     Quaternion rot = Quaternion::FromEulerDegrees(Vector3(0.0f, yaw, 0.f));
-
+    
     SetRotation(rot);
 }
 
@@ -225,24 +208,26 @@ void Actor::SetParent(Actor* newParent)
 {
     if (mParent == newParent)
         return;
-
+    
     // 古い親から外す
     if (mParent)
     {
         auto& siblings = mParent->mChildren;
         siblings.erase(
-            std::remove(siblings.begin(), siblings.end(), this),
-            siblings.end()
-        );
+                       std::remove(siblings.begin(), siblings.end(), this),
+                       siblings.end()
+                       );
     }
-
+    
     mParent = newParent;
-
+    
     if (mParent)
     {
         mParent->mChildren.push_back(this);
     }
-
+    
     // ローカル値として扱うだけ（ワールド維持とかはしない）
     MarkWorldDirty();
 }
+
+} // namespace toy

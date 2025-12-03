@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cassert>
 
+namespace toy {
+
 // Bone処理用
 void VertexBoneData::AddBoneData(unsigned int BoneID, float Weight)
 {
@@ -16,5 +18,7 @@ void VertexBoneData::AddBoneData(unsigned int BoneID, float Weight)
         }
     }
     // ここには来ないはず。
-//   assert(0);
+    //   assert(0);
 }
+
+} // namespace toy

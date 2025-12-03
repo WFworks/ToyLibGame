@@ -3,6 +3,8 @@
 #include "Engine/Core/Component.h"
 #include "Utils/MathUtil.h"
 
+namespace toy {
+
 class MoveComponent : public Component
 {
     
@@ -15,7 +17,7 @@ public:
     float GetForwardSpeed() const { return mForwardSpeed; }
     float GetRightSpeed() const { return mRightSpeed; }
     float GetVerticalSpeed() const { return mVerticalSpeed; }
-
+    
     void SetAngularSpeed(float speed) { mAngularSpeed = speed; }
     void SetForwardSpeed(float speed) { mForwardSpeed = speed; }
     void SetRightSpeed(float speed) { mRightSpeed = speed;}
@@ -30,7 +32,7 @@ public:
     void Reset();
     // 壁すり抜け防止機能付きの移動
     bool TryMoveWithRayCheck(const Vector3& moveVec, float deltaTime);
-
+    
 protected:
     float mAngularSpeed;    // 回転
     float mForwardSpeed;    // 前後
@@ -39,5 +41,7 @@ protected:
     
     bool mIsMovable;        // 移動可能な状態か
     bool mIsTurnable;       // 回転可能な状態か
-
+    
 };
+
+} // namespace toy

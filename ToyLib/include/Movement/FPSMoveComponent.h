@@ -1,6 +1,8 @@
 #pragma once
 #include "Movement/MoveComponent.h"
 
+namespace toy {
+
 class FPSMoveComponent : public MoveComponent
 {
 public:
@@ -12,3 +14,5 @@ private:
     float mTurnSpeed;
     float mSpeed;
 };
+
+} // namespace toy

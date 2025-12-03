@@ -1,8 +1,10 @@
 #include "Asset/Audio/SoundEffect.h"
 #include "Asset/AssetManager.h"
 
+namespace toy {
+
 SoundEffect::SoundEffect()
-    : mChunk(nullptr)
+: mChunk(nullptr)
 {
 }
 
@@ -29,3 +31,4 @@ void SoundEffect::Play(int loops)
     }
 }
 
+} // namespace toy

@@ -3,6 +3,8 @@
 #include "Graphics/VisualComponent.h"
 #include <vector>
 
+namespace toy {
+
 class ParticleComponent : public VisualComponent
 {
 public:
@@ -12,7 +14,7 @@ public:
         P_WATER,
         P_SMOKE
     };
-
+    
     struct Particle
     {
         Vector3 pos;
@@ -21,29 +23,29 @@ public:
         float size;
         bool isVisible;
     };
-
+    
     ParticleComponent(class Actor* owner, int drawOrder = 20);
     ~ParticleComponent();
-
+    
     void Update(float deltaTime) override;
     void Draw() override;
-
+    
     void SetTexture(std::shared_ptr<class Texture> tex) override;
     void CreateParticles(Vector3 pos, unsigned int num, float life, float partLife, float size, ParticleMode mode);
-
+    
     void SetAddBlend(bool b) { mIsBlendAdd = b; }
     void SetSpeed(float speed) { mPartSpeed = speed; }
-
+    
     int GetDrawOrder() const { return mDrawOrder; }
-
+    
 private:
     void GenerateParts();
-
+    
     std::shared_ptr<class Texture> mTexture;
     Vector3 mPosition;
     std::vector<Particle> mParts;
-
-
+    
+    
     int mDrawOrder;
     unsigned int mNumParts;
     float mLifeTime;
@@ -51,7 +53,9 @@ private:
     float mPartLifecycle;
     float mPartSize;
     float mPartSpeed;
-
+    
     ParticleMode mParticleMode;
     bool mIsBlendAdd;
 };
+
+} // namespace toy

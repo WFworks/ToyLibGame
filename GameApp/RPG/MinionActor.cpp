@@ -1,10 +1,10 @@
 #include "MinionActor.h"
 
-MinionActor::MinionActor(Application* a)
+MinionActor::MinionActor(toy::Application* a)
 : Actor(a)
 , mCounter(0.0f)
 {
-    auto mesh = CreateComponent<SkeletalMeshComponent>();
+    auto mesh = CreateComponent<toy::SkeletalMeshComponent>();
     mesh->SetMesh(GetApp()->GetAssetManager()->GetMesh("Enemy_EyeDrone.gltf"));
     SetScale(0.5);
     Quaternion q = Quaternion(Vector3::UnitY, Math::ToRadians(180));

@@ -2,6 +2,8 @@
 #include "Environment/WeatherDomeComponent.h"
 #include "Environment/WeatherOverlayComponent.h"
 
+namespace toy {
+
 WeatherManager::WeatherManager()
 : mWeather(WeatherType::CLEAR)
 {
@@ -52,9 +54,11 @@ void WeatherManager::ChangeWeather(const WeatherType weather)
             break;
     }
     mWeather = weather;
-
+    
     mWeatherDome->SetWeatherType(mWeather);
     mWeatherOverlay->SetRainAmount(rainAmount);
     mWeatherOverlay->SetFogAmount(fogAmount);
     mWeatherOverlay->SetSnowAmout(snowAmount);
 }
+
+} // namespace toy

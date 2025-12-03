@@ -8,6 +8,8 @@
 
 extern const int NUM_VERTEX;
 
+namespace toy {
+
 // OBB計算用のStruct
 struct OBB
 {
@@ -17,7 +19,7 @@ struct OBB
     Vector3 axisX;  // 分離軸X
     Vector3 axisY;  // 分離軸Y
     Vector3 axisZ;  // 分離軸Z
-
+    
     Vector3 min;
     Vector3 max;
     
@@ -64,16 +66,16 @@ public:
     struct Cube GetWorldAABB() const;
     
     std::shared_ptr<struct Polygon[]> GetPolygons() const { return mPolygons; }
-
+    
     float GetRadius() const { return mRadius; }
     void SetRadius(float f) { mRadius = f; }
-
+    
 private:
-
+    
     
     std::shared_ptr<struct Polygon[]> mPolygons;
     void CreatePolygons();
-
+    
     std::shared_ptr<struct Cube> mBoundingBox;
     std::shared_ptr<struct OBB> mObb;
     float mRadius;
@@ -82,3 +84,4 @@ private:
     
 };
 
+} // namespace toy

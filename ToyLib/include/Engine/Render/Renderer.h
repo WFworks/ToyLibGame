@@ -10,6 +10,8 @@
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 
+namespace toy {
+
 enum class VisualLayer
 {
     Background2D,
@@ -36,7 +38,7 @@ public:
     void Shutdown();
     // クリア色を設定
     void SetClearColor(const Vector3& color);
-
+    
     // ビューマトリックスを設定する
     void SetViewMatrix(const Matrix4& view) { mInvView = mViewMatrix = view; mInvView.Invert();}
     Matrix4 GetViewMatrix() const { return mViewMatrix; }
@@ -51,17 +53,17 @@ public:
     // スクリーンサイズのGtter
     float GetScreenWidth() const { return mScreenWidth; }
     float GetScreenHeight() const { return mScreenHeight; }
-      
+    
     
     // Visualコンポーネント
     void AddVisualComp(class VisualComponent* comp);
     void RemoveVisualComp(class VisualComponent* comp);
-
+    
     // デバッグモード設定
     void SetDebugMode(const bool b) { mIsDebugMode = b; }
     bool GetDebugMode() const { return mIsDebugMode; }
     
-
+    
     // データ解放
     void UnloadData();
     
@@ -93,7 +95,7 @@ public:
     // テキストからテクスチャを生成する
     std::shared_ptr<class Texture> CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<class TextFont> font);
     
-
+    
 private:
     // セッティング読み込み
     bool LoadSettings(const std::string& filePath);
@@ -114,7 +116,7 @@ private:
     bool mIsDebugMode;
     // クリア色
     Vector3 mClearColor;
-
+    
     // シャドウマップ
     float mShadowNear;
     float mShadowFar;
@@ -128,7 +130,7 @@ private:
     Matrix4 mInvView;
     // プロジェクションマトリックス
     Matrix4 mProjectionMatrix;
-
+    
     // Windowハンドラ
     SDL_Window* mWindow;
     // GLコンテキスト
@@ -138,12 +140,12 @@ private:
     std::shared_ptr<class VertexArray> mFullScreenQuad;
     void CreateFullScreenQuad();
     
-   
+    
     // シェーダー格納
     std::unordered_map<std::string, std::shared_ptr<class Shader>> mShaders;
     // シェーダー一括ロード
     bool LoadShaders();
-
+    
     // スプライト用ポリゴン（Billboardでも使う）
     std::shared_ptr<class VertexArray> mSpriteVerts;
     // スプライト用ポリゴンの生成
@@ -155,7 +157,7 @@ private:
     void RenderShadowMap();
     Matrix4 mLightSpaceMatrix;
     std::shared_ptr<class Texture> mShadowMapTexture;
-
+    
     // コンポーネント
     std::vector<class VisualComponent*> mVisualComps;
     class SkyDomeComponent* mSkyDomeComp; // Gameアプリ側で生成、生ポインタを保持
@@ -167,3 +169,4 @@ private:
     unsigned int mCntDrawObject;
 };
 
+} // namespace toy

@@ -4,10 +4,10 @@
 
 int main(int argc, char** argv)
 {
-    SingleInstance instance;
+    toy::SingleInstance instance;
     if (!instance.IsLocked()) return 1;
 
-    std::unique_ptr<Application> app = CreateUserApplication();
+    std::unique_ptr<toy::Application> app = CreateUserApplication();
 
     if (app->Initialize())
     {

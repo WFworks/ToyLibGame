@@ -2,6 +2,8 @@
 #include "Engine/Core/Actor.h"
 #include <cmath>
 
+namespace toy {
+
 OrbitMoveComponent::OrbitMoveComponent(class Actor* owner, int updateOrder)
 : MoveComponent(owner, updateOrder)
 , mCenterActor(nullptr)
@@ -18,17 +20,19 @@ void OrbitMoveComponent::Update(float deltaTime)
         mCurrentAngle += mOrbitSpeed * deltaTime;
         if (mCurrentAngle > 360.0f)
             mCurrentAngle -= 360.0f;
-
+        
         float radians = Math::ToRadians(mCurrentAngle);
         Vector3 centerPos = mCenterActor->GetPosition();
         float newX = centerPos.x + mOrbitRadius * cosf(radians);
         float newZ = centerPos.z + mOrbitRadius * sinf(radians);
-
+        
         GetOwner()->SetPosition(Vector3(newX, GetOwner()->GetPosition().y, newZ));
-
+        
         Vector3 toCenter = centerPos - GetOwner()->GetPosition();
         toCenter.Normalize();
         float angle = atan2f(toCenter.x, toCenter.z);
         GetOwner()->SetRotation(Quaternion(Vector3::UnitY, angle));
     }
 }
+
+} // namespace toy

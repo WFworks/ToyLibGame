@@ -6,6 +6,7 @@
 // ４本まで
 #define NUM_BONES_PER_VEREX 4
 
+namespace toy {
 
 // 頂点ごとのBoneデータ
 struct VertexBoneData
@@ -15,12 +16,12 @@ struct VertexBoneData
     {
         Reset();
     };
-
+    
     // 頂点に影響あるBoneのID
     unsigned int IDs[NUM_BONES_PER_VEREX];
     // 影響するウェイト
     float Weights[NUM_BONES_PER_VEREX];
-
+    
     
     // ゼロにリセット
     void Reset()
@@ -43,12 +44,14 @@ struct BoneInfo
 {
     Matrix4 BoneOffset;
     Matrix4 FinalTransformation;
-
-
+    
+    
     BoneInfo()
     {
         memset(&BoneOffset, 0, sizeof(BoneOffset));
         memset(&FinalTransformation, 0, sizeof(FinalTransformation));
-
+        
     }
 };
+
+} // namespace toy

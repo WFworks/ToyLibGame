@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 
+namespace toy {
+
 class AssetManager
 {
 public:
@@ -35,3 +37,5 @@ private:
     
     std::string mAssetsPath;
 };
+
+} // namespace toy

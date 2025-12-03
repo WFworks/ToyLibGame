@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+namespace toy {
 
 // アプリ制御クラス
 class Application
@@ -14,7 +15,7 @@ public:
     Application();
     // デストラクタ
     virtual ~Application();
-
+    
     // 初期化
     virtual bool Initialize();
     // メインループ
@@ -50,7 +51,7 @@ protected:
     virtual void UpdateGame(float deltaTime) { }
     virtual void InitGame() {}
     virtual void ShutdownGame() {}
-   
+    
     // アセットディレクトリのパスの設定
     void SetAssetsPath(const std::string& path);
     
@@ -85,7 +86,7 @@ private:
     std::unique_ptr<class TimeOfDaySystem> mTimeOfDaySys;
     // カウンター
     unsigned int mTicksCount;
-
+    
     
     // アクティブなアクター
     std::vector<std::unique_ptr<class Actor>> mActors;
@@ -93,16 +94,17 @@ private:
     std::vector<std::unique_ptr<class Actor>> mPendingActors;
     // true の場合Pendingsにまわす
     bool mIsUpdatingActors;
-
+    
     // 入力受付
     void ProcessInput();
     // ゲームメイン
     void UpdateFrame();
     // 描画
     void Draw();
-
+    
     // pause
     bool mIsPause;
-
+    
 };
 
+} // namespace toy 

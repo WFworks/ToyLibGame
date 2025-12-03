@@ -2,6 +2,7 @@
 #include "Environment/SkyDomeComponent.h"
 #include "Environment/WeatherManager.h"
 
+namespace toy {
 
 class WeatherDomeComponent : public SkyDomeComponent
 {
@@ -13,7 +14,7 @@ public:
     
     void SetTime(float t);
     void SetSunDirection(const Vector3& dir);
-
+    
     WeatherType GetWeatherType() const { return mWeatherType; }
     void SetWeatherType(WeatherType weather) { mWeatherType = weather; }
     
@@ -21,7 +22,7 @@ private:
     float mTime;
     Vector3 mSunDir;
     WeatherType mWeatherType;
-
+    
     Vector3 mRawSkyColor;
     Vector3 mRawCloudColor;
     Vector3 mFogColor;
@@ -34,3 +35,5 @@ private:
     Vector3 GetCloudColor(float time);
     Vector3 GetSkyColor(float time);
 };
+
+} // namespace toy

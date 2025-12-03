@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 
+namespace toy {
+
 enum class WeatherType
 {
     CLEAR = 0,
@@ -35,5 +37,7 @@ private:
     
     WeatherType mWeather;
     
-
+    
 };
+
+} // namespace toy
