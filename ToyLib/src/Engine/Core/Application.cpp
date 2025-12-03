@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_ttf.h>
+#include <iostream>
 
 namespace toy {
 

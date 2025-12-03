@@ -21,6 +21,7 @@
 #include <GL/glew.h>
 #include <algorithm>
 #include <string>
+#include <iostream>
 
 namespace toy {
 
