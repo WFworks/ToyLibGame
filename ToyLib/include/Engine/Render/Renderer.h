@@ -162,5 +162,7 @@ private:
     
     void DrawSky();
     void DrawVisualLayer(VisualLayer layer);
+    
+    unsigned int mCntDrawObject;
 };
 

@@ -39,6 +39,7 @@ Renderer::Renderer()
 , mWindow(nullptr)
 , mGLContext(nullptr)
 , mShaderPath("ToyLib/Shaders/")
+, mCntDrawObject(0)
 {
     mLightingManager = std::make_shared<LightingManager>();
     LoadSettings("ToyLib/Settings/Renderer_Settings.json");
@@ -135,7 +136,10 @@ void Renderer::Draw()
     DrawVisualLayer(VisualLayer::OverlayScreen);
     
     DrawVisualLayer(VisualLayer::UI);
-
+    
+    std::cout << "Render 3D Objects Count = " << mCntDrawObject << std::endl;
+    mCntDrawObject = 0;
+    
     SDL_GL_SwapWindow(mWindow);
 }
 
@@ -195,7 +199,7 @@ void Renderer::DrawVisualLayer(VisualLayer layer)
         glDepthMask(GL_TRUE);         // 書き込みON
     }
     
-    
+   
     for (auto& comp : mVisualComps)
     {
         if (!comp->IsVisible() || comp->GetLayer() != layer)
@@ -215,12 +219,15 @@ void Renderer::DrawVisualLayer(VisualLayer layer)
 
                     // カリング
                     if (!FrustumIntersectsAABB(frustum, aabb))
+                    {
                         continue;
+                    }
                 }
             }
         }
 
         comp->Draw();
+        mCntDrawObject++;
     }
 
     glEnable(GL_DEPTH_TEST); // 念のため戻す
