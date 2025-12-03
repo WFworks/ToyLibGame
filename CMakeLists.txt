@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(TOYLIB_PATH ToyLib)
-set(GAME_PATH  GameApp)
+set(GAME_PATH  ToyGame)
 
 find_package(OpenGL REQUIRED)
 

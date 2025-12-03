@@ -7,7 +7,6 @@
         "${workspaceFolder}/ToyLibCore/include/**",
         "${workspaceFolder}/GameApp",
         "C:/tools/vcpkg/installed/x64-windows/include",
-        "${workspaceFolder}/**"
       ],
       "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.3x.xxxxx/bin/Hostx64/x64/cl.exe",
       "cStandard": "c17",
@@ -34,7 +33,6 @@
         "${workspaceFolder}/ToyLibCore/include/**",
         "${workspaceFolder}/GameApp",
         "/usr/include",
-        "${workspaceFolder}/**"
       ],
       "compilerPath": "/usr/bin/g++",
       "cStandard": "c17",
