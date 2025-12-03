@@ -163,6 +163,7 @@ private:
     void DrawSky();
     void DrawVisualLayer(VisualLayer layer);
     
+    // 表示オブジェクトのカウンター（Debug/Test用）
     unsigned int mCntDrawObject;
 };
 

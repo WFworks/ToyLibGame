@@ -40,6 +40,11 @@
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		7EA726002EE0535100EDB9BE /* ToyKit */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ToyKit;
+			sourceTree = "<group>";
+		};
 		7EDCE8F52ED72FC00069EE3D /* GameApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = GameApp;
@@ -74,6 +79,7 @@
 		7EDCE8972ED72F7F0069EE3D = {
 			isa = PBXGroup;
 			children = (
+				7EA726002EE0535100EDB9BE /* ToyKit */,
 				7EDCE8F52ED72FC00069EE3D /* GameApp */,
 				7EDCE9852ED72FC00069EE3D /* ToyLib */,
 				7EDCE9BE2ED72FD00069EE3D /* Frameworks */,
@@ -114,6 +120,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				7EA726002EE0535100EDB9BE /* ToyKit */,
 				7EDCE8F52ED72FC00069EE3D /* GameApp */,
 				7EDCE9852ED72FC00069EE3D /* ToyLib */,
 			);
