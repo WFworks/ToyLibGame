@@ -20,20 +20,20 @@ enum HeroMotion
 #endif
 
 
-class HeroActor : public Actor
+class HeroActor : public toy::Actor
 {
 public:
-    HeroActor(class Application* a);
+    HeroActor(class toy::Application* a);
     virtual ~HeroActor();
     void UpdateActor(float deltaTime) override;
-    void ActorInput(const struct InputState& state) override;
+    void ActorInput(const struct toy::InputState& state) override;
 private:
     enum HeroMotion mAnimID;
-    class MoveComponent* mMoveComp;
-    class SkeletalMeshComponent* mMeshComp;
-    class ColliderComponent* mCollComp;
-    class CameraComponent* mCameraComp;
-    class GravityComponent* mGravComp;
-    class SoundComponent* mSound;
+    class toy::MoveComponent* mMoveComp;
+    class toy::SkeletalMeshComponent* mMeshComp;
+    class toy::ColliderComponent* mCollComp;
+    class toy::CameraComponent* mCameraComp;
+    class toy::GravityComponent* mGravComp;
+    class toy::SoundComponent* mSound;
     bool mMovable;
 };

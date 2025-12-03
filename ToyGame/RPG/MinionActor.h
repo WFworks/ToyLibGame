@@ -3,10 +3,10 @@
 #include "ToyLib.h"
 
 
-class MinionActor : public Actor
+class MinionActor : public toy::Actor
 {
 public:
-    MinionActor(class Application* a);
+    MinionActor(class toy::Application* a);
     virtual ~MinionActor();
     void UpdateActor(float deltaTime) override;
 private:

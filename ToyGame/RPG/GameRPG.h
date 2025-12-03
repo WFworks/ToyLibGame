@@ -2,7 +2,8 @@
 #include <string>
 #include <memory>
 
-class GameRPG : public Application
+
+class GameRPG : public toy::Application
 {
 public:
     GameRPG();
@@ -13,7 +14,7 @@ protected:
     void UpdateGame(float deltaTime) override;
     void ShutdownGame() override;
 private:
-    std::unique_ptr<class WeatherManager> mWeather;
-    class TextSpriteComponent* mTextComp;
+    std::unique_ptr<class toy::WeatherManager> mWeather;
+    class toy::TextSpriteComponent* mTextComp;
 
 };
