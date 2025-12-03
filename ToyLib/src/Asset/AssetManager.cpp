@@ -9,7 +9,7 @@
 namespace toy {
 
 AssetManager::AssetManager()
-: mAssetsPath("GameApp/Assets") // デフォルト値
+: mAssetsPath("ToyGame/Assets") // デフォルト値
 {
 }
 

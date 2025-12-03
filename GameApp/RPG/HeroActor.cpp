@@ -8,7 +8,7 @@ HeroActor::HeroActor(toy::Application* a)
 , mMovable(true)
 {
     // --- JSON読み込み ---
-    std::ifstream file("GameApp/Settings/HeroActor.json");
+    std::ifstream file("ToyGame/Settings/HeroActor.json");
     nlohmann::json json;
     file >> json;
 

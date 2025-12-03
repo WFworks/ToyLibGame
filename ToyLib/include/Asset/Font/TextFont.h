@@ -12,7 +12,7 @@ public:
     ~TextFont();
     
     // フォントファイルを読み込む
-    // 例: Load("GameApp/Assets/Fonts/NotoSansJP-Regular.ttf", 24);
+    // 例: Load("ToyGame/Assets/Fonts/NotoSansJP-Regular.ttf", 24);
     bool Load(const std::string& filePath, int pointSize);
     
     // 明示的に解放したいとき

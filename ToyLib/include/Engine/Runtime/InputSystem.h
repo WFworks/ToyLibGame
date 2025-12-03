@@ -144,7 +144,7 @@ public:
     //=======================
 
     // JSONから論理ボタンごとの設定を読み込む
-    // - filePath: 例 "GameApp/Settings/InputConfig.json"
+    // - filePath: 例 "ToyGame/Settings/InputConfig.json"
     bool LoadButtonConfig(const std::string& filePath);
 
     //=======================

@@ -10,7 +10,7 @@ TOYLIB_REGISTER_APP(GameRPG)
 GameRPG::GameRPG()
 : toy::Application()
 {
-    SetAssetsPath("GameApp/Assets/RPG/");
+    SetAssetsPath("ToyGame/Assets/RPG/");
     
     GetTimeOfDaySystem()->SetTimeScale(30.f);
 }
