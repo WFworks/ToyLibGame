@@ -5,9 +5,8 @@
       "includePath": [
         "${workspaceFolder}/ToyLibCore/include",
         "${workspaceFolder}/ToyLibCore/include/**",
-        "${workspaceFolder}/GameApp",
+        "${workspaceFolder}/ToyGame",
         "C:/tools/vcpkg/installed/x64-windows/include",
-        "${workspaceFolder}/**"
       ],
       "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.3x.xxxxx/bin/Hostx64/x64/cl.exe",
       "cStandard": "c17",
@@ -18,7 +17,7 @@
       "name": "macOS",
       "includePath": [
         "${workspaceFolder}/ToyLibCore/include/**",
-        "${workspaceFolder}/GameApp/**",
+        "${workspaceFolder}/ToyGame/**",
         "/usr/local/include",
         "/opt/homebrew/include"
       ],
@@ -32,9 +31,8 @@
       "includePath": [
         "${workspaceFolder}/ToyLibCore/include",
         "${workspaceFolder}/ToyLibCore/include/**",
-        "${workspaceFolder}/GameApp",
+        "${workspaceFolder}/ToyGame",
         "/usr/include",
-        "${workspaceFolder}/**"
       ],
       "compilerPath": "/usr/bin/g++",
       "cStandard": "c17",

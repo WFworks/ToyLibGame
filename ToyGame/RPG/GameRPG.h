@@ -1,0 +1,19 @@
+#include "ToyLib.h"
+#include <string>
+#include <memory>
+
+class GameRPG : public Application
+{
+public:
+    GameRPG();
+    ~GameRPG();
+protected:
+    void InitGame() override;
+    void LoadData();
+    void UpdateGame(float deltaTime) override;
+    void ShutdownGame() override;
+private:
+    std::unique_ptr<class WeatherManager> mWeather;
+    class TextSpriteComponent* mTextComp;
+
+};
