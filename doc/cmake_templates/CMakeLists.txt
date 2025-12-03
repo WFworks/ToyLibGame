@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
-project(toylibGame)
+project(ToyGame)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(TOYLIB_PATH ToyLibCore)
+set(TOYLIB_PATH ToyLib)
 set(GAME_PATH  GameApp)
 
 find_package(OpenGL REQUIRED)
@@ -168,37 +168,37 @@ endif()
 # 資材コピー（共通）
 #========================
 
-set(SOURCE_SHADER_DIR       "${CMAKE_SOURCE_DIR}/ToyLibCore/Shaders")
-set(SOURCE_ASSET_DIR        "${CMAKE_SOURCE_DIR}/GameApp/Assets")
-set(SOURCE_SETTINGS_DIR     "${CMAKE_SOURCE_DIR}/GameApp/Settings")
-set(SOURCE_SYSSETTINGS_DIR  "${CMAKE_SOURCE_DIR}/ToyLibCore/Settings")
+set(SOURCE_SHADER_DIR       "${CMAKE_SOURCE_DIR}/${TOYLIB_PATH}/Shaders")
+set(SOURCE_ASSET_DIR        "${CMAKE_SOURCE_DIR}/${GAME_PATH}/Assets")
+set(SOURCE_SETTINGS_DIR     "${CMAKE_SOURCE_DIR}/${GAME_PATH}/Settings")
+set(SOURCE_SYSSETTINGS_DIR  "${CMAKE_SOURCE_DIR}/${TOYLIB_PATH}/Settings")
 
 
 # 実行ファイルのあるディレクトリを基準にコピー
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${SOURCE_SHADER_DIR}"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/ToyLibCore/Shaders"
-    COMMENT "Copying Shaders to $<TARGET_FILE_DIR:${PROJECT_NAME}>/ToyLibCore/Shaders"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${TOYLIB_PATH}/Shaders"
+    COMMENT "Copying Shaders to $<TARGET_FILE_DIR:${PROJECT_NAME}>/${TOYLIB_PATH}/Shaders"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${SOURCE_ASSET_DIR}"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/GameApp/Assets"
-    COMMENT "Copying Assets to $<TARGET_FILE_DIR:${PROJECT_NAME}>/GameApp/Assets"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${GAME_PATH}/Assets"
+    COMMENT "Copying Assets to $<TARGET_FILE_DIR:${PROJECT_NAME}>/${GAME_PATH}/Assets"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${SOURCE_SETTINGS_DIR}"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/GameApp/Settings"
-    COMMENT "Copying Settings to $<TARGET_FILE_DIR:${PROJECT_NAME}>/GameApp/Settings"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${GAME_PATH}/Settings"
+    COMMENT "Copying Settings to $<TARGET_FILE_DIR:${PROJECT_NAME}>/${GAME_PATH}/Settings"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${SOURCE_SYSSETTINGS_DIR}"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/ToyLibCore/Settings"
-    COMMENT "Copying Settings to $<TARGET_FILE_DIR:${PROJECT_NAME}>/ToyLibCore/Settings"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/${TOYLIB_PATH}/Settings"
+    COMMENT "Copying Settings to $<TARGET_FILE_DIR:${PROJECT_NAME}>/${TOYLIB_PATH}/Settings"
 )

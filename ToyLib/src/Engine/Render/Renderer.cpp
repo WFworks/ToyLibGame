@@ -38,10 +38,10 @@ Renderer::Renderer()
 , mShadowFBOHeight(4096)
 , mWindow(nullptr)
 , mGLContext(nullptr)
-, mShaderPath("ToyLibCore/Shaders/")
+, mShaderPath("ToyLib/Shaders/")
 {
     mLightingManager = std::make_shared<LightingManager>();
-    LoadSettings("ToyLibCore/Settings/Renderer_Settings.json");
+    LoadSettings("ToyLib/Settings/Renderer_Settings.json");
 }
 
 // デストラクタ

@@ -51,7 +51,7 @@ bool Application::Initialize()
 
     // 入力システム初期化
     mInputSys->Initialize();
-    mInputSys->LoadButtonConfig("ToyLibCore/Settings/InputConfig.json");
+    mInputSys->LoadButtonConfig("ToyLib/Settings/InputConfig.json");
     
     // データ ロード、主にRendererに登録されるもの。
     LoadData();

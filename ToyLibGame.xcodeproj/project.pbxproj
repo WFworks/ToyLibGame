@@ -29,7 +29,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		7EDC06E02EDB86B60069EE3D /* Exceptions for "ToyLibCore" folder in "Compile Sources" phase from "ToyLibGame" target */ = {
+		7EDC06E02EDB86B60069EE3D /* Exceptions for "ToyLib" folder in "Compile Sources" phase from "ToyLibGame" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			buildPhase = 7EDCE89C2ED72F7F0069EE3D /* Sources */;
 			membershipExceptions = (
@@ -45,16 +45,16 @@
 			path = GameApp;
 			sourceTree = "<group>";
 		};
-		7EDCE9852ED72FC00069EE3D /* ToyLibCore */ = {
+		7EDCE9852ED72FC00069EE3D /* ToyLib */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				7EDC06E02EDB86B60069EE3D /* Exceptions for "ToyLibCore" folder in "Compile Sources" phase from "ToyLibGame" target */,
+				7EDC06E02EDB86B60069EE3D /* Exceptions for "ToyLib" folder in "Compile Sources" phase from "ToyLibGame" target */,
 			);
 			explicitFileTypes = {
 				include/Graphics/Sprite/TextSpriteComponent.h = sourcecode.c.h;
 				include/Utils/StringUtil.h = sourcecode.c.h;
 			};
-			path = ToyLibCore;
+			path = ToyLib;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,7 +75,7 @@
 			isa = PBXGroup;
 			children = (
 				7EDCE8F52ED72FC00069EE3D /* GameApp */,
-				7EDCE9852ED72FC00069EE3D /* ToyLibCore */,
+				7EDCE9852ED72FC00069EE3D /* ToyLib */,
 				7EDCE9BE2ED72FD00069EE3D /* Frameworks */,
 				7EDCE8A12ED72F7F0069EE3D /* Products */,
 			);
@@ -115,7 +115,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				7EDCE8F52ED72FC00069EE3D /* GameApp */,
-				7EDCE9852ED72FC00069EE3D /* ToyLibCore */,
+				7EDCE9852ED72FC00069EE3D /* ToyLib */,
 			);
 			name = ToyLibGame;
 			packageProductDependencies = (
@@ -291,7 +291,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
-					"$(SRCROOT)/ToyLibCore/include",
+					"$(SRCROOT)/ToyLib/include",
 				);
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
 				OTHER_LDFLAGS = (
@@ -316,7 +316,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
-					"$(SRCROOT)/ToyLibCore/include",
+					"$(SRCROOT)/ToyLib/include",
 				);
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
 				OTHER_LDFLAGS = (

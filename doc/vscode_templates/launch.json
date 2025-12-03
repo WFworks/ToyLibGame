@@ -2,29 +2,29 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch toylibGame (Windows)",
+      "name": "Launch ToyGame (Windows)",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/Debug/toylibGame.exe",
+      "program": "${workspaceFolder}/build/Debug/ToyGame.exe",
       "cwd": "${workspaceFolder}/build/Debug",
       "console": "internalConsole",
       "preLaunchTask": "CMake Build (Windows)"
     },
     {
-      "name": "Launch toylibGame (Linux)",
+      "name": "Launch ToyGame (Linux)",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/toylibGame",
+      "program": "${workspaceFolder}/build/ToyGame",
       "cwd": "${workspaceFolder}/build",
       "MIMode": "gdb",
       "console": "internalConsole",
       "preLaunchTask": "CMake Build (Unix)"
     },
     {
-      "name": "Launch toylibGame (macOS)",
+      "name": "Launch ToyGame (macOS)",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/toylibGame",
+      "program": "${workspaceFolder}/build/ToyGame",
       "cwd": "${workspaceFolder}/build",
       "MIMode": "lldb",
       "console": "internalConsole",
