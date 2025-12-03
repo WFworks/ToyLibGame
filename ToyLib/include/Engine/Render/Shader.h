@@ -9,6 +9,7 @@
 #include <sstream>
 #include <iostream>
 
+namespace toy {
 
 // シェーダー管理用のクラス
 class Shader
@@ -21,7 +22,7 @@ public:
     void Unload();
     // OpenGLにセット
     void SetActive();
-
+    
     // uniform　マトリックス、ベクトル、値
     void SetMatrixUniform(const char* name, const Matrix4& matrix);
     void SetMatrixUniforms(const char* name, Matrix4* matrices, unsigned count);
@@ -40,7 +41,7 @@ private:
     GLuint mFragShaderID;
     // シェーダープログラムのID
     GLuint mShaderProgramID;
-
+    
     // シェーダーをコンパイル
     bool CompileShader(const std::string& fileName, GLenum shaderType, GLuint& outShader);
     // コンパイル済みかチェック
@@ -48,7 +49,7 @@ private:
     // リンクできているかチェック
     bool IsValidProgram();
     
-
+    
 };
 
-
+} // namespace toy

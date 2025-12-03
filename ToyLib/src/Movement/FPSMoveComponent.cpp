@@ -2,6 +2,7 @@
 #include "Engine/Runtime/InputSystem.h"
 #include "Engine/Core/Actor.h"
 
+namespace toy {
 
 FPSMoveComponent::FPSMoveComponent(class Actor* a, int order)
 : MoveComponent(a, order)
@@ -19,12 +20,12 @@ FPSMoveComponent::~FPSMoveComponent()
 
 void FPSMoveComponent::ProcessInput(const struct InputState& state)
 {
-
+    
     if(!mIsMovable) return;
-
+    
     mForwardSpeed = mSpeed * state.Controller.GetLeftStick().y;
     mAngularSpeed = mTurnSpeed * state.Controller.GetLeftStick().x;
-        
+    
     if (state.IsButtonDown(GameButton::DPadLeft))
     {
         mAngularSpeed = -mTurnSpeed;
@@ -53,7 +54,7 @@ void FPSMoveComponent::Update(float deltaTime)
         Quaternion rot = Quaternion::Concatenate(GetOwner()->GetRotation(), inc);
         GetOwner()->SetRotation(rot);
     }
-
+    
     // 前進・後退（RayCCD付き）
     if (!Math::NearZero(mForwardSpeed))
     {
@@ -67,3 +68,5 @@ void FPSMoveComponent::Update(float deltaTime)
         }
     }
 }
+
+} // namespace toy

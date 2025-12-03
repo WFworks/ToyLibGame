@@ -4,6 +4,7 @@
 #include "Physics/PhysWorld.h"
 #include "Physics/ColliderComponent.h"
 
+namespace toy {
 
 // コンストラクタ
 MoveComponent::MoveComponent(class Actor* a, int updateOrder)
@@ -14,7 +15,7 @@ MoveComponent::MoveComponent(class Actor* a, int updateOrder)
 , mVerticalSpeed(0.0f)
 , mIsMovable(true)
 {
-	
+    
 }
 
 void MoveComponent::Update(float deltaTime)
@@ -27,7 +28,7 @@ void MoveComponent::Update(float deltaTime)
         rot = Quaternion::Concatenate(rot, inc);
         GetOwner()->SetRotation(rot);
     }
-
+    
     Vector3 pos = GetOwner()->GetPosition();
     if (!Math::NearZero(mForwardSpeed))
     {
@@ -41,7 +42,7 @@ void MoveComponent::Update(float deltaTime)
     {
         pos += GetOwner()->GetUpward() * mVerticalSpeed * deltaTime;
     }
-
+    
     GetOwner()->SetPosition(pos);
 }
 
@@ -57,10 +58,10 @@ void MoveComponent::Reset()
 bool MoveComponent::TryMoveWithRayCheck(const Vector3& moveVec, float deltaTime)
 {
     if (!GetOwner() || !mIsMovable) return false;
-
+    
     Vector3 start = GetOwner()->GetPosition();
     Vector3 goal = start + moveVec * deltaTime;
-
+    
     Vector3 stopPos;
     if (GetOwner()->GetApp()->GetPhysWorld()->RayHitWall(start, goal, stopPos))
     {
@@ -70,9 +71,11 @@ bool MoveComponent::TryMoveWithRayCheck(const Vector3& moveVec, float deltaTime)
     {
         GetOwner()->SetPosition(goal);
     }
-
+    
     // 念のための押し戻し（MTV）
     GetOwner()->GetApp()->GetPhysWorld()->CollideAndCallback(C_PLAYER, C_WALL, true, false);
-
+    
     return true;
 }
+
+} // namespace toy

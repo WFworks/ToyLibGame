@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 
+namespace toy {
+
 struct BlendInfo
 {
     const aiAnimation* fromAnim = nullptr;
@@ -18,12 +20,12 @@ class AnimationPlayer
 {
 public:
     AnimationPlayer(std::shared_ptr<class Mesh> mesh);
-
+    
     void Update(float deltaTime);
     void Play(int animID, bool loop = true);
     void SetPlayRate(float rate) { mPlayRate = rate; }
     void Pause(bool paused) { mIsPaused = paused; }
-
+    
     const std::vector<Matrix4>& GetFinalMatrices() const { return mFinalMatrices; }
     
     void PlayOnce(int animID, int nextAnimID);
@@ -31,7 +33,7 @@ public:
     
     bool IsFinished() const { return mIsFinished; }
     bool IsLooping() const { return mIsLooping; }
-
+    
 private:
     std::shared_ptr<class Mesh> mMesh;
     int mAnimID;
@@ -42,7 +44,7 @@ private:
     
     int mNextAnimID;
     bool mIsFinished;
-
+    
     std::vector<Matrix4> mFinalMatrices;
     BlendInfo mBlend;
     
@@ -50,3 +52,4 @@ private:
     int FindClipIndex(const aiAnimation* anim) const;
 };
 
+} // namespace toy

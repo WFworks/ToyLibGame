@@ -1,6 +1,7 @@
 #include "Asset/Font/TextFont.h"
-
 #include <iostream>
+
+namespace toy {
 
 TextFont::TextFont()
 : mFont(nullptr)
@@ -22,16 +23,16 @@ bool TextFont::Load(const std::string& filePath, int pointSize)
         TTF_CloseFont(mFont);
         mFont = nullptr;
     }
-
+    
     mFont = TTF_OpenFont(filePath.c_str(), pointSize);
     if (!mFont)
     {
         std::cerr << "TTF_OpenFont failed: " << TTF_GetError()
-                  << " (file: " << filePath << ", size: " << pointSize << ")"
-                  << std::endl;
+        << " (file: " << filePath << ", size: " << pointSize << ")"
+        << std::endl;
         return false;
     }
-
+    
     mFilePath  = filePath;
     mPointSize = pointSize;
     return true;
@@ -45,3 +46,5 @@ void TextFont::Unload()
         mFont = nullptr;
     }
 }
+
+} // namespace toy

@@ -2,6 +2,8 @@
 #include "Utils/MathUtil.h"
 #include <memory>
 
+namespace toy {
+
 // ディレクショナルライト
 struct DirectionalLight
 {
@@ -23,7 +25,7 @@ struct FogInfo
     float MaxDist = 100.f;
     float MinDist = 0.00001f;
     Vector3 Color = Vector3(0.5f, 0.5f, 0.5f);
-
+    
 };
 
 class LightingManager
@@ -54,12 +56,12 @@ public:
     void SetFogMinDist(float min) { mFog.MinDist = min; }
     void SetFogMaxDist(float max) { mFog.MaxDist = max; }
     void SetFogColor(const Vector3& color) { mFog.Color = color; }
-
+    
     float GetFogMinDist() const { return mFog.MinDist; }
     float GetFogMaxDist() const { return mFog.MaxDist; }
     const Vector3& GetFogColor() const { return mFog.Color; }
-
-
+    
+    
     void  SetSunIntensity(const float i) { mSunIntensity = i; }
     float GetSunIntensity() const { return mSunIntensity; }
     
@@ -72,3 +74,5 @@ private:
     Vector3 mAmbientColor = Vector3(0.5f, 0.5f, 0.5f);
     float mSunIntensity; // 太陽の強さ
 };
+
+} // namespace toy

@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+namespace toy {
+
 // コンストラクタ
 ColliderComponent::ColliderComponent(Actor* a)
 : Component(a)
@@ -38,3 +40,5 @@ void ColliderComponent::Collided(ColliderComponent* c)
         mIsCollided = true;
     }
 }
+
+} // namespace toy

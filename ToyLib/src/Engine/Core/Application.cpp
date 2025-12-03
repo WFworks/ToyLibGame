@@ -11,6 +11,7 @@
 #include <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_ttf.h>
 
+namespace toy {
 
 Application::Application()
 : mIsActive(false)
@@ -48,7 +49,7 @@ bool Application::Initialize()
     
     // Renderer初期化
     mRenderer->Initialize();
-
+    
     // 入力システム初期化
     mInputSys->Initialize();
     mInputSys->LoadButtonConfig("ToyLib/Settings/InputConfig.json");
@@ -62,7 +63,7 @@ bool Application::Initialize()
     mIsActive = true;
     mTicksCount = SDL_GetTicks();
     
-
+    
     return true;
 }
 
@@ -92,7 +93,7 @@ void Application::Shutdown()
     UnloadData();
     mInputSys->Shutdown();
     mRenderer->Shutdown();
-
+    
     TTF_Quit();
     SDL_Quit();
 }
@@ -110,20 +111,20 @@ void Application::ProcessInput()
         switch (event.type)
         {
                 
-        case SDL_QUIT:
-            mIsActive = false;
-            break;
+            case SDL_QUIT:
+                mIsActive = false;
+                break;
         }
     }
-
+    
     mInputSys->Update();
     const InputState& state = mInputSys->GetState();
-
+    
     if (state.Keyboard.GetKeyState(SDL_SCANCODE_ESCAPE) == EReleased)
     {
         mIsActive = false;
     }
-
+    
     if (state.Keyboard.GetKeyState(SDL_SCANCODE_SPACE) == EHeld)
     {
         mIsPause = true;
@@ -158,12 +159,12 @@ void Application::AddActor(std::unique_ptr<Actor> actor)
 void Application::UnloadData()
 {
     mActors.clear();
-
+    
     if (mRenderer)
     {
         mRenderer->UnloadData();
     }
-
+    
     if (mAssetManager)
     {
         mAssetManager->UnloadData();
@@ -173,7 +174,7 @@ void Application::UnloadData()
 // Actors, Renderer関連
 void Application::LoadData()
 {
-
+    
 }
 
 int fps = 0;
@@ -198,7 +199,7 @@ void Application::UpdateFrame()
     // FPS60固定
     while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16))
         ;
-
+    
     float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
     if (deltaTime > 0.05f)
     {
@@ -206,20 +207,20 @@ void Application::UpdateFrame()
     }
     mTicksCount = SDL_GetTicks();
     
-
+    
     // ポーズ中以降の処理キャンセル
     if(mIsPause) return;
     
     // 時間を進める
     mTimeOfDaySys->Update(deltaTime);
-
+    
     // 派生先のUpdateを呼ぶ
     UpdateGame(deltaTime);
     
     // 物理計算系
     mPhysWorld->Test();
     
-
+    
     // Actorsメイン呼び出し
     mIsUpdatingActors = true;
     for (auto& a : mActors)
@@ -227,7 +228,7 @@ void Application::UpdateFrame()
         a->Update(deltaTime);
     }
     mIsUpdatingActors = false;
-
+    
     // Pendingがある場合はActorsに移動
     for (auto& p : mPendingActors)
     {
@@ -235,12 +236,12 @@ void Application::UpdateFrame()
         mActors.emplace_back(std::move(p));
     }
     mPendingActors.clear();
-
+    
     // EDeadフラグのアクターは削除
     mActors.erase(std::remove_if(mActors.begin(), mActors.end(),
                                  [](const std::unique_ptr<Actor>& actor) {
-                                    return actor->GetState() == Actor::EDead;
-                                }),mActors.end());
+        return actor->GetState() == Actor::EDead;
+    }),mActors.end());
 }
 
 // アセットディレクトリの設定
@@ -248,3 +249,5 @@ void Application::SetAssetsPath(const std::string &path)
 {
     mAssetManager->SetAssetsPath(path);
 }
+
+} // namespace toy

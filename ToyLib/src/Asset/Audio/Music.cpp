@@ -1,8 +1,10 @@
 #include "Asset/Audio/Music.h"
 #include "Asset/AssetManager.h"
 
+namespace toy {
+
 Music::Music()
-    : mMusic(nullptr)
+: mMusic(nullptr)
 {
 }
 
@@ -33,3 +35,5 @@ void Music::Stop()
 {
     Mix_HaltMusic();
 }
+
+} // namespace toy

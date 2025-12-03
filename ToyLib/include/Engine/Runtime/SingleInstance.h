@@ -7,6 +7,8 @@
 #include <unistd.h>
 #endif
 
+namespace toy {
+
 class SingleInstance
 {
 private:
@@ -16,12 +18,13 @@ private:
     int mFd;
 #endif
     bool mIsLocked;
-
+    
 public:
     SingleInstance();
-
+    
     ~SingleInstance();
-
+    
     bool IsLocked() const { return mIsLocked; }
 };
 
+} // namespace toy

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utils/MathUtil.h"
-#include "Utils/Polygon.h"
+#include "Asset/Geometry/Polygon.h"
 #include "Frustum.h"
 
 // ToyLib の Matrix4 に合わせたアクセス
@@ -66,7 +66,7 @@ inline Frustum BuildFrustumFromMatrix(const Matrix4& vp)
     return fr;
 }
 
-inline bool FrustumIntersectsAABB(const Frustum& fr, const Cube& box)
+inline bool FrustumIntersectsAABB(const Frustum& fr, const toy::Cube& box)
 {
     // AABB の 8 点を生成
     Vector3 corners[8] =

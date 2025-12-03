@@ -3,6 +3,7 @@
 #include <string>
 #include <assimp/scene.h>
 
+namespace toy {
 // アニメーションクリップ情報
 struct AnimationClip
 {
@@ -11,3 +12,5 @@ struct AnimationClip
     float mDuration;                // 再生時間（Ticks）
     float mTicksPerSecond;          // 1秒あたりのTick数
 };
+
+} // namespace toy

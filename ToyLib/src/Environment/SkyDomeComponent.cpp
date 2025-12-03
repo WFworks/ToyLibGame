@@ -8,6 +8,8 @@
 #include "Engine/Render/Renderer.h"
 #include <algorithm>
 
+namespace toy {
+
 SkyDomeComponent::SkyDomeComponent(Actor* a)
 : Component(a)
 {
@@ -19,14 +21,16 @@ SkyDomeComponent::SkyDomeComponent(Actor* a)
 
 void SkyDomeComponent::Draw()
 {
-
+    
     if (!mSkyVAO || !mShader) return;
     
-
+    
 }
 
 
 void SkyDomeComponent::Update(float deltaTime)
 {
-
+    
 }
+
+} // namespace toy

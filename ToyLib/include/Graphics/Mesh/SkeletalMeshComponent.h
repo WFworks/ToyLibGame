@@ -7,6 +7,7 @@
 
 const size_t MAX_SKELETON_BONES = 96;
 
+namespace toy {
 
 // スケルタルアニメーションメッシュを管理
 class SkeletalMeshComponent : public MeshComponent
@@ -28,11 +29,12 @@ public:
     
     class AnimationPlayer* GetAnimPlayer() { return mAnimPlayer.get(); }
     
-
+    
 private:
     // アニメーション時間
     float mAnimTime;
     std::unique_ptr<class AnimationPlayer> mAnimPlayer;
-
+    
 };
 
+} // namespace toy

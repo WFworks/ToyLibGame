@@ -9,18 +9,20 @@
 #include "Asset/Geometry/VertexArray.h"
 #include <random>
 
+namespace toy {
+
 ParticleComponent::ParticleComponent(Actor* owner, int drawOrder)
-    : VisualComponent(owner, drawOrder)
-    , mTexture(nullptr)
-    , mDrawOrder(drawOrder)
-    , mIsBlendAdd(true)
-    , mNumParts(0)
-    , mLifeTime(0.0f)
-    , mTotalLife(0.0f)
-    , mPartLifecycle(0.0f)
-    , mPartSize(0.0f)
-    , mPartSpeed(2.0f)
-    , mParticleMode(P_SPARK)
+: VisualComponent(owner, drawOrder)
+, mTexture(nullptr)
+, mDrawOrder(drawOrder)
+, mIsBlendAdd(true)
+, mNumParts(0)
+, mLifeTime(0.0f)
+, mTotalLife(0.0f)
+, mPartLifecycle(0.0f)
+, mPartSize(0.0f)
+, mPartSpeed(2.0f)
+, mParticleMode(P_SPARK)
 {
     mLayer = VisualLayer::Effect3D;
     mShader = GetOwner()->GetApp()->GetRenderer()->GetShader("Particle");
@@ -46,25 +48,25 @@ void ParticleComponent::CreateParticles(Vector3 pos, unsigned int num, float lif
     mPartLifecycle = partLife;
     mPartSize = size;
     mParticleMode = mode;
-
+    
     mParts.resize(mNumParts);
 }
 
 void ParticleComponent::GenerateParts()
 {
     std::random_device rnd;
-
+    
     for (int i = 0; i < mNumParts; i++)
     {
         if (mParts[i].isVisible) continue;
-     
+        
         float x = (float)(rnd() % (int)mPartSpeed);
         float y = (float)(rnd() % (int)mPartSpeed);
         float z = (float)(rnd() % (int)mPartSpeed);
         if (rand() % 2) x *= -1;
         if (rand() % 2) y *= -1;
         if (rand() % 2) z *= -1;
-
+        
         mParts[i].pos = mPosition;
         mParts[i].dir = Vector3(x, y, z);
         mParts[i].isVisible = true;
@@ -81,7 +83,7 @@ void ParticleComponent::Update(float deltaTime)
     {
         mIsVisible = false;
     }
-
+    
     for (int i = 0; i < mNumParts; i++)
     {
         if (mParts[i].isVisible)
@@ -90,15 +92,15 @@ void ParticleComponent::Update(float deltaTime)
                 mParts[i].dir.y -= 0.04f;
             else if (mParticleMode == P_SMOKE)
                 mParts[i].dir.y += 0.04f;
-
+            
             mParts[i].lifeTime += deltaTime;
             mParts[i].pos += mParts[i].dir * deltaTime;
-
+            
             if (mParts[i].lifeTime > mPartLifecycle)
                 mParts[i].isVisible = false;
         }
     }
-
+    
     if (rand() % 2 == 0)
     {
         GenerateParts();
@@ -108,7 +110,7 @@ void ParticleComponent::Update(float deltaTime)
 void ParticleComponent::Draw()
 {
     if (!mIsVisible || mTexture == nullptr) return;
-
+    
     if (mIsBlendAdd)
     {
         glBlendFunc(GL_ONE, GL_ONE);
@@ -123,10 +125,10 @@ void ParticleComponent::Draw()
     invView.mat[3][0] = mat.mat[3][0];
     invView.mat[3][1] = mat.mat[3][1];
     invView.mat[3][2] = mat.mat[3][2];
-
+    
     Matrix4 scaleMat = Matrix4::CreateScale(mPartSize, mPartSize, 1);
     Matrix4 world = scaleMat * Matrix4::CreateScale(GetOwner()->GetScale()) * invView;
-
+    
     auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
@@ -134,10 +136,10 @@ void ParticleComponent::Draw()
     mShader->SetActive();
     mShader->SetMatrixUniform("uViewProj", view * proj);
     mShader->SetMatrixUniform("uWorldTransform", world);
-
+    
     mTexture->SetActive(0);
     mShader->SetTextureUniform("uTexture", 0);
-
+    
     // VAO有効有効化
     mVertexArray->SetActive();
     for (int i = 0; i < mNumParts; i++)
@@ -153,3 +155,5 @@ void ParticleComponent::Draw()
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 }
+
+} // namespace toy

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Engine/Core/Component.h"
-#include "Utils/Polygon.h"
+#include "Asset/Geometry/Polygon.h"
 
 #include <vector>
 #include <memory>
+
+namespace toy {
 
 #define ENABLE_BITMASK_OPERATORS(x)                                \
 inline x operator|(x a, x b) { return static_cast<x>(static_cast<int>(a) | static_cast<int>(b)); } \
@@ -12,6 +14,8 @@ inline x operator&(x a, x b) { return static_cast<x>(static_cast<int>(a) & stati
 inline x& operator|=(x& a, x b) { a = a | b; return a; }            \
 inline x& operator&=(x& a, x b) { a = a & b; return a; }            \
 inline x operator~(x a) { return static_cast<x>(~static_cast<int>(a)); }
+
+
 
 enum ColliderType : uint32_t
 {
@@ -32,7 +36,7 @@ class ColliderComponent : public Component
 public:
     ColliderComponent(class Actor* a);
     virtual ~ColliderComponent();
-
+    
     // 自分のタイプ
     void SetFlags(uint32_t flags) { mFlags = flags; }
     void AddFlag(uint32_t flag) { mFlags |= flag; }
@@ -59,7 +63,7 @@ public:
     // 表示されているかどうか
     bool GetDisp() const { return mIsDisp; }
     void SetDisp(bool b) { mIsDisp = b; }
-
+    
     // レイを取得 基本は空
     virtual Ray GetRay() const { return Ray(); }
     
@@ -74,3 +78,5 @@ private:
     std::vector<ColliderComponent*> mTargetColliders;
     
 };
+
+} // namespace toy

@@ -1,6 +1,8 @@
 #pragma once
 #include "Movement/MoveComponent.h"
 
+namespace toy {
+
 class DirMoveComponent : public MoveComponent
 {
 public:
@@ -13,3 +15,5 @@ private:
     void AdjustDir();
     Vector3 mPrevPosition;
 };
+
+} // namespace toy

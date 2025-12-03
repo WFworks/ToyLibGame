@@ -5,6 +5,8 @@
 #include "Engine/Render/Renderer.h"
 #include "Asset/Material/Texture.h"
 
+namespace toy {
+
 TextSpriteComponent::TextSpriteComponent(Actor* owner, int drawOrder, VisualLayer layer)
 : SpriteComponent(owner, drawOrder, layer)
 , mText("")
@@ -70,3 +72,4 @@ void TextSpriteComponent::UpdateTexture()
     // ここでは特にやることなし（スケーリングしたいときは SetScale() を別途呼ぶ）
 }
 
+} // namespace toy

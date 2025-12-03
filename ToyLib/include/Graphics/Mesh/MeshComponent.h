@@ -3,7 +3,8 @@
 #include "Graphics/VisualComponent.h"
 #include "Utils/MathUtil.h"
 #include <memory>
-//#include <cstddef>
+
+namespace toy {
 
 // Meshを管理するComponent
 class MeshComponent : public VisualComponent
@@ -11,14 +12,14 @@ class MeshComponent : public VisualComponent
 public:
     MeshComponent(class Actor* a, int drawOrder = 100, VisualLayer layer = VisualLayer::Effect3D, bool isSkeletal = false);
     virtual ~MeshComponent();
-        
+    
     // 描画 override
     virtual void Draw();
     virtual void DrawShadow();
     
     virtual void SetMesh(std::shared_ptr<class Mesh> m) { mMesh = m; }              // メッシュセット
     void SetTextureIndex(unsigned int index) { mTextureIndex = index; }    // テクスチャGetter
-   
+    
     bool GetIsSkeletal() const { return mIsSkeletal; }
     std::shared_ptr<VertexArray> GetVertexArray(int id) const;
     
@@ -34,10 +35,10 @@ protected:
     std::shared_ptr<class Mesh>  mMesh;      // メッシュ
     unsigned int mTextureIndex;    // TextureID
     
-
+    
     //bool mIsVisible;
     bool mIsSkeletal;
-
+    
     std::shared_ptr<class Texture> mShadowMapTexture;
     
     std::shared_ptr<class LightingManager> mLightingManger;
@@ -50,3 +51,4 @@ protected:
     float mContourFactor;
 };
 
+} // namespace toy

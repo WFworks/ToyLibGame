@@ -13,6 +13,8 @@
 #include <GL/glew.h>
 #include <vector>
 
+namespace toy {
+
 // コンストラクタ
 MeshComponent::MeshComponent(Actor* a, int drawOrder, VisualLayer layer, bool isSkeletal)
 : VisualComponent(a, drawOrder, layer)
@@ -37,7 +39,7 @@ MeshComponent::MeshComponent(Actor* a, int drawOrder, VisualLayer layer, bool is
 // デストラクタ
 MeshComponent::~MeshComponent()
 {
-
+    
 }
 
 // 描画
@@ -57,8 +59,8 @@ void MeshComponent::Draw()
     Matrix4 proj = renderer->GetProjectionMatrix();
     Matrix4 light = renderer->GetLightSpaceMatrix();
     
-
- 
+    
+    
     mShader->SetActive();
     mLightingManger->ApplyToShader(mShader, view);
     mShader->SetMatrixUniform("uViewProj", view * proj);
@@ -67,12 +69,12 @@ void MeshComponent::Draw()
     mShader->SetFloatUniform("uShadowBias", 0.005);
     mShader->SetBooleanUniform("uUseToon", mIsToon);
     
-
-
+    
+    
     
     // WorldマトリックスをShaderに送る
     mShader->SetMatrixUniform("uWorldTransform", GetOwner()->GetWorldTransform());
-
+    
     // Vertex Array
     auto va = mMesh->GetVertexArray();
     for (auto& v : va)
@@ -85,7 +87,7 @@ void MeshComponent::Draw()
         v->SetActive();
         glDrawElements(GL_TRIANGLES, v->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
     }
-        
+    
     // 輪郭強調用
     if (mIsToon)
     {
@@ -106,7 +108,7 @@ void MeshComponent::Draw()
         }
         glFrontFace(GL_CCW);
     }
-        
+    
     if (mIsBlendAdd)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -141,3 +143,5 @@ void MeshComponent::DrawShadow()
         glDrawElements(GL_TRIANGLES, v->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
     }
 }
+
+} // namespace toy

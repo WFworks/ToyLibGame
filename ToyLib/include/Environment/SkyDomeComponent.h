@@ -3,15 +3,17 @@
 #include "Engine/Render/Shader.h"
 #include <memory>
 
+namespace toy {
+
 class SkyDomeComponent : public Component
 {
 public:
     SkyDomeComponent(class Actor* a);
-
+    
     virtual void Draw();
     void Update(float deltaTime) override;
     
-
+    
     void SetLightingManager(std::shared_ptr<class LightingManager> manager) { mLightingManager = manager; }
     
 protected:
@@ -19,3 +21,5 @@ protected:
     std::shared_ptr<class LightingManager> mLightingManager;
     std::shared_ptr<class Shader> mShader;
 };
+
+} // namespace toy

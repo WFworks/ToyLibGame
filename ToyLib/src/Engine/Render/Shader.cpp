@@ -1,25 +1,23 @@
 #include "Engine/Render/Shader.h"
 
-//#ifndef GL_SILENCE_DEPRECATION
-//#define GL_SILENCE_DEPRECATION
-//#endif //GL_SILENCE_DEPRECATION
+namespace toy {
 
 Shader::Shader()
-    : mShaderProgramID(0)
-    , mVertexShaderID(0)
-    , mFragShaderID(0)
+: mShaderProgramID(0)
+, mVertexShaderID(0)
+, mFragShaderID(0)
 {
     
 }
 
 Shader::~Shader()
 {
-
+    
 }
 
 // シェーダー読み込み
 bool Shader::Load(const std::string& vertName, const std::string& fragName)
-{    
+{
     // シェーダー コンパイル
     if (!CompileShader(vertName, GL_VERTEX_SHADER, mVertexShaderID))
     {
@@ -190,3 +188,5 @@ bool Shader::IsValidProgram()
     
     return true;
 }
+
+} // namespace toy

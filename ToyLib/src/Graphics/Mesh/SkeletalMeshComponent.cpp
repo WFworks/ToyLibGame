@@ -10,6 +10,8 @@
 #include "Asset/Material/Material.h"
 #include "Engine/Runtime/AnimationPlayer.h"
 
+namespace toy {
+
 SkeletalMeshComponent::SkeletalMeshComponent(Actor* a, int drawOrder, VisualLayer layer)
 : MeshComponent(a, drawOrder, layer,  true)
 , mAnimTime(0.0f)
@@ -35,13 +37,13 @@ void SkeletalMeshComponent::Draw()
     {
         glBlendFunc(GL_ONE, GL_ONE);
     }
-
+    
     mShadowMapTexture->SetActive(1);
     auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
     Matrix4 light = renderer->GetLightSpaceMatrix();
-
+    
     mShader->SetActive();
     mLightingManger->ApplyToShader(mShader, view);
     mShader->SetMatrixUniform("uViewProj", view * proj);
@@ -54,11 +56,11 @@ void SkeletalMeshComponent::Draw()
     
     // アニメーション行列取得
     std::vector<Matrix4> transforms =
-        mAnimPlayer ? mAnimPlayer->GetFinalMatrices() : std::vector<Matrix4>();
-
+    mAnimPlayer ? mAnimPlayer->GetFinalMatrices() : std::vector<Matrix4>();
+    
     mShader->SetMatrixUniforms("uMatrixPalette", transforms.data(), (unsigned int)transforms.size());
     mShader->SetFloatUniform("uSpecPower", mMesh->GetSpecPower());
-
+    
     // VertexArray 描画
     auto va = mMesh->GetVertexArray();
     for (auto v : va)
@@ -71,7 +73,7 @@ void SkeletalMeshComponent::Draw()
         v->SetActive();
         glDrawElements(GL_TRIANGLES, v->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
     }
-
+    
     // トゥーン輪郭描画（そのまま）
     if (mIsToon)
     {
@@ -92,7 +94,7 @@ void SkeletalMeshComponent::Draw()
         }
         glFrontFace(GL_CCW);
     }
-
+    
     if (mIsBlendAdd)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -102,21 +104,21 @@ void SkeletalMeshComponent::Draw()
 void SkeletalMeshComponent::DrawShadow()
 {
     if (!mMesh) return;
-
+    
     auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 light = renderer->GetLightSpaceMatrix();
-
+    
     mShadowShader->SetActive();
     mShadowShader->SetMatrixUniform("uWorldTransform", GetOwner()->GetWorldTransform());
-
+    
     static std::vector<Matrix4> gEmptyMatrixList;
     std::vector<Matrix4> transforms =
-        mAnimPlayer ? mAnimPlayer->GetFinalMatrices() : gEmptyMatrixList;
+    mAnimPlayer ? mAnimPlayer->GetFinalMatrices() : gEmptyMatrixList;
     
-
+    
     mShadowShader->SetMatrixUniforms("uMatrixPalette", transforms.data(), (unsigned int)transforms.size());
     mShadowShader->SetMatrixUniform("uLightSpaceMatrix", light);
-
+    
     auto va = mMesh->GetVertexArray();
     for (auto v : va)
     {
@@ -140,3 +142,5 @@ void SkeletalMeshComponent::SetMesh(std::shared_ptr<Mesh> mesh)
     MeshComponent::SetMesh(mesh);
     mAnimPlayer = std::make_unique<AnimationPlayer>(mesh);
 }
+
+} // namespace toy

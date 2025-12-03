@@ -4,6 +4,8 @@
 #include "Engine/Core/Application.h"
 #include "Physics/ColliderComponent.h"
 
+namespace toy {
+
 CameraComponent::CameraComponent(Actor* a, int updateOrder)
 : Component(a, updateOrder)
 {
@@ -26,4 +28,4 @@ void CameraComponent::Update(float deltaTime)
     mCameraPosition = inView.GetTranslation();
 }
 
-
+} // namespace toy

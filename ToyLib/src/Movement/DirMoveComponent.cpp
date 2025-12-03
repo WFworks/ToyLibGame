@@ -5,6 +5,7 @@
 #include "Engine/Render/Renderer.h"
 #include "Physics/PhysWorld.h"
 
+namespace toy {
 
 DirMoveComponent::DirMoveComponent(class Actor* a, int order)
 : MoveComponent(a, order)
@@ -18,39 +19,39 @@ DirMoveComponent::~DirMoveComponent()
 {
     
 }
- 
+
 void DirMoveComponent::Update(float deltaTime)
 {
     //Vector3 pos = mOwnerActor->GetPosition();
-
+    
     // カメラ基準の移動方向を計算
     Vector3 forward = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix().GetZAxis();
     Vector3 right = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix().GetXAxis();
-
+    
     forward.y = 0.0f;
     right.y = 0.0f;
     forward.Normalize();
     right.Normalize();
-
+    
     Vector3 moveDir = forward * mForwardSpeed + right * mRightSpeed;
-
+    
     if (moveDir.LengthSq() > Math::NearZeroEpsilon)
     {
         moveDir.Normalize();
         moveDir.Normalize();
         TryMoveWithRayCheck(moveDir * mSpeed, deltaTime);
     }
-
+    
     AdjustDir();
     mPrevPosition = GetOwner()->GetPosition();
 }
 
 void DirMoveComponent::ProcessInput(const struct InputState& state)
 {
-
+    
     if(!mIsMovable) return;
-
-
+    
+    
     mForwardSpeed = mSpeed * state.Controller.GetLeftStick().y;
     mRightSpeed = mSpeed * state.Controller.GetLeftStick().x;
     if (state.IsButtonDown(GameButton::DPadLeft))
@@ -69,7 +70,7 @@ void DirMoveComponent::ProcessInput(const struct InputState& state)
     {
         mForwardSpeed = -mSpeed;
     }
-
+    
 }
 
 void DirMoveComponent::AdjustDir()
@@ -81,9 +82,11 @@ void DirMoveComponent::AdjustDir()
         float rot = Math::Atan2(moveVal.x, moveVal.z);
         Quaternion targetRot = Quaternion(Vector3::UnitY, rot);
         Quaternion currentRot = GetOwner()->GetRotation();
-
+        
         // 球面線形補間（スムーズな回転）
         Quaternion smoothRot = Quaternion::Slerp(currentRot, targetRot, 0.1f); // 0.1fは回転の追従速度
         GetOwner()->SetRotation(smoothRot);
     }
 }
+
+} // namespace toy

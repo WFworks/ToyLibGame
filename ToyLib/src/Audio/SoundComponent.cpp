@@ -5,15 +5,17 @@
 #include "Asset/Audio/SoundEffect.h"
 #include "Engine/Render/Renderer.h"
 
+namespace toy {
+
 SoundComponent::SoundComponent(Actor* owner, int updateOrder)
-    : Component(owner, updateOrder)
-    , mVolume(1.0f)
-    , mIsLoop(false)
-    , mAutoPlay(false)
-    , mUseDistanceAttenuation(false)
-    , mIsExclusive(false)
-    , mChannel(-1)
-    , mHasPlayed(false)
+: Component(owner, updateOrder)
+, mVolume(1.0f)
+, mIsLoop(false)
+, mAutoPlay(false)
+, mUseDistanceAttenuation(false)
+, mIsExclusive(false)
+, mChannel(-1)
+, mHasPlayed(false)
 {
 }
 
@@ -30,30 +32,30 @@ void SoundComponent::SetSound(const std::string& fileName)
 void SoundComponent::Play()
 {
     if (mSoundName.empty()) return;
-
+    
     if (mIsExclusive && IsPlaying())
     {
         return; // 排他再生中は新しく鳴らさない
     }
-
+    
     auto sound = GetOwner()->GetApp()->GetAssetManager()->GetSoundEffect(mSoundName);
     if (!sound) return;
-
+    
     float actualVolume = mVolume;
-
+    
     if (mUseDistanceAttenuation)
     {
         Vector3 camPos = GetOwner()->GetApp()->GetRenderer()->GetViewMatrix().GetTranslation();
         Vector3 pos = GetOwner()->GetPosition();
         float distance = (camPos - pos).Length();
-
+        
         if (distance > 5.0f)
         {
             actualVolume *= (5.0f / distance);
             if (actualVolume < 0.0f) actualVolume = 0.0f;
         }
     }
-
+    
     Mix_VolumeChunk(sound->GetChunk(), static_cast<int>(actualVolume * MIX_MAX_VOLUME));
     mChannel = Mix_PlayChannel(-1, sound->GetChunk(), mIsLoop ? -1 : 0);
 }
@@ -79,10 +81,12 @@ void SoundComponent::Update(float deltaTime)
         Play();
         mHasPlayed = true;
     }
-
+    
     // チャンネルが停止してたら -1 にリセット（明示的に管理）
     if (mChannel >= 0 && !IsPlaying())
     {
         mChannel = -1;
     }
 }
+
+} // namespace toy

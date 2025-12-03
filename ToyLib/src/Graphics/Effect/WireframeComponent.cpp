@@ -6,6 +6,7 @@
 #include "Engine/Render/LightingManager.h"
 #include "Asset/Geometry/VertexArray.h"
 
+namespace toy {
 
 WireframeComponent::WireframeComponent(Actor* owner, int drawOrder, VisualLayer layer)
 : VisualComponent(owner, drawOrder, layer)
@@ -33,5 +34,7 @@ void WireframeComponent::Draw()
     mShader->SetMatrixUniform("uWorldTransform", GetOwner()->GetWorldTransform());
     mVertexArray->SetActive();
     glDrawElements(GL_LINE_STRIP,  mVertexArray->GetNumVerts() * 3, GL_UNSIGNED_INT, nullptr);
-
+    
 }
+
+} // namespace toy

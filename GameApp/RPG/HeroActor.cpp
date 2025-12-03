@@ -1,7 +1,8 @@
 #include "HeroActor.h"
 #include <iostream>
 
-HeroActor::HeroActor(Application* a)
+
+HeroActor::HeroActor(toy::Application* a)
 : Actor(a)
 , mAnimID(H_Stand)
 , mMovable(true)
@@ -12,7 +13,7 @@ HeroActor::HeroActor(Application* a)
     file >> json;
 
     // --- スケルタルメッシュ ---
-    mMeshComp = CreateComponent<SkeletalMeshComponent>();
+    mMeshComp = CreateComponent<toy::SkeletalMeshComponent>();
     std::string meshPath;
     if (json.contains("mesh") && json["mesh"].contains("file"))
     {
@@ -39,7 +40,7 @@ HeroActor::HeroActor(Application* a)
     SetScale(scale);
 
     // --- コライダー ---
-    mCollComp = CreateComponent<ColliderComponent>();
+    mCollComp = CreateComponent<toy::ColliderComponent>();
     mCollComp->GetBoundingVolume()->ComputeBoundingVolume(GetApp()->GetAssetManager()->GetMesh(meshPath)->GetVertexArray());
     Vector3 vOffset;
     JsonHelper::GetVector3(json["collider"], "bounding_box_offset", vOffset);
@@ -47,25 +48,25 @@ HeroActor::HeroActor(Application* a)
     JsonHelper::GetVector3(json["collider"], "bounding_box_scale", vScale);
     mCollComp->GetBoundingVolume()->AdjustBoundingBox(vOffset, vScale);
     //mCollComp->GetBoundingVolume()->SetVisible(true);
-    mCollComp->SetFlags(C_FOOT | C_PLAYER);
+    mCollComp->SetFlags(toy::C_FOOT | toy::C_PLAYER);
     mCollComp->SetDisp(true);
 
     // --- 移動コンポーネント ---
     //mMoveComp = CreateComponent<MoveComponent>();
     //mMoveComp = CreateComponent<FPSMoveComponent>();
-    mMoveComp = CreateComponent<DirMoveComponent>();
+    mMoveComp = CreateComponent<toy::DirMoveComponent>();
     
     
     // --- カメラコンポーネント ---
-    mCameraComp = CreateComponent<OrbitCameraComponent>();
+    mCameraComp = CreateComponent<toy::OrbitCameraComponent>();
     //mCameraComp = CreateComponent<FollowCameraComponent>();
     
 
-    mGravComp = CreateComponent<GravityComponent>();
+    mGravComp = CreateComponent<toy::GravityComponent>();
     //SetPosition(Vector3(0,100,0));
     
     
-    mSound = CreateComponent<SoundComponent>();
+    mSound = CreateComponent<toy::SoundComponent>();
     mSound->SetSound("Walk.mp3");
     mSound->SetVolume(0.1f);
     
@@ -81,7 +82,7 @@ void HeroActor::UpdateActor(float deltaTime)
 {
 }
 
-void HeroActor::ActorInput(const InputState& state)
+void HeroActor::ActorInput(const toy::InputState& state)
 {
     bool inputAttack = false;
 
@@ -91,17 +92,17 @@ void HeroActor::ActorInput(const InputState& state)
     if (mMovable)
     {
         // 攻撃入力（入力優先度付きで判定）
-        if (state.IsButtonPressed(GameButton::B))
+        if (state.IsButtonPressed(toy::GameButton::B))
         {
             animPlayer->PlayOnce(H_Slash, H_Stand);
             inputAttack = true;
         }
-        else if (state.IsButtonPressed(GameButton::X))
+        else if (state.IsButtonPressed(toy::GameButton::X))
         {
             animPlayer->PlayOnce(H_Spin, H_Stand);
             inputAttack = true;
         }
-        else if (state.IsButtonPressed(GameButton::Y))
+        else if (state.IsButtonPressed(toy::GameButton::Y))
         {
             animPlayer->PlayOnce(H_Stab, H_Stand);
             inputAttack = true;
@@ -114,7 +115,7 @@ void HeroActor::ActorInput(const InputState& state)
         else
         {
             // ジャンプ（移動ロックしない）
-            if (state.IsButtonPressed(GameButton::A))
+            if (state.IsButtonPressed(toy::GameButton::A))
             {
                 mGravComp->Jump();
                 animPlayer->PlayOnce(H_Jump, H_Stand);
