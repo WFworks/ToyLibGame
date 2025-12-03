@@ -78,7 +78,7 @@ private:
     
     // ポリゴンデータ格納（計算用途）
     //std::vector<std::unique_ptr<struct Polygon>> mPolygons;
-    std::vector<Polygon> mPolygons;
+    std::vector<struct Polygon> mPolygons;
     
     void CreatePolygons(const float* verts, const unsigned int* indices, const unsigned int num);
     

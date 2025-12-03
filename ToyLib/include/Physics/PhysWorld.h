@@ -30,7 +30,7 @@ public:
     float GetGroundHeightAt(const Vector3& pos) const;
     // 一番近い地面の高さを調べる
     bool GetNearestGroundY(const class Actor* a, float& outY) const;
-    void SetGroundPolygons(const std::vector<Polygon>& polys);
+    void SetGroundPolygons(const std::vector<struct Polygon>& polys);
     
     // RayCCB実装用
     bool RayHitWall(const Vector3& start, const Vector3& end, Vector3& hitPos) const;
