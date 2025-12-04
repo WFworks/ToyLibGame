@@ -299,6 +299,7 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
 					"$(SRCROOT)/ToyLib/include",
+					"$(SRCROOT)/ToyKit/include",
 				);
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
 				OTHER_LDFLAGS = (
@@ -324,6 +325,7 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
 					"$(SRCROOT)/ToyLib/include",
+					"$(SRCROOT)/ToyKit/include",
 				);
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
 				OTHER_LDFLAGS = (
