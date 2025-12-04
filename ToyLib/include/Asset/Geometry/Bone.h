@@ -4,7 +4,7 @@
 #include <cstring>
 
 // ４本まで
-#define NUM_BONES_PER_VEREX 4
+const unsigned int NUM_BONES_PER_VERTEX = 4;
 
 namespace toy {
 
@@ -18,15 +18,15 @@ struct VertexBoneData
     };
     
     // 頂点に影響あるBoneのID
-    unsigned int IDs[NUM_BONES_PER_VEREX];
+    unsigned int IDs[NUM_BONES_PER_VERTEX];
     // 影響するウェイト
-    float Weights[NUM_BONES_PER_VEREX];
+    float Weights[NUM_BONES_PER_VERTEX];
     
     
     // ゼロにリセット
     void Reset()
     {
-        for(int i = 0; i < NUM_BONES_PER_VEREX; i++)
+        for(int i = 0; i < NUM_BONES_PER_VERTEX; i++)
         {
             IDs[i] = 0;
             Weights[i] = 0.0f;
