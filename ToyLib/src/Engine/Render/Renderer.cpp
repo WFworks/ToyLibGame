@@ -44,6 +44,7 @@ Renderer::Renderer()
 , mGLContext(nullptr)
 , mShaderPath("ToyLib/Shaders/")
 , mCntDrawObject(0)
+, mSkyDomeComp(nullptr)
 {
     mLightingManager = std::make_shared<LightingManager>();
     LoadSettings("ToyLib/Settings/Renderer_Settings.json");
