@@ -37,16 +37,25 @@
 				include/Utils/StringUtil.h,
 			);
 		};
+		7EE8FEFF2EE1BD69002844FB /* Exceptions for "ToyGame" folder in "Compile Sources" phase from "ToyLibGame" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 7EDCE89C2ED72F7F0069EE3D /* Sources */;
+			membershipExceptions = (
+				KitRPG/FieldScene.h,
+			);
+		};
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		7E6BD40B2EE089F0002DB8FE /* ToyKit */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ToyKit;
-			sourceTree = "<group>";
-		};
 		7EDCE8F52ED72FC00069EE3D /* ToyGame */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7EE8FEFF2EE1BD69002844FB /* Exceptions for "ToyGame" folder in "Compile Sources" phase from "ToyLibGame" target */,
+			);
+			explicitFileTypes = {
+				KitRPG/FieldScene.h = sourcecode.c.h;
+				KitRPG/KitRPG.cpp = sourcecode.cpp.cpp;
+			};
 			path = ToyGame;
 			sourceTree = "<group>";
 		};
@@ -60,6 +69,11 @@
 				include/Utils/StringUtil.h = sourcecode.c.h;
 			};
 			path = ToyLib;
+			sourceTree = "<group>";
+		};
+		7EE8FF072EE1D352002844FB /* ToyKit */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ToyKit;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -79,7 +93,7 @@
 		7EDCE8972ED72F7F0069EE3D = {
 			isa = PBXGroup;
 			children = (
-				7E6BD40B2EE089F0002DB8FE /* ToyKit */,
+				7EE8FF072EE1D352002844FB /* ToyKit */,
 				7EDCE8F52ED72FC00069EE3D /* ToyGame */,
 				7EDCE9852ED72FC00069EE3D /* ToyLib */,
 				7EDCE9BE2ED72FD00069EE3D /* Frameworks */,
@@ -120,9 +134,9 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				7E6BD40B2EE089F0002DB8FE /* ToyKit */,
 				7EDCE8F52ED72FC00069EE3D /* ToyGame */,
 				7EDCE9852ED72FC00069EE3D /* ToyLib */,
+				7EE8FF072EE1D352002844FB /* ToyKit */,
 			);
 			name = ToyLibGame;
 			packageProductDependencies = (
@@ -299,7 +313,7 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
 					"$(SRCROOT)/ToyLib/include",
-					"$(SRCROOT)/ToyKit/include",
+					"$(SRCROOT)/ToyKit/Include",
 				);
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
 				OTHER_LDFLAGS = (
@@ -325,7 +339,7 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
 					"$(SRCROOT)/ToyLib/include",
-					"$(SRCROOT)/ToyKit/include",
+					"$(SRCROOT)/ToyKit/Include",
 				);
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/lib;
 				OTHER_LDFLAGS = (

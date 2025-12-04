@@ -35,6 +35,7 @@ public:
         AddActor(std::move(actor));
         return rawPtr;
     }
+    void DestroyActor(class Actor* actor);
     
     // 描画エンジンを取得
     class Renderer* GetRenderer() const { return mRenderer.get(); }
