@@ -5,13 +5,19 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(TOYLIB_PATH ToyLib)
+set(TOYKIT_PATH ToyKit)
 set(GAME_PATH  ToyGame)
 
 find_package(OpenGL REQUIRED)
 
-# ToyLibCore のソース
+# ToyLib のソース
 file(GLOB_RECURSE TOYLIB_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/${TOYLIB_PATH}/src/*.cpp
+)
+
+# ToyKit のソース
+file(GLOB_RECURSE TOYKIT_SOURCES CONFIGURE_DEPENDS
+    ${CMAKE_SOURCE_DIR}/${TOYKIT_PATH}/src/*.cpp
 )
 
 # GameApp 以下のソース（GameApp/RPG, GameApp/Shooting も全部拾う）
@@ -22,6 +28,7 @@ file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
 # まとめる
 set(SOURCES
     ${TOYLIB_SOURCES}
+    ${TOYKIT_SOURCES}
     ${GAME_SOURCES}
 )
 
@@ -30,6 +37,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 # インクルードパス
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/${TOYLIB_PATH}/include
+    ${CMAKE_SOURCE_DIR}/${TOYKIT_PATH}/include
     ${CMAKE_SOURCE_DIR}/${GAME_PATH}
 )
 #========================
