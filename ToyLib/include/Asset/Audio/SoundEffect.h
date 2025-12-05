@@ -1,4 +1,3 @@
-// Asset/Audio/SoundEffect.h
 #pragma once
 #include <string>
 #include <vector>
@@ -21,7 +20,7 @@ public:
     ALuint GetBuffer() const { return mBuffer; }
 
 private:
-    ALuint mBuffer;
+    ALuint mBuffer = 0;
     std::string mFilePath;
 
     bool LoadWav16(const std::string& fullPath,
@@ -29,6 +28,7 @@ private:
                    ALenum& outFormat,
                    ALsizei& outFreq);
 };
+
 
 } // namespace toy
 

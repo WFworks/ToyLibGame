@@ -41,19 +41,14 @@ void SoundComponent::SetSound(const std::string& fileName)
 void SoundComponent::Play()
 {
     if (mSoundName.empty()) return;
-
-    std::cout << "SoundCompnent::Play() " << std::endl;
-    
-    if (mIsExclusive && IsPlaying())
-    {
-        return;
-    }
+    if (mIsExclusive && IsPlaying()) return;
 
     auto* app = GetOwner()->GetApp();
     auto* assets = app->GetAssetManager();
     auto sound = assets->GetSoundEffect(mSoundName);
-    if (!sound) {
-        std::cout << "失敗" << std::endl;
+    
+    if (!sound)
+    {
         return;
     }
 
