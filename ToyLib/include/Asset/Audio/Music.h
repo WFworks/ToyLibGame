@@ -8,8 +8,6 @@
 
 namespace toy {
 
-class AssetManager;
-
 // 「BGM用 MP3 アセット」
 // - AssetManager によって管理される
 // - デコード状態（mpg123_handle）もこの中で保持
@@ -20,7 +18,7 @@ public:
     ~Music();
 
     // AssetManager から呼ばれる
-    bool Load(const std::string& fileName, AssetManager* manager);
+    bool Load(const std::string& fileName, class AssetManager* manager);
 
     // ストリーミング用 API（AudioSystem から利用）
     void   Rewind();

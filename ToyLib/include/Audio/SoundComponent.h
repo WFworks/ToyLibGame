@@ -3,13 +3,8 @@
 #include "Engine/Core/Component.h"
 #include <string>
 
-#if defined(__APPLE__)
-    #include <AL/al.h>
-    #include <AL/alc.h>
-#else
-    #include <AL/al.h>
-    #include <AL/alc.h>
-#endif
+#include <AL/al.h>
+#include <AL/alc.h>
 
 namespace toy {
 

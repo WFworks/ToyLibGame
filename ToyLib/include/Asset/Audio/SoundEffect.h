@@ -7,15 +7,13 @@
 
 namespace toy {
 
-class AssetManager;
-
 class SoundEffect
 {
 public:
     SoundEffect();
     ~SoundEffect();
 
-    bool Load(const std::string& fileName, AssetManager* manager);
+    bool Load(const std::string& fileName, class AssetManager* manager);
 
     ALuint GetBuffer() const { return mBuffer; }
 

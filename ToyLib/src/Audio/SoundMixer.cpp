@@ -9,6 +9,14 @@ namespace toy {
 
 SoundMixer::SoundMixer(AssetManager* assetManager)
 : mAssetManager(assetManager)
+, mDevice(nullptr)
+, mContext(nullptr)
+, mBgmEnabled(true)
+, mSoundEnabled(true)
+, mVolume(0.3f)
+, mBgmSource(0)
+, mBgmPlaying(false)
+, mBgmLoop(true) // PlayBGM はループ扱い
 {
     InitOpenAL();
     mBgmDecodeBuffer.resize(BGM_CHUNK_SIZE);

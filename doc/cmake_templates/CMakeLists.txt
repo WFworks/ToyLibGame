@@ -144,22 +144,46 @@ elseif(UNIX AND NOT APPLE)
 
     find_package(OpenGL REQUIRED)
     find_package(PkgConfig REQUIRED)
+
+    # SDL2 / image / ttf / GLEW / assimp は pkg-config でOK
     pkg_check_modules(SDL2 REQUIRED sdl2)
     pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
     pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
-    pkg_check_modules(MPG123 REQUIRED mpg123)
-    find_package(OpenAL REQUIRED)         # openal-soft が裏で使われることが多い
-    find_package(GLEW REQUIRED)
     pkg_check_modules(ASSIMP REQUIRED assimp)
+    find_package(GLEW REQUIRED)
+    find_package(OpenAL REQUIRED)   # openal-soft で解決されることが多い
+
+    # ==== mpg123 を pkg-config ではなく手動で探す ====
+    find_path(MPG123_INCLUDE_DIR
+        NAMES mpg123.h
+        PATHS
+            /usr/include
+            /usr/local/include
+            /usr/include/mpg123
+            /usr/local/include/mpg123
+    )
+
+    find_library(MPG123_LIBRARY
+        NAMES mpg123
+        PATHS
+            /usr/lib
+            /usr/local/lib
+            /usr/lib/x86_64-linux-gnu
+            /usr/lib64
+    )
+
+    if (NOT MPG123_INCLUDE_DIR OR NOT MPG123_LIBRARY)
+        message(FATAL_ERROR "mpg123 not found. Install libmpg123-dev (Debian/Ubuntu) or mpg123-devel / mpg123 for your distro.")
+    endif()
 
     include_directories(
         ${SDL2_INCLUDE_DIRS}
         ${SDL2_IMAGE_INCLUDE_DIRS}
         ${SDL2_TTF_INCLUDE_DIRS}
-        ${MPG123_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIRS}
         ${ASSIMP_INCLUDE_DIRS}
         ${OPENAL_INCLUDE_DIR}
+        ${MPG123_INCLUDE_DIR}
     )
 
     target_link_libraries(${PROJECT_NAME}
@@ -167,10 +191,10 @@ elseif(UNIX AND NOT APPLE)
         ${SDL2_LIBRARIES}
         ${SDL2_IMAGE_LIBRARIES}
         ${SDL2_TTF_LIBRARIES}
-        ${MPG123_LIBRARIES}
         ${GLEW_LIBRARIES}
         ${ASSIMP_LIBRARIES}
         OpenAL::OpenAL
+        ${MPG123_LIBRARY}
     )
 
 elseif(APPLE)
