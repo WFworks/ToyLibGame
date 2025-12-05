@@ -144,7 +144,6 @@ elseif(APPLE)
     message(STATUS "Configuring for macOS build")
 
     find_package(OpenGL REQUIRED)
-    find_package(PkgConfig REQUIRED)
 
     find_package(SDL2 REQUIRED HINTS /opt/homebrew/opt/sdl2)
     find_package(SDL2_image REQUIRED HINTS /opt/homebrew/opt/sdl2_image)
@@ -153,17 +152,36 @@ elseif(APPLE)
     find_package(ASSIMP REQUIRED HINTS /opt/homebrew/opt/assimp)
     find_package(OpenAL REQUIRED HINTS /opt/homebrew/opt/openal-soft)
 
-    pkg_check_modules(MPG123 REQUIRED HINTS /opt/homebrew/opt/mpg123 mpg123)
+    # ==== mpg123 を pkg-config じゃなくて直接探す ====
+    find_path(MPG123_INCLUDE_DIR
+        NAMES mpg123.h
+        HINTS
+            /opt/homebrew/opt/mpg123/include
+            /opt/homebrew/include
+            /usr/local/include
+    )
 
-    include_directories(
+    find_library(MPG123_LIBRARY
+        NAMES mpg123
+        HINTS
+            /opt/homebrew/opt/mpg123/lib
+            /opt/homebrew/lib
+            /usr/local/lib
+    )
+
+    if(NOT MPG123_INCLUDE_DIR OR NOT MPG123_LIBRARY)
+        message(FATAL_ERROR "mpg123 not found. Please install with 'brew install mpg123'.")
+    endif()
+
+    target_include_directories(${PROJECT_NAME} PRIVATE
         /opt/homebrew/include
         ${SDL2_INCLUDE_DIRS}
         ${SDL2_IMAGE_INCLUDE_DIRS}
         ${SDL2_TTF_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIRS}
         ${ASSIMP_INCLUDE_DIRS}
-        ${OPENAL_INCLUDE_DIR}      # FindOpenAL がくれる
-        ${MPG123_INCLUDE_DIRS}     # pkg_config がくれる
+        ${OPENAL_INCLUDE_DIR}
+        ${MPG123_INCLUDE_DIR}
     )
 
     target_link_libraries(${PROJECT_NAME}
@@ -173,8 +191,8 @@ elseif(APPLE)
         SDL2_ttf::SDL2_ttf
         GLEW::GLEW
         assimp::assimp
-        ${OPENAL_LIBRARY}          # ← OpenAL::OpenAL ではなくこっち
-        ${MPG123_LIBRARIES}
+        ${OPENAL_LIBRARY}
+        ${MPG123_LIBRARY}
     )
 
     set_target_properties(${PROJECT_NAME} PROPERTIES
