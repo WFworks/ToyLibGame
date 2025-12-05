@@ -3,7 +3,7 @@
 #include "Engine/Core/ApplicationEntry.h"
 
 // ToyLibの起動Applicationとして登録
-TOYLIB_REGISTER_APP(KitRPG)
+//TOYLIB_REGISTER_APP(KitRPG)
 
 
 KitRPG::KitRPG()
