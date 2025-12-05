@@ -7,6 +7,7 @@
 #include "Asset/Audio/SoundEffect.h"
 #include "Engine/Render/Renderer.h"
 #include "Utils/MathUtil.h"
+#include <iostream>
 
 namespace toy {
 
@@ -41,6 +42,8 @@ void SoundComponent::Play()
 {
     if (mSoundName.empty()) return;
 
+    std::cout << "SoundCompnent::Play() " << std::endl;
+    
     if (mIsExclusive && IsPlaying())
     {
         return;
@@ -49,7 +52,10 @@ void SoundComponent::Play()
     auto* app = GetOwner()->GetApp();
     auto* assets = app->GetAssetManager();
     auto sound = assets->GetSoundEffect(mSoundName);
-    if (!sound) return;
+    if (!sound) {
+        std::cout << "失敗" << std::endl;
+        return;
+    }
 
     if (mSource == 0)
     {

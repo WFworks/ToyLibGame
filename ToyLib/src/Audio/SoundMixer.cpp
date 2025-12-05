@@ -133,6 +133,7 @@ void SoundMixer::PlayBGM()
 {
     if (!mBgmEnabled || !mCurrentBGM) return;
 
+    
     InitBGMSource();
 
     // 既存キューをクリア
@@ -185,7 +186,7 @@ void SoundMixer::StopBGM()
         }
     }
 }
-
+/*
 void SoundMixer::PlaySoundEffect(const std::string& fileName)
 {
     if (!mSoundEnabled) return;
@@ -203,6 +204,42 @@ void SoundMixer::PlaySoundEffect(const std::string& fileName)
     alSourcePlay(src);
     mOneShotSources.push_back(src);
 }
+*/
+void SoundMixer::PlaySoundEffect(const std::string& fileName)
+{
+    if (!mSoundEnabled) return;
+    printf("play SE called \n");
+    auto se = mAssetManager->GetSoundEffect(fileName);
+    if (!se)
+    {
+        printf("[SoundMixer] SE load failed: %s\n", fileName.c_str());
+        return;
+    }
+
+    ALuint src = 0;
+    alGenSources(1, &src);
+    alSourcei(src, AL_BUFFER, se->GetBuffer());
+    alSourcef(src, AL_GAIN, mVolume);
+    alSource3f(src, AL_POSITION, 0.0f, 0.0f, 0.0f);
+    alSourcef(src, AL_ROLLOFF_FACTOR, 0.0f);
+
+    ALenum err = alGetError();
+    if (err != AL_NO_ERROR)
+    {
+        printf("[SoundMixer] SE AL error before play: 0x%x\n", err);
+    }
+
+    alSourcePlay(src);
+
+    err = alGetError();
+    if (err != AL_NO_ERROR)
+    {
+        printf("[SoundMixer] SE AL error after play: 0x%x\n", err);
+    }
+
+    mOneShotSources.push_back(src);
+}
+
 
 void SoundMixer::Update(float)
 {

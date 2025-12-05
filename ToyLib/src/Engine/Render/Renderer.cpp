@@ -142,7 +142,7 @@ void Renderer::Draw()
     
     DrawVisualLayer(VisualLayer::UI);
     
-    std::cout << "Render 3D Objects Count = " << mCntDrawObject << std::endl;
+    //std::cout << "Render 3D Objects Count = " << mCntDrawObject << std::endl;
     mCntDrawObject = 0;
     
     SDL_GL_SwapWindow(mWindow);
