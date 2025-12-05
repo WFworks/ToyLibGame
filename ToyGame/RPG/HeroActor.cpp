@@ -67,8 +67,8 @@ HeroActor::HeroActor(toy::Application* a)
     
     
     mSound = CreateComponent<toy::SoundComponent>();
-    mSound->SetSound("Walk.mp3");
-    mSound->SetVolume(0.1f);
+    mSound->SetSound("Walk.wav");
+    mSound->SetVolume(0.5f);
     
     
 }

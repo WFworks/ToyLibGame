@@ -227,6 +227,11 @@ void Application::UpdateFrame()
                                  [](const std::unique_ptr<Actor>& actor) {
         return actor->GetState() == Actor::EDead;
     }),mActors.end());
+    
+    if (mSoundMixer)
+    {
+        mSoundMixer->Update(deltaTime);
+    }
 }
 
 // アセットディレクトリの設定

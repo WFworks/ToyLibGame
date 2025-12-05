@@ -4,7 +4,7 @@
 #include "MinionActor.h"
 
 // ToyLibの起動Applicationとして登録
-//TOYLIB_REGISTER_APP(GameRPG)
+TOYLIB_REGISTER_APP(GameRPG)
 
 
 GameRPG::GameRPG()
@@ -243,7 +243,7 @@ void GameRPG::LoadData()
     // BGM
     GetSoundMixer()->LoadBGM("MusMus-BGM-112.mp3");
     GetSoundMixer()->PlayBGM();
-    GetSoundMixer()->SetVolume(0.01);
+    GetSoundMixer()->SetVolume(0.5);
     
     
     
