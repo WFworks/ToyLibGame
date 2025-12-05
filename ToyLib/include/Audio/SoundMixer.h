@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <AL/al.h>
 #include <AL/alc.h>

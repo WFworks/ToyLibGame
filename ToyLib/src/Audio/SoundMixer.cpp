@@ -6,6 +6,7 @@
 #include "Asset/Audio/SoundEffect.h"
 
 #include <cstdio>
+#include <algorithm>
 
 namespace toy {
 
