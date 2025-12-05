@@ -32,18 +32,38 @@ SoundMixer::~SoundMixer()
 void SoundMixer::InitOpenAL()
 {
     mDevice = alcOpenDevice(nullptr);
-    if (!mDevice) return;
+    if (!mDevice)
+    {
+        std::printf("[SoundMixer] Failed to open OpenAL device\n");
+        return;
+    }
 
     mContext = alcCreateContext(mDevice, nullptr);
     if (!mContext)
     {
+        std::printf("[SoundMixer] Failed to create OpenAL context\n");
         alcCloseDevice(mDevice);
         mDevice = nullptr;
         return;
     }
 
-    alcMakeContextCurrent(mContext);
+    if (!alcMakeContextCurrent(mContext))
+    {
+        std::printf("[SoundMixer] Failed to make OpenAL context current\n");
+        alcDestroyContext(mContext);
+        mContext = nullptr;
+        alcCloseDevice(mDevice);
+        mDevice = nullptr;
+        return;
+    }
+
     alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
+
+    ALenum err = alGetError();
+    if (err != AL_NO_ERROR)
+    {
+        std::printf("[SoundMixer] OpenAL error after init: 0x%x\n", err);
+    }
 }
 
 void SoundMixer::ShutdownOpenAL()

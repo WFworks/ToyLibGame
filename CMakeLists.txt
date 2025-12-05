@@ -53,8 +53,41 @@ if(WIN32)
     find_package(GLEW CONFIG REQUIRED)
     find_package(OpenGL REQUIRED)
     find_package(assimp CONFIG REQUIRED)
-    # openal-soft / mpg123 (vcpkg 想定)
-    find_package(OpenAL CONFIG REQUIRED)
+    find_package(OpenAL CONFIG REQUIRED)  # openal-soft (vcpkg) 前提
+
+    # ========================
+    # vcpkg のルートとトリプレット
+    # ========================
+    # 必要なら自分の環境に合わせてここだけ変えてOK
+    set(VCPKG_ROOT "C:/tools/vcpkg")
+    set(VCPKG_TRIPLET "x64-windows")
+
+    set(VCPKG_INC_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/include")
+    set(VCPKG_LIB_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/lib")
+    set(VCPKG_BIN_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/bin")
+
+    # ========================
+    # mpg123 を手動で探す
+    # ========================
+    find_path(MPG123_INCLUDE_DIR
+        NAMES mpg123.h
+        HINTS ${VCPKG_INC_DIR}
+    )
+
+    find_library(MPG123_LIBRARY
+        NAMES mpg123
+        HINTS ${VCPKG_LIB_DIR}
+    )
+
+    if(NOT MPG123_INCLUDE_DIR OR NOT MPG123_LIBRARY)
+        message(FATAL_ERROR "mpg123 not found. Run: vcpkg install mpg123:x64-windows")
+    endif()
+
+    # 既存の include に mpg123 を追加
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        ${VCPKG_INC_DIR}
+        ${MPG123_INCLUDE_DIR}
+    )
 
     target_link_libraries(${PROJECT_NAME}
         OpenGL32
@@ -64,7 +97,7 @@ if(WIN32)
         GLEW::GLEW
         assimp::assimp
         OpenAL::OpenAL
-        mpg123          # vcpkg でインストールしてあれば見つかるはず
+        ${MPG123_LIBRARY}      # ← ここを生 mpg123 じゃなくて .lib のフルパス変数に
     )
 
     # SDLのエントリポイント無効化
@@ -76,8 +109,9 @@ if(WIN32)
         target_link_options(${PROJECT_NAME} PRIVATE /SUBSYSTEM:CONSOLE)
     endif()
 
-    # vcpkg の DLL 置き場（自分の環境に合わせてここだけ調整）
-    set(VCPKG_BIN_DIR "C:/tools/vcpkg/installed/x64-windows/bin")
+    # ========================
+    # DLL コピー（vcpkg/bin）
+    # ========================
 
     set(DLL_FILES
         "${VCPKG_BIN_DIR}/SDL2.dll"
@@ -88,7 +122,7 @@ if(WIN32)
         "${VCPKG_BIN_DIR}/SDL2_ttf.dll"
         "${VCPKG_BIN_DIR}/glew32.dll"
         "${VCPKG_BIN_DIR}/assimp-vc143-mt.dll"
-
+        "${VCPKG_BIN_DIR}/fmt.dll"
         # OpenAL-soft 本体
         "${VCPKG_BIN_DIR}/openal32.dll"
 
@@ -96,7 +130,6 @@ if(WIN32)
         "${VCPKG_BIN_DIR}/mpg123.dll"
     )
 
-    # 実行ファイルと同じディレクトリに DLL をコピー
     foreach(dll ${DLL_FILES})
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
