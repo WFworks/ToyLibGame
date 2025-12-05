@@ -43,53 +43,31 @@ void SoundComponent::Play()
     if (mSoundName.empty()) return;
     if (mIsExclusive && IsPlaying()) return;
 
-    auto* app = GetOwner()->GetApp();
+    auto* app    = GetOwner()->GetApp();
     auto* assets = app->GetAssetManager();
-    auto sound = assets->GetSoundEffect(mSoundName);
-    
-    if (!sound)
-    {
-        return;
-    }
+    auto sound   = assets->GetSoundEffect(mSoundName);
+    if (!sound) return;
 
     if (mSource == 0)
     {
         alGenSources(1, &mSource);
+
+        // 一回だけでいい設定
+        alSourcef(mSource, AL_REFERENCE_DISTANCE, 3.0f);  // ここまではほぼフル音量
+        alSourcef(mSource, AL_MAX_DISTANCE, 50.0f);       // これ以上はあまり変わらない
+        alSourcef(mSource, AL_ROLLOFF_FACTOR, 1.0f);      // 減衰の強さ
     }
-
-    float actualVolume = mVolume;
-
-    if (mUseDistanceAttenuation)
-    {
-        // カメラ位置を取得して簡易的な距離減衰
-        auto camPos = app->GetRenderer()->GetViewMatrix().GetTranslation();
-        auto pos    = GetOwner()->GetPosition();
-        float distance = (camPos - pos).Length();
-
-        const float refDist = 5.0f;
-        if (distance > refDist)
-        {
-            actualVolume *= (refDist / distance);
-            if (actualVolume < 0.0f) actualVolume = 0.0f;
-        }
-    }
-
-    if (actualVolume < 0.0f) actualVolume = 0.0f;
-    if (actualVolume > 1.0f) actualVolume = 1.0f;
 
     alSourcei(mSource, AL_BUFFER, sound->GetBuffer());
-    alSourcef(mSource, AL_GAIN, actualVolume);
+    alSourcef(mSource, AL_GAIN, mVolume);
     alSourcei(mSource, AL_LOOPING, mIsLoop ? AL_TRUE : AL_FALSE);
 
-    // 3D位置を Actor に合わせる（簡易）
+    // 位置だけ OpenAL に渡す
     auto pos = GetOwner()->GetPosition();
     alSource3f(mSource, AL_POSITION, pos.x, pos.y, pos.z);
-    alSourcef(mSource, AL_ROLLOFF_FACTOR,
-              mUseDistanceAttenuation ? 1.0f : 0.0f);
 
     alSourcePlay(mSource);
 }
-
 void SoundComponent::Stop()
 {
     if (mSource != 0)
@@ -115,14 +93,24 @@ void SoundComponent::Update(float)
         mHasPlayed = true;
     }
 
-    // ループしない場合、再生終了後にフラグをリセット
-    if (!mIsLoop && mSource != 0)
+    if (mSource != 0)
     {
         ALint state = 0;
         alGetSourcei(mSource, AL_SOURCE_STATE, &state);
-        if (state == AL_STOPPED)
+
+        // 再生中なら Actor の位置に追従させる
+        if (state == AL_PLAYING)
         {
-            // 必要ならここで何かイベントを飛ばしてもよい
+            auto pos = GetOwner()->GetPosition();
+            alSource3f(mSource, AL_POSITION, pos.x, pos.y, pos.z);
+        }
+
+        // ループしない場合、再生終了後にフラグをリセットしたりイベント飛ばしたりできる
+        if (!mIsLoop && state == AL_STOPPED)
+        {
+            // TODO: 必要ならここで何かイベントを飛ばす or フラグをリセット
+            // 例:
+            // mHasPlayed = false;
         }
     }
 }

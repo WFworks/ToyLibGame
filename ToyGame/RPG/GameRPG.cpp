@@ -2,6 +2,7 @@
 #include "Engine/Core/ApplicationEntry.h"
 #include "HeroActor.h"
 #include "MinionActor.h"
+#include "ToyLib.h"
 
 // ToyLibの起動Applicationとして登録
 TOYLIB_REGISTER_APP(GameRPG)
@@ -70,6 +71,16 @@ void GameRPG::InitGame()
     fireCollider->SetDisp(true);
     fireCollider->SetFlags(toy::C_GROUND | toy::C_WALL | toy::C_FOOT);
     fireActor->CreateComponent<toy::GravityComponent>();
+    
+    auto fireSound = fireActor->CreateComponent<toy::SoundComponent>();
+    fireSound->SetSound("fire.wav");
+    fireSound->SetLoop(true);
+    fireSound->SetVolume(2.f);
+    fireSound->SetUseDistanceAttenuation(true);
+    fireSound->Play();
+
+
+    
     
     // 炎
     auto particleActor = CreateActor<toy::Actor>();
@@ -243,7 +254,7 @@ void GameRPG::LoadData()
     // BGM
     GetSoundMixer()->LoadBGM("MusMus-BGM-112.mp3");
     GetSoundMixer()->PlayBGM();
-    GetSoundMixer()->SetVolume(0.5);
+    GetSoundMixer()->SetVolume(0.2);
     
     
     

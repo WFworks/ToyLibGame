@@ -2,69 +2,74 @@
 #pragma once
 
 #include <string>
-#include <memory>
 #include <vector>
 
 #include <AL/al.h>
 #include <AL/alc.h>
 
-const int BGM_NUM_BUFFERS = 4;
-const int BGM_CHUNK_SIZE  = 4096 * 4;
+#include "Utils/MathUtil.h"      // Matrix4 / Vector3
 
 namespace toy {
 
 class AssetManager;
+class Music;
 class SoundEffect;
 
 class SoundMixer
 {
 public:
-    SoundMixer(class AssetManager* assetManager);
+    SoundMixer(AssetManager* assetManager);
     ~SoundMixer();
-
-    // 毎フレーム呼ぶ（BGMストリーミング＋ワンショットSEのクリーンアップ）
-    void Update(float deltaTime);
 
     void SetBGMEnable(bool enable);
     void SetSoundEnable(bool enable);
-    void SetVolume(float volume); // 0.0〜1.0
+    void SetVolume(float volume);
 
     bool LoadBGM(const std::string& fileName);
-    void PlayBGM();   // ループ再生
+    void PlayBGM();
     void StopBGM();
 
-    // 2D効果音（ワンショット）
     void PlaySoundEffect(const std::string& fileName);
 
-private:
-    class AssetManager* mAssetManager = nullptr;
+    // Renderer から invViewMatrix を渡す
+    void Update(float deltaTime, const Matrix4& invViewMatrix);
 
-    bool  mBgmEnabled;
-    bool  mSoundEnabled;
-    float mVolume;
+private:
+    // OpenAL 基本
+    void InitOpenAL();
+    void ShutdownOpenAL();
+
+    // BGM
+    void InitBGMSource();
+    void ShutdownBGMSource();
+
+private:
+    AssetManager* mAssetManager;
 
     // OpenAL デバイス/コンテキスト
     ALCdevice*  mDevice;
     ALCcontext* mContext;
 
-
-    std::shared_ptr<class Music> mCurrentBGM;
-    ALuint  mBgmSource;
-    ALuint  mBgmBuffers[BGM_NUM_BUFFERS] = {};
-    bool    mBgmPlaying;
-    bool    mBgmLoop;
-    std::vector<unsigned char> mBgmDecodeBuffer;
-
-    // ワンショットSE用ソース
+    // SE（ワンショット）
     std::vector<ALuint> mOneShotSources;
 
-private:
-    void InitOpenAL();
-    void ShutdownOpenAL();
+    // BGM ストリーミング
+    static constexpr int BGM_NUM_BUFFERS = 4;
+    static constexpr int BGM_CHUNK_SIZE  = 32 * 1024;
 
-    void InitBGMSource();
-    void ShutdownBGMSource();
+    ALuint mBgmSource;
+    ALuint mBgmBuffers[BGM_NUM_BUFFERS];
+
+    bool  mBgmPlaying;
+    bool  mBgmLoop;
+
+    std::shared_ptr<Music> mCurrentBGM;
+    std::vector<unsigned char> mBgmDecodeBuffer;   // ← 修正点：unsigned char
+
+    // 共通設定
+    bool  mBgmEnabled;
+    bool  mSoundEnabled;
+    float mVolume;
 };
 
 } // namespace toy
-

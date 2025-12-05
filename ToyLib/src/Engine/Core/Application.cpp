@@ -230,7 +230,8 @@ void Application::UpdateFrame()
     
     if (mSoundMixer)
     {
-        mSoundMixer->Update(deltaTime);
+        Matrix4 inv = GetRenderer()->GetInvViewMatrix();
+        mSoundMixer->Update(deltaTime, inv);
     }
 }
 
