@@ -40,6 +40,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/${TOYKIT_PATH}/include
     ${CMAKE_SOURCE_DIR}/${GAME_PATH}
 )
+
 #========================
 # プラットフォーム別設定
 #========================
@@ -49,20 +50,23 @@ if(WIN32)
     find_package(SDL2 CONFIG REQUIRED)
     find_package(SDL2_image CONFIG REQUIRED)
     find_package(SDL2_ttf CONFIG REQUIRED)
-    find_package(SDL2_mixer CONFIG REQUIRED)
     find_package(GLEW CONFIG REQUIRED)
     find_package(OpenGL REQUIRED)
     find_package(assimp CONFIG REQUIRED)
+    # openal-soft / mpg123 (vcpkg 想定)
+    find_package(OpenAL CONFIG REQUIRED)
 
     target_link_libraries(${PROJECT_NAME}
         OpenGL32
         SDL2::SDL2
         SDL2_image::SDL2_image
         SDL2_ttf::SDL2_ttf
-        SDL2_mixer::SDL2_mixer
         GLEW::GLEW
         assimp::assimp
+        OpenAL::OpenAL
+        mpg123          # vcpkg でインストールしてあれば見つかるはず
     )
+
     # SDLのエントリポイント無効化
     target_compile_definitions(${PROJECT_NAME} PRIVATE SDL_MAIN_HANDLED)
 
@@ -82,16 +86,13 @@ if(WIN32)
         "${VCPKG_BIN_DIR}/libpng16.dll"
         "${VCPKG_BIN_DIR}/zlib1.dll"
         "${VCPKG_BIN_DIR}/SDL2_ttf.dll"
-        "${VCPKG_BIN_DIR}/SDL2_mixer.dll"
         "${VCPKG_BIN_DIR}/glew32.dll"
         "${VCPKG_BIN_DIR}/assimp-vc143-mt.dll"
 
-        # SDL_mixer が使う音声コーデックまわり
-        "${VCPKG_BIN_DIR}/ogg.dll"
-        "${VCPKG_BIN_DIR}/vorbis.dll"
-        "${VCPKG_BIN_DIR}/vorbisfile.dll"
-        "${VCPKG_BIN_DIR}/vorbisenc.dll"
-        "${VCPKG_BIN_DIR}/wavpackdll.dll"
+        # OpenAL-soft 本体
+        "${VCPKG_BIN_DIR}/openal32.dll"
+
+        # BGM デコード用 mpg123
         "${VCPKG_BIN_DIR}/mpg123.dll"
     )
 
@@ -113,7 +114,8 @@ elseif(UNIX AND NOT APPLE)
     pkg_check_modules(SDL2 REQUIRED sdl2)
     pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
     pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
-    pkg_check_modules(SDL2_MIXER REQUIRED SDL2_mixer)
+    pkg_check_modules(MPG123 REQUIRED mpg123)
+    find_package(OpenAL REQUIRED)         # openal-soft が裏で使われることが多い
     find_package(GLEW REQUIRED)
     pkg_check_modules(ASSIMP REQUIRED assimp)
 
@@ -121,49 +123,58 @@ elseif(UNIX AND NOT APPLE)
         ${SDL2_INCLUDE_DIRS}
         ${SDL2_IMAGE_INCLUDE_DIRS}
         ${SDL2_TTF_INCLUDE_DIRS}
-        ${SDL2_MIXER_INCLUDE_DIRS}
+        ${MPG123_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIRS}
         ${ASSIMP_INCLUDE_DIRS}
+        ${OPENAL_INCLUDE_DIR}
     )
 
     target_link_libraries(${PROJECT_NAME}
         ${OPENGL_LIBRARIES}
-        ${SDL2_LIBRARIES} 
+        ${SDL2_LIBRARIES}
         ${SDL2_IMAGE_LIBRARIES}
         ${SDL2_TTF_LIBRARIES}
-        ${SDL2_MIXER_LIBRARIES} 
+        ${MPG123_LIBRARIES}
         ${GLEW_LIBRARIES}
         ${ASSIMP_LIBRARIES}
+        OpenAL::OpenAL
     )
 
 elseif(APPLE)
     message(STATUS "Configuring for macOS build")
 
     find_package(OpenGL REQUIRED)
+    find_package(PkgConfig REQUIRED)
+
     find_package(SDL2 REQUIRED HINTS /opt/homebrew/opt/sdl2)
     find_package(SDL2_image REQUIRED HINTS /opt/homebrew/opt/sdl2_image)
-    find_package(SDL2_mixer REQUIRED HINTS /opt/homebrew/opt/sdl2_mixer)
     find_package(SDL2_ttf REQUIRED HINTS /opt/homebrew/opt/sdl2_ttf)
     find_package(GLEW REQUIRED HINTS /opt/homebrew/opt/glew)
     find_package(ASSIMP REQUIRED HINTS /opt/homebrew/opt/assimp)
+    find_package(OpenAL REQUIRED HINTS /opt/homebrew/opt/openal-soft)
+
+    pkg_check_modules(MPG123 REQUIRED HINTS /opt/homebrew/opt/mpg123 mpg123)
 
     include_directories(
         /opt/homebrew/include
         ${SDL2_INCLUDE_DIRS}
         ${SDL2_IMAGE_INCLUDE_DIRS}
-        ${SDL2_MIXER_INCLUDE_DIRS}
+        ${SDL2_TTF_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIRS}
         ${ASSIMP_INCLUDE_DIRS}
+        ${OPENAL_INCLUDE_DIR}      # FindOpenAL がくれる
+        ${MPG123_INCLUDE_DIRS}     # pkg_config がくれる
     )
 
     target_link_libraries(${PROJECT_NAME}
         OpenGL::GL
         SDL2::SDL2
         SDL2_image::SDL2_image
-        SDL2_mixer::SDL2_mixer
         SDL2_ttf::SDL2_ttf
         GLEW::GLEW
         assimp::assimp
+        ${OPENAL_LIBRARY}          # ← OpenAL::OpenAL ではなくこっち
+        ${MPG123_LIBRARIES}
     )
 
     set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -180,7 +191,6 @@ set(SOURCE_SHADER_DIR       "${CMAKE_SOURCE_DIR}/${TOYLIB_PATH}/Shaders")
 set(SOURCE_ASSET_DIR        "${CMAKE_SOURCE_DIR}/${GAME_PATH}/Assets")
 set(SOURCE_SETTINGS_DIR     "${CMAKE_SOURCE_DIR}/${GAME_PATH}/Settings")
 set(SOURCE_SYSSETTINGS_DIR  "${CMAKE_SOURCE_DIR}/${TOYLIB_PATH}/Settings")
-
 
 # 実行ファイルのあるディレクトリを基準にコピー
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
