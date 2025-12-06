@@ -64,13 +64,13 @@ void SpriteComponent::Draw()
     float vw = renderer->GetVirtualWidth();
     float vh = renderer->GetVirtualHeight();
 
+    // 0除算回避
     if (vw <= 0.0f) vw = sw;
     if (vh <= 0.0f) vh = sh;
 
-    // 同アスペクト前提ならこれでOK
+    // 論理→物理変換は「小さい方」に合わせる（アスペクト比維持）
     float sx = sw / vw;
     float sy = sh / vh;
-    // 論理→物理変換は「小さい方」に合わせる（アスペクト比維持）
     float scale = (sx < sy) ? sx : sy;
 
     // サイズ
