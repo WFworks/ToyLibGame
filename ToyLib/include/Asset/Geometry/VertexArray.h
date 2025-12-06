@@ -6,85 +6,125 @@
 
 namespace toy {
 
-// 頂点データ管理
+//-------------------------------------------
+// VertexArray
+// ・OpenGL の VAO/VBO/IBO をまとめて管理
+// ・メッシュ、スキンメッシュ、スプライトなど用途ごとに複数の
+//   コンストラクタを用意
+// ・衝突判定用に三角形(Polygon)リストも保持
+//-------------------------------------------
 class VertexArray
 {
 public:
-    
-    // コンストラクタ（フォーマットごとに３種類）
-    
-    // 主にスプライト用(4)
+
+    //=====================================================
+    // ▼ 4頂点のみの簡易モデル（スプライト用）
+    //   verts : XYUV または XYZW のような最小構成
+    //=====================================================
     VertexArray(const float* verts,
-                unsigned int num_verts,
+                unsigned int numVerts,
                 const unsigned int* indices,
-                unsigned int num_indices);
-    
-    // メッシュ用(6)
-    VertexArray(unsigned int num_verts,
+                unsigned int numIndices);
+
+    //=====================================================
+    // ▼ 通常メッシュ / スキンなし
+    //   verts : xyz * numVerts
+    //   norms : normal
+    //   uvs   : texcoord
+    //=====================================================
+    VertexArray(unsigned int numVerts,
                 const float* verts,
                 const float* norms,
                 const float* uvs,
-                unsigned int num_indices,
+                unsigned int numIndices,
                 const unsigned int* indices);
-    
-    
-    // アニメーションメッシュ用(8)
-    VertexArray(unsigned int num_verts,
+
+    //=====================================================
+    // ▼ アニメーションメッシュ（スキンあり）
+    //   boneids : 4本までのボーン ID
+    //   weights : 各ウェイト
+    //=====================================================
+    VertexArray(unsigned int numVerts,
                 const float* verts,
                 const float* norms,
                 const float* uvs,
                 const unsigned int* boneids,
                 const float* weights,
-                unsigned int num_indices,
+                unsigned int numIndices,
                 const unsigned int* indices);
-    
-    // 雨やフルスクリーンエフェクト用(5)
+
+    //=====================================================
+    // ▼ 雨粒やフルスクリーンエフェクト等の特殊用途
+    //   （頂点が vec2 のみ）
+    //=====================================================
     VertexArray(const float* verts,
                 unsigned int numVerts,
                 const unsigned int* indices,
                 unsigned int numIndices,
                 bool isVec2Only);
-    
-    // デストラクタ
+
     virtual ~VertexArray();
-    
-    // 描画用にBind
+
+    //-----------------------------------------------
+    // 描画時に VAO を bind
+    //-----------------------------------------------
     void SetActive();
-    // テクスチャIDを設定
+
+    //-----------------------------------------------
+    // 使用するテクスチャ（MaterialIndex）を記録
+    //-----------------------------------------------
     void SetTextureID(unsigned int id) { mTextureID = id; }
     unsigned int GetTextureID() const { return mTextureID; }
-    
-    // インデックス数
-    unsigned int GetNumIndices() const { return mNumIndices; }
-    // 頂点数
-    unsigned int GetNumVerts() const { return mNumVerts; }
-    // 面データ
-    const std::vector<struct Polygon>& GetPolygons() const { return mPolygons; }
-    std::vector<struct Polygon> GetWorldPolygons(const Matrix4& worldTransform) const;
-    
-private:
-    // 頂点の
-    unsigned int mNumVerts;
-    // インデックスの数
-    unsigned int mNumIndices;
-    // 頂点バッファVBO
-    unsigned int mVertexBuffer[5];
-    
-    
-    // 頂点データID
-    unsigned int mVertexBufferID;
-    // インデックスバッファID
-    unsigned int mIndexBufferID;
-    // テクスチャID
-    unsigned int mTextureID;
-    
-    // ポリゴンデータ格納（計算用途）
-    //std::vector<std::unique_ptr<struct Polygon>> mPolygons;
-    std::vector<struct Polygon> mPolygons;
-    
-    void CreatePolygons(const float* verts, const unsigned int* indices, const unsigned int num);
-    
-};
 
+    //-----------------------------------------------
+    // 基本情報取得
+    //-----------------------------------------------
+    unsigned int GetNumVerts() const   { return mNumVerts; }
+    unsigned int GetNumIndices() const { return mNumIndices; }
+
+    //-----------------------------------------------
+    // 三角形ポリゴン（ローカル）取得
+    //-----------------------------------------------
+    const std::vector<struct Polygon>& GetPolygons() const { return mPolygons; }
+
+    //-----------------------------------------------
+    // 三角形ポリゴン（ワールド座標変換済み）を返す
+    //-----------------------------------------------
+    std::vector<struct Polygon> GetWorldPolygons(const Matrix4& worldTransform) const;
+
+private:
+    // 頂点数・インデックス数
+    unsigned int mNumVerts   = 0;
+    unsigned int mNumIndices = 0;
+
+    //-----------------------------------------------
+    // VBO 配列（最大 5 本：pos, normal, uv, boneID, weight）
+    //-----------------------------------------------
+    unsigned int mVertexBuffer[5] = {0};
+
+    //-----------------------------------------------
+    // 頂点バッファ / インデックスバッファ
+    //-----------------------------------------------
+    unsigned int mVertexBufferID = 0;
+    unsigned int mIndexBufferID  = 0;
+
+    //-----------------------------------------------
+    // マテリアルインデックスとして使う TextureID
+    //-----------------------------------------------
+    unsigned int mTextureID = 0;
+
+    //-----------------------------------------------
+    // 物理判定用の三角形リスト
+    //-----------------------------------------------
+    std::vector<struct Polygon> mPolygons;
+
+private:
+    //-----------------------------------------------
+    // ローカル頂点 → Polygon（三角形リスト）へ変換
+    //-----------------------------------------------
+    void CreatePolygons(const float* verts,
+                        const unsigned int* indices,
+                        unsigned int numIndices);
+};
 
 } // namespace toy

@@ -11,164 +11,271 @@
 
 namespace toy {
 
+//-------------------------------------------------------------
+// VisualLayer
+// ・描画順や用途ごとにレイヤーを分けるための種別
+// ・DrawVisualLayer() で使われる
+//-------------------------------------------------------------
 enum class VisualLayer
 {
-    Background2D,
-    Effect3D,
-    Object3D,
-    OverlayScreen,
-    UI,
+    Background2D,   // 2D背景（遠景など）
+    Effect3D,       // パーティクルやエフェクト
+    Object3D,       // 通常3Dオブジェクト
+    OverlayScreen,  // 画面全体のポストエフェクトなど
+    UI,             // UI / HUD
 };
 
-// 描画エンジン
+
+//-------------------------------------------------------------
+// Renderer
+// ・SDL ウィンドウと OpenGL コンテキストを管理
+// ・カメラ行列、ライト、シャドウ、スプライト等を一括して扱う
+// ・Application から Draw() が呼ばれてフレームを描画する
+//-------------------------------------------------------------
 class Renderer
 {
 public:
-    // コンストラクタ
     Renderer();
-    // デストラクタ
     virtual ~Renderer();
-    // 初期化
+    
+    //---------------------------------------------------------
+    // 初期化／終了
+    //---------------------------------------------------------
+    
+    // SDL + OpenGL コンテキストの初期化
     bool Initialize();
+    
+    // SDL_Window 取得
     SDL_Window* GetSDLWindow() const { return mWindow; }
-    // 描画（Applicationから呼ばれる）
+    
+    // 1フレーム描画（Application から呼ばれるメイン描画）
     void Draw();
-    // 終了
+    
+    // 破棄処理（OpenGL リソース等の解放）
     void Shutdown();
-    // クリア色を設定
+    
+    // クリアカラー設定
     void SetClearColor(const Vector3& color);
     
-    // ビューマトリックスを設定する
-    void SetViewMatrix(const Matrix4& view) { mInvView = mViewMatrix = view; mInvView.Invert();}
+    
+    //---------------------------------------------------------
+    // カメラ／ビュー系
+    //---------------------------------------------------------
+    
+    // ビュー行列設定（内部で逆行列もキャッシュ）
+    void SetViewMatrix(const Matrix4& view) { mInvView = mViewMatrix = view; mInvView.Invert(); }
+    
     Matrix4 GetViewMatrix() const { return mViewMatrix; }
     Matrix4 GetInvViewMatrix() const { return mInvView; }
     Matrix4 GetProjectionMatrix() const { return mProjectionMatrix; }
+    
+    // View * Projection（描画時によく使う）
     Matrix4 GetViewProjMatrix() const { return mViewMatrix * mProjectionMatrix; }
     
-    // FOV取得（度）
+    // 視野角（Perspective FOV／度数法）
     float GetPerspectiveFov() const { return mPerspectiveFOV; }
     void SetPerspectiveFov(float f) { mPerspectiveFOV = f; }
     
-    // スクリーンサイズのGtter
+    
+    //---------------------------------------------------------
+    // スクリーン情報
+    //---------------------------------------------------------
+    
     float GetScreenWidth() const { return mScreenWidth; }
     float GetScreenHeight() const { return mScreenHeight; }
     
+    // DPI スケール（Retina 等でのスケーリング用）
+    float GetWindowDisplayScale() const { return mWindowDisplayScale; }
     
-    // Visualコンポーネント
+    
+    //---------------------------------------------------------
+    // VisualComponent 管理
+    //---------------------------------------------------------
+    
+    // VisualComponent を登録／解除
     void AddVisualComp(class VisualComponent* comp);
     void RemoveVisualComp(class VisualComponent* comp);
     
-    // デバッグモード設定
+    
+    //---------------------------------------------------------
+    // デバッグ系
+    //---------------------------------------------------------
+    
     void SetDebugMode(const bool b) { mIsDebugMode = b; }
     bool GetDebugMode() const { return mIsDebugMode; }
-    
-    
-    // データ解放
-    void UnloadData();
-    
-    // スカイドーム登録
-    void RegisterSkyDome(class SkyDomeComponent* sky);
-    class SkyDomeComponent* GetSkyDome() const { return mSkyDomeComp; }
-    
-    
-    // ライトマネージャー
-    //void SetLightingManager(std::shared_ptr<class LightingManager> manager) { mLightingManager = manager; }
-    std::shared_ptr<class LightingManager> GetLightingManager() const { return mLightingManager; }
-    
-    
-    std::shared_ptr<class Shader> GetShader(const std::string& name) { return mShaders[name]; }
-    
-    // 光源マトリックス
-    Matrix4 GetLightSpaceMatrix() const { return mLightSpaceMatrix; }
-    
-    // スプライト用VAO取得
-    std::shared_ptr<class VertexArray> GetSpriteVerts() const { return mSpriteVerts; }
-    // フルスクリーン用VAO取得
-    std::shared_ptr<class VertexArray> GetFullScreenQuad() const { return mFullScreenQuad; }
-    
-    std::shared_ptr<class Texture> GetShadowMapTexture() const { return mShadowMapTexture; }
-    
     bool IsDebugMode() const { return mIsDebugMode; }
     
     
-    // テキストからテクスチャを生成する
-    std::shared_ptr<class Texture> CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<class TextFont> font);
+    //---------------------------------------------------------
+    // リソース管理／補助
+    //---------------------------------------------------------
     
-	// DPIスケール取得    
-	float GetWindowDisplayScale() const { return mWindowDisplayScale; }
+    // 全リソースの解放（シーン切り替えなど）
+    void UnloadData();
+    
+    // スカイドーム登録（ゲーム側で生成し生ポインタで渡す）
+    void RegisterSkyDome(class SkyDomeComponent* sky);
+    class SkyDomeComponent* GetSkyDome() const { return mSkyDomeComp; }
+    
+    // ライティング管理（ライト情報の一元管理）
+    std::shared_ptr<class LightingManager> GetLightingManager() const { return mLightingManager; }
+    
+    // 名前指定でシェーダ取得
+    std::shared_ptr<class Shader> GetShader(const std::string& name) { return mShaders[name]; }
+    
+    
+    //---------------------------------------------------------
+    // シャドウマップ／ライト空間
+    //---------------------------------------------------------
+    
+    // ライト空間行列（ShadowMap 用の ViewProj）
+    Matrix4 GetLightSpaceMatrix() const { return mLightSpaceMatrix; }
+    
+    // シャドウマップテクスチャ（デプス or sampler2DShadow 等）
+    std::shared_ptr<class Texture> GetShadowMapTexture() const { return mShadowMapTexture; }
+    
+    
+    //---------------------------------------------------------
+    // 共通ジオメトリ（スプライト / フルスクリーン）
+    //---------------------------------------------------------
+    
+    // スプライト描画用の四角形 VAO（Billboard 等にも利用）
+    std::shared_ptr<class VertexArray> GetSpriteVerts() const { return mSpriteVerts; }
+    
+    // フルスクリーン用ポリゴン（ポストプロセス等）
+    std::shared_ptr<class VertexArray> GetFullScreenQuad() const { return mFullScreenQuad; }
+    
+    
+    //---------------------------------------------------------
+    // テキスト描画補助
+    //---------------------------------------------------------
+    
+    // テキストからテクスチャを生成（フォント＋カラー指定）
+    std::shared_ptr<class Texture> CreateTextTexture(
+        const std::string& text,
+        const Vector3& color,
+        std::shared_ptr<class TextFont> font
+    );
+    
 private:
-    // セッティング読み込み
+    //---------------------------------------------------------
+    // 設定／初期化周り
+    //---------------------------------------------------------
+    
+    // 設定ファイル読み込み（ウィンドウサイズ／タイトルなど）
     bool LoadSettings(const std::string& filePath);
+    
     // ライティング管理
     std::shared_ptr<class LightingManager> mLightingManager;
     
-    // レンダラーパラメーター //
+    // シェーダーの配置パス
     std::string mShaderPath;
+    
     // ウィンドウタイトル
     std::string mStrTitle;
-    //スクリーンサイズ
+    
+    // スクリーンサイズ
     float mScreenWidth;
     float mScreenHeight;
-    bool mIsFullScreen;
-    // 視野角(度)
+    bool  mIsFullScreen;
+    
+    // 視野角（Perspective FOV／度）
     float mPerspectiveFOV;
-    // デバッグモード
+    
+    // デバッグ描画 ON/OFF
     bool mIsDebugMode;
-    // クリア色
+    
+    // クリアカラー
     Vector3 mClearColor;
     
-    // シャドウマップ
+    
+    //---------------------------------------------------------
+    // シャドウマッピング設定
+    //---------------------------------------------------------
+    
     float mShadowNear;
     float mShadowFar;
     float mShadowOrthoWidth;
     float mShadowOrthoHeight;
-    int mShadowFBOWidth;
-    int mShadowFBOHeight;
+    int   mShadowFBOWidth;
+    int   mShadowFBOHeight;
     
-    // ビューマトリックス
+    
+    //---------------------------------------------------------
+    // カメラ行列
+    //---------------------------------------------------------
+    
     Matrix4 mViewMatrix;
     Matrix4 mInvView;
-    // プロジェクションマトリックス
     Matrix4 mProjectionMatrix;
     
-    // Windowハンドラ
-    SDL_Window* mWindow;
-    // GLコンテキスト
+    
+    //---------------------------------------------------------
+    // SDL / OpenGL ハンドル
+    //---------------------------------------------------------
+    
+    SDL_Window*   mWindow;
     SDL_GLContext mGLContext;
     
-    // フルスクリーンVAO
+    
+    //---------------------------------------------------------
+    // 共通ジオメトリ（フルスクリーン／スプライト）
+    //---------------------------------------------------------
+    
+    // フルスクリーン描画用 VAO
     std::shared_ptr<class VertexArray> mFullScreenQuad;
     void CreateFullScreenQuad();
     
-    
-    // シェーダー格納
-    std::unordered_map<std::string, std::shared_ptr<class Shader>> mShaders;
-    // シェーダー一括ロード
-    bool LoadShaders();
-    
-    // スプライト用ポリゴン（Billboardでも使う）
+    // スプライト用頂点（Billboard 等でも使う）
     std::shared_ptr<class VertexArray> mSpriteVerts;
-    // スプライト用ポリゴンの生成
     void CreateSpriteVerts();
     
-    // シャドウマッピング関連処理とパラメータ
+    
+    //---------------------------------------------------------
+    // シェーダ関連
+    //---------------------------------------------------------
+    
+    std::unordered_map<std::string, std::shared_ptr<class Shader>> mShaders;
+    bool LoadShaders();
+    
+    
+    //---------------------------------------------------------
+    // シャドウマッピング処理
+    //---------------------------------------------------------
+    
     GLuint mShadowFBO;
-    bool InitializeShadowMapping();
-    void RenderShadowMap();
+    bool   InitializeShadowMapping();
+    void   RenderShadowMap();
+    
     Matrix4 mLightSpaceMatrix;
     std::shared_ptr<class Texture> mShadowMapTexture;
     
-    // コンポーネント
+    
+    //---------------------------------------------------------
+    // Visual / SkyDome
+    //---------------------------------------------------------
+    
     std::vector<class VisualComponent*> mVisualComps;
-    class SkyDomeComponent* mSkyDomeComp; // Gameアプリ側で生成、生ポインタを保持
+    
+    // SkyDome は Game 側で生成・所有し、生ポインタを保持
+    class SkyDomeComponent* mSkyDomeComp;
     
     void DrawSky();
     void DrawVisualLayer(VisualLayer layer);
     
-    // 表示オブジェクトのカウンター（Debug/Test用）
+    
+    //---------------------------------------------------------
+    // デバッグ用カウンタ
+    //---------------------------------------------------------
+    
+    // 1フレーム内で描画したオブジェクト数（Debug/Test用）
     unsigned int mCntDrawObject;
-
-    // DPIスケール
+    
+    
+    //---------------------------------------------------------
+    // DPI スケール
+    //---------------------------------------------------------
+    
     float mWindowDisplayScale;
 };
 

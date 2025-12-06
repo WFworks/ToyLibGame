@@ -4,9 +4,9 @@
 namespace toy {
 
 TextFont::TextFont()
-: mFont(nullptr)
-, mFilePath("")
-, mPointSize(0)
+    : mFont(nullptr)
+    , mFilePath("")
+    , mPointSize(0)
 {
 }
 
@@ -17,14 +17,10 @@ TextFont::~TextFont()
 
 bool TextFont::Load(const std::string& filePath, int pointSize)
 {
-    // すでにロード済みなら一度解放
-    if (mFont)
-    {
-        TTF_CloseFont(mFont);
-        mFont = nullptr;
-    }
-    
-    // SDL3_ttf では第2引数が float になっているのでキャストしておく
+    // 既存フォントを解放（再ロード時の安全措置）
+    Unload();
+
+    // SDL_ttf（SDL3_ttf）ではサイズが float のためキャスト
     mFont = TTF_OpenFont(filePath.c_str(), static_cast<float>(pointSize));
     if (!mFont)
     {
@@ -34,7 +30,7 @@ bool TextFont::Load(const std::string& filePath, int pointSize)
                   << std::endl;
         return false;
     }
-    
+
     mFilePath  = filePath;
     mPointSize = pointSize;
     return true;

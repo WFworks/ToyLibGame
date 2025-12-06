@@ -8,9 +8,10 @@
 
 namespace toy {
 
-//--------------------------------------
-// 文字列 → SDL_Scancode
-//--------------------------------------
+//=============================================================
+// 文字列 → SDL_Scancode 変換
+//   - JSON の "keyboard": ["W", "Space"] などを SDL_Scancode に
+//=============================================================
 static SDL_Scancode StringToScancode(const std::string& name)
 {
     static const std::unordered_map<std::string, SDL_Scancode> table = {
@@ -25,7 +26,7 @@ static SDL_Scancode StringToScancode(const std::string& name)
         {"V", SDL_SCANCODE_V}, {"W", SDL_SCANCODE_W}, {"X", SDL_SCANCODE_X},
         {"Y", SDL_SCANCODE_Y}, {"Z", SDL_SCANCODE_Z},
 
-        // 数字キー
+        // 数字キー（メインキー列）
         {"Num0", SDL_SCANCODE_0}, {"Num1", SDL_SCANCODE_1},
         {"Num2", SDL_SCANCODE_2}, {"Num3", SDL_SCANCODE_3},
         {"Num4", SDL_SCANCODE_4}, {"Num5", SDL_SCANCODE_5},
@@ -33,16 +34,16 @@ static SDL_Scancode StringToScancode(const std::string& name)
         {"Num8", SDL_SCANCODE_8}, {"Num9", SDL_SCANCODE_9},
 
         // 特殊キー
-        {"Space",   SDL_SCANCODE_SPACE},
-        {"Escape",  SDL_SCANCODE_ESCAPE},
-        {"Enter",   SDL_SCANCODE_RETURN},
-        {"Tab",     SDL_SCANCODE_TAB},
+        {"Space",      SDL_SCANCODE_SPACE},
+        {"Escape",     SDL_SCANCODE_ESCAPE},
+        {"Enter",      SDL_SCANCODE_RETURN},
+        {"Tab",        SDL_SCANCODE_TAB},
         {"LeftShift",  SDL_SCANCODE_LSHIFT},
         {"RightShift", SDL_SCANCODE_RSHIFT},
         {"LeftCtrl",   SDL_SCANCODE_LCTRL},
         {"RightCtrl",  SDL_SCANCODE_RCTRL},
 
-        // 矢印
+        // 矢印キー
         {"Up",    SDL_SCANCODE_UP},
         {"Down",  SDL_SCANCODE_DOWN},
         {"Left",  SDL_SCANCODE_LEFT},
@@ -53,13 +54,15 @@ static SDL_Scancode StringToScancode(const std::string& name)
     if (it != table.end())
         return it->second;
 
-    std::cerr << "[InputSystem] Unknown key name in config: " << name << std::endl;
+    std::cerr << "[InputSystem] Unknown key name in config: "
+              << name << std::endl;
     return SDL_SCANCODE_UNKNOWN;
 }
 
-//--------------------------------------
-// 文字列 → SDL_GamepadButton (SDL3)
-//--------------------------------------
+//=============================================================
+// 文字列 → SDL_GamepadButton 変換（SDL3 Gamepad）
+//   - JSON の "gamepad": ["A", "DPadUp"] を SDL_GamepadButton に
+//=============================================================
 static SDL_GamepadButton StringToPadButton(const std::string& name)
 {
     static const std::unordered_map<std::string, SDL_GamepadButton> table = {
@@ -89,9 +92,10 @@ static SDL_GamepadButton StringToPadButton(const std::string& name)
     return SDL_GAMEPAD_BUTTON_INVALID;
 }
 
-//--------------------------------------
-// 文字列 → GameButton
-//--------------------------------------
+//=============================================================
+// 文字列 → GameButton 変換
+//   - JSON の "A", "KeyW" を論理ボタン enum に変換
+//=============================================================
 static bool StringToGameButton(const std::string& name, GameButton& out)
 {
     static const std::unordered_map<std::string, GameButton> table = {
@@ -118,13 +122,14 @@ static bool StringToGameButton(const std::string& name, GameButton& out)
     auto it = table.find(name);
     if (it == table.end())
         return false;
+
     out = it->second;
     return true;
 }
 
-//--------------------------------------
-// KeyboardState
-//--------------------------------------
+//=============================================================
+// KeyboardState 実装
+//=============================================================
 
 bool KeyboardState::GetKeyValue(SDL_Scancode keyCode) const
 {
@@ -133,6 +138,7 @@ bool KeyboardState::GetKeyValue(SDL_Scancode keyCode) const
 
 ButtonState KeyboardState::GetKeyState(SDL_Scancode keyCode) const
 {
+    // 前フレーム / 今フレームからボタン状態を ENone/EPressed/EReleased/EHeld にマッピング
     if (mPrevState[keyCode] == 0)
     {
         if (mCurrState[keyCode] == 0)
@@ -149,9 +155,9 @@ ButtonState KeyboardState::GetKeyState(SDL_Scancode keyCode) const
     }
 }
 
-//--------------------------------------
-// ControllerState (SDL3 Gamepad)
-//--------------------------------------
+//=============================================================
+// ControllerState 実装（SDL3 Gamepad）
+//=============================================================
 
 bool ControllerState::GetButtonValue(SDL_GamepadButton button) const
 {
@@ -176,36 +182,41 @@ ButtonState ControllerState::GetButtonState(SDL_GamepadButton button) const
     }
 }
 
-//--------------------------------------
-// InputState → ラッパ
-//--------------------------------------
+//=============================================================
+// InputState ラッパ
+//   - ゲーム側からは InputSystem を意識せず GameButton ベースで扱える
+//=============================================================
 
 bool InputState::IsButtonDown(GameButton btn) const
 {
     return mOwner && mOwner->IsButtonDown(btn);
 }
+
 bool InputState::IsButtonPressed(GameButton btn) const
 {
     return mOwner && mOwner->IsButtonPressed(btn);
 }
+
 bool InputState::IsButtonReleased(GameButton btn) const
 {
     return mOwner && mOwner->IsButtonReleased(btn);
 }
+
 void InputState::SetOwner(class InputSystem* inputSystem)
 {
     mOwner = inputSystem;
 }
 
-//--------------------------------------
+//=============================================================
 // InputSystem::Initialize (SDL3)
-//--------------------------------------
-
+//   - キーボード／Gamepad の初期状態セット
+//   - テキスト入力モード OFF
+//=============================================================
 bool InputSystem::Initialize(SDL_Window* window)
 {
     mWindow = window;
     
-    // キーボード
+    // キーボード状態取得
     int numKeys = 0;
     const bool* keys = SDL_GetKeyboardState(&numKeys);
     mState.Keyboard.mCurrState =
@@ -213,12 +224,13 @@ bool InputSystem::Initialize(SDL_Window* window)
     std::memset(mState.Keyboard.mPrevState, 0,
                 sizeof(mState.Keyboard.mPrevState));
 
-    // ゲームパッド検出 (SDL3 Gamepad API)
+    // Gamepad 検出 (SDL3 Gamepad API)
     mGamepad = nullptr;
     int count = 0;
     SDL_JoystickID* ids = SDL_GetGamepads(&count);
     if (ids && count > 0)
     {
+        // とりあえず 1 個目を使用
         mGamepad = SDL_OpenGamepad(ids[0]);
     }
     if (ids)
@@ -232,15 +244,15 @@ bool InputSystem::Initialize(SDL_Window* window)
     std::memset(mState.Controller.mPrevButtons, 0,
                 sizeof(mState.Controller.mPrevButtons));
 
-    mState.Controller.mLeftStick  = Vector2::Zero;
-    mState.Controller.mRightStick = Vector2::Zero;
-    mState.Controller.mLeftTrigger  = 0.0f;
-    mState.Controller.mRightTrigger = 0.0f;
+    mState.Controller.mLeftStick      = Vector2::Zero;
+    mState.Controller.mRightStick     = Vector2::Zero;
+    mState.Controller.mLeftTrigger    = 0.0f;
+    mState.Controller.mRightTrigger   = 0.0f;
 
-    // Owner 設定
+    // InputState から InputSystem に逆参照できるようにセット
     mState.SetOwner(this);
 
-    // テキスト入力 OFF
+    // デフォルトではテキスト入力 OFF
     mTextInputMode = false;
     SDL_StopTextInput(mWindow);
 
@@ -256,7 +268,10 @@ void InputSystem::Shutdown()
     }
 }
 
-// 前フレーム状態コピー
+//=============================================================
+// フレーム更新前処理
+//   - 前フレームの状態を Prev にコピーしておく
+//=============================================================
 void InputSystem::PrepareForUpdate()
 {
     std::memcpy(mState.Keyboard.mPrevState,
@@ -268,45 +283,57 @@ void InputSystem::PrepareForUpdate()
                 sizeof(mState.Controller.mPrevButtons));
 }
 
+//=============================================================
+// フレーム更新
+//   - SDL_PollEvent による内部更新後に呼び出される想定
+//   - Gamepad 状態を SDL から取得
+//=============================================================
 void InputSystem::Update()
 {
-    // SDL_PollEvent で内部状態は更新済み前提
+    // SDL_PollEvent で内部キーボード状態は更新済み前提
 
     if (mState.Controller.mIsConnected && mGamepad)
     {
-        // ボタン
+        // ボタン状態取得
         for (int i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; ++i)
         {
             mState.Controller.mCurrButtons[i] =
-                SDL_GetGamepadButton(mGamepad,
-                    static_cast<SDL_GamepadButton>(i));
+                SDL_GetGamepadButton(
+                    mGamepad,
+                    static_cast<SDL_GamepadButton>(i)
+                );
         }
 
-        // トリガー
+        // トリガー（0〜1 に正規化）
         mState.Controller.mLeftTrigger =
             Filter1D(SDL_GetGamepadAxis(mGamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER));
         mState.Controller.mRightTrigger =
             Filter1D(SDL_GetGamepadAxis(mGamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER));
 
-        // スティック
+        // 左スティック
         int x = SDL_GetGamepadAxis(mGamepad, SDL_GAMEPAD_AXIS_LEFTX);
         int y = -SDL_GetGamepadAxis(mGamepad, SDL_GAMEPAD_AXIS_LEFTY);
         mState.Controller.mLeftStick = Filter2D(x, y);
 
+        // 右スティック
         x = SDL_GetGamepadAxis(mGamepad, SDL_GAMEPAD_AXIS_RIGHTX);
         y = -SDL_GetGamepadAxis(mGamepad, SDL_GAMEPAD_AXIS_RIGHTY);
         mState.Controller.mRightStick = Filter2D(x, y);
     }
 }
 
-// デッドゾーン 1D
+//=============================================================
+// アナログ入力フィルタ（1D）
+//   - デッドゾーン処理付きスカラー
+//=============================================================
 float InputSystem::Filter1D(int input)
 {
-    const int deadZone = 250;
+    const int   deadZone = 250;
     const float maxValue = 32767.0f;
 
     float retVal = 0.0f;
     int absValue = input > 0 ? input : -input;
+
     if (absValue > deadZone)
     {
         retVal = static_cast<float>(absValue - deadZone) /
@@ -317,7 +344,10 @@ float InputSystem::Filter1D(int input)
     return retVal;
 }
 
-// デッドゾーン 2D
+//=============================================================
+// アナログ入力フィルタ（2D ベクトル）
+//   - 円形デッドゾーン & 正規化
+//=============================================================
 Vector2 InputSystem::Filter2D(int inputX, int inputY)
 {
     const float deadZone = 8000.0f;
@@ -340,10 +370,11 @@ Vector2 InputSystem::Filter2D(int inputX, int inputY)
     return dir;
 }
 
-//--------------------------------------
-// LoadButtonConfig (中身はボタン型だけ SDL_GamepadButton に)
-//--------------------------------------
-
+//=============================================================
+// ボタンコンフィグ読み込み (JSON)
+//   - "buttons" オブジェクトを走査して、
+//     各 GameButton に keyboard / gamepad バインドを登録
+//=============================================================
 bool InputSystem::LoadButtonConfig(const std::string& filePath)
 {
     std::ifstream ifs(filePath);
@@ -375,16 +406,18 @@ bool InputSystem::LoadButtonConfig(const std::string& filePath)
 
     const auto& buttonsObj = root["buttons"];
 
+    // 既存のバインドをクリア
     for (auto& b : mButtonBindings)
     {
         b.Keyboard.clear();
         b.Gamepad.clear();
     }
 
+    // "buttons": { "A": { "keyboard": [...], "gamepad": [...] }, ... }
     for (auto it = buttonsObj.begin(); it != buttonsObj.end(); ++it)
     {
-        const std::string buttonName = it.key();
-        const nlohmann::json& buttonJson = it.value();
+        const std::string       buttonName = it.key();
+        const nlohmann::json&   buttonJson = it.value();
 
         GameButton gb;
         if (!StringToGameButton(buttonName, gb))
@@ -397,6 +430,7 @@ bool InputSystem::LoadButtonConfig(const std::string& filePath)
         auto idx = static_cast<size_t>(gb);
         ButtonBinding& binding = mButtonBindings[idx];
 
+        // キーボード側
         std::vector<std::string> keyNames;
         if (JsonHelper::GetStringArray(buttonJson, "keyboard", keyNames))
         {
@@ -408,6 +442,7 @@ bool InputSystem::LoadButtonConfig(const std::string& filePath)
             }
         }
 
+        // ゲームパッド側
         std::vector<std::string> padNames;
         if (JsonHelper::GetStringArray(buttonJson, "gamepad", padNames))
         {
@@ -425,10 +460,11 @@ bool InputSystem::LoadButtonConfig(const std::string& filePath)
     return true;
 }
 
-//--------------------------------------
-// 論理ボタン問い合わせ
-//--------------------------------------
-
+//=============================================================
+// 論理ボタン問い合わせ（Down / Pressed / Released）
+//   - キーボード + Gamepad のバインドをまとめて判定
+//   - IsButtonDown は「押しっぱ + 押した瞬間」両方を true にする
+//=============================================================
 bool InputSystem::IsButtonDown(GameButton button) const
 {
     auto idx = static_cast<size_t>(button);
@@ -450,20 +486,24 @@ bool InputSystem::IsButtonDown(GameButton button) const
             return true;
     }
 
-    // 右スティック → WASD マッピング
+    // --- 右スティックを WASD としても扱う ---
     const Vector2& rs = mState.Controller.GetRightStick();
     const float threshold = 0.3f;
 
     switch (button)
     {
     case GameButton::KeyW:
-        if (rs.y > threshold) return true; break;
+        if (rs.y > threshold)  return true;
+        break;
     case GameButton::KeyS:
-        if (rs.y < -threshold) return true; break;
+        if (rs.y < -threshold) return true;
+        break;
     case GameButton::KeyD:
-        if (rs.x > threshold) return true; break;
+        if (rs.x > threshold)  return true;
+        break;
     case GameButton::KeyA:
-        if (rs.x < -threshold) return true; break;
+        if (rs.x < -threshold) return true;
+        break;
     default:
         break;
     }
@@ -476,10 +516,12 @@ bool InputSystem::IsButtonPressed(GameButton button) const
     auto idx = static_cast<size_t>(button);
     const ButtonBinding& binding = mButtonBindings[idx];
 
+    // キーボード
     for (auto sc : binding.Keyboard)
         if (mState.Keyboard.GetKeyState(sc) == EPressed)
             return true;
 
+    // パッド
     for (auto pb : binding.Gamepad)
         if (mState.Controller.GetButtonState(pb) == EPressed)
             return true;
@@ -492,10 +534,12 @@ bool InputSystem::IsButtonReleased(GameButton button) const
     auto idx = static_cast<size_t>(button);
     const ButtonBinding& binding = mButtonBindings[idx];
 
+    // キーボード
     for (auto sc : binding.Keyboard)
         if (mState.Keyboard.GetKeyState(sc) == EReleased)
             return true;
 
+    // パッド
     for (auto pb : binding.Gamepad)
         if (mState.Controller.GetButtonState(pb) == EReleased)
             return true;
@@ -503,10 +547,12 @@ bool InputSystem::IsButtonReleased(GameButton button) const
     return false;
 }
 
-//--------------------------------------
-// テキスト入力モード
-//--------------------------------------
-
+//=============================================================
+// テキスト入力モード切り替え
+//   - true  : SDL_StartTextInput
+//   - false : SDL_StopTextInput
+//   - すでに同じ状態なら何もしない
+//=============================================================
 void InputSystem::SetTextInputMode(bool enabled)
 {
     if (enabled == mTextInputMode)

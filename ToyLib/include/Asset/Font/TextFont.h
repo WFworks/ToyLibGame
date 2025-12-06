@@ -5,38 +5,58 @@
 
 namespace toy {
 
+//==============================================================
+// TextFont
+//   - SDL3_ttf の TTF_Font をラップする軽量クラス
+//   - AssetManager により shared_ptr<TextFont> 管理される前提
+//==============================================================
 class TextFont
 {
 public:
     TextFont();
     ~TextFont();
-    
-    // フォントファイルを読み込む
-    // 例: Load("ToyGame/Assets/Fonts/NotoSansJP-Regular.ttf", 24);
+
+    //------------------------------------------------------------------
+    // Load
+    //   - TTF_OpenFont() を使いフォントをメモリにロード
+    //   - 同じ TextFont インスタンスで何度も Load() した場合は
+    //     前のフォントを自動 Unload() してからロードし直す
+    //------------------------------------------------------------------
     bool Load(const std::string& filePath, int pointSize);
-    
-    // 明示的に解放したいとき
+
+    //------------------------------------------------------------------
+    // Unload
+    //   - TTF_CloseFont(mFont)
+    //   - 呼ばなくても破棄時に自動で開放される
+    //------------------------------------------------------------------
     void Unload();
-    
-    // 有効なフォントかどうか
+
+    //------------------------------------------------------------------
+    // IsValid
+    //   - フォントが正常にロードできたか確認
+    //------------------------------------------------------------------
     bool IsValid() const { return mFont != nullptr; }
-    
-    // SDL_ttf の生ポインタ（Renderer などから使用）
+
+    //------------------------------------------------------------------
+    // SDL_ttf の生フォントポインタ
+    //   - Renderer::CreateTextTexture() などが利用
+    //------------------------------------------------------------------
     TTF_Font* GetNativeFont() const { return mFont; }
-    
-    // 情報系
+
+    //------------------------------------------------------------------
+    // 情報取得
+    //------------------------------------------------------------------
     const std::string& GetFilePath() const { return mFilePath; }
     int GetPointSize() const { return mPointSize; }
-    
+
 private:
-    // コピー禁止（AssetManager で shared_ptr 管理前提）
+    // コピー禁止（AssetManager 経由の shared_ptr 前提）
     TextFont(const TextFont&) = delete;
     TextFont& operator=(const TextFont&) = delete;
-    
-    TTF_Font* mFont;
-    std::string mFilePath;
-    int mPointSize;
+
+    TTF_Font*    mFont       = nullptr;
+    std::string  mFilePath   = "";
+    int          mPointSize  = 0;
 };
 
 } // namespace toy
-

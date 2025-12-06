@@ -4,31 +4,43 @@
 
 namespace toy {
 
+//------------------------------------------------------------------------------
+// コンストラクタ
+//------------------------------------------------------------------------------
 InertiaMoveComponent::InertiaMoveComponent(class Actor* owner, int updateOrder)
 : MoveComponent(owner, updateOrder)
-, mTargetForwardSpeed(0.0f)
-, mTargetRightSpeed(0.0f)
+, mTargetForwardSpeed (0.0f)
+, mTargetRightSpeed   (0.0f)
 , mTargetVerticalSpeed(0.0f)
-, mTargetAngularSpeed(0.0f)
-, mAcceleration(5.0f)           // 好みに応じて調整
-, mAngularAcceleration(90.0f)   // 好みに応じて調整
+, mTargetAngularSpeed (0.0f)
+, mAcceleration       (5.0f)    // 慣性の効き具合（大きいほどすぐ追従）
+, mAngularAcceleration(90.0f)   // 回転慣性の追従度
 {
 }
 
+//------------------------------------------------------------------------------
+// 慣性付きの速度更新
+//   - 現在速度 → 目標速度へ徐々に Lerp
+//   - 実際の座標反映は MoveComponent::Update() に任せる
+//------------------------------------------------------------------------------
 void InertiaMoveComponent::Update(float deltaTime)
 {
-    // 徐々に現在速度を目標速度に近づける
-    float newForward = Math::Lerp(GetForwardSpeed(), mTargetForwardSpeed, mAcceleration * deltaTime);
-    float newRight   = Math::Lerp(GetRightSpeed(), mTargetRightSpeed, mAcceleration * deltaTime);
+    // 線形速度の追従
+    float newForward = Math::Lerp(GetForwardSpeed(),  mTargetForwardSpeed,  mAcceleration * deltaTime);
+    float newRight   = Math::Lerp(GetRightSpeed(),    mTargetRightSpeed,    mAcceleration * deltaTime);
     float newVert    = Math::Lerp(GetVerticalSpeed(), mTargetVerticalSpeed, mAcceleration * deltaTime);
-    float newAngular = Math::Lerp(GetAngularSpeed(), mTargetAngularSpeed, mAngularAcceleration * deltaTime);
     
+    // 角速度の追従
+    float newAngular = Math::Lerp(GetAngularSpeed(), mTargetAngularSpeed,
+                                  mAngularAcceleration * deltaTime);
+    
+    // MoveComponent の速度として反映
     SetForwardSpeed(newForward);
     SetRightSpeed(newRight);
     SetVerticalSpeed(newVert);
     SetAngularSpeed(newAngular);
     
-    // 通常の移動処理は親クラスに任せる
+    // 通常の移動処理（座標更新/回転更新）は MoveComponent に任せる
     MoveComponent::Update(deltaTime);
 }
 

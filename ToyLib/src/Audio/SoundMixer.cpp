@@ -21,15 +21,19 @@ SoundMixer::SoundMixer(AssetManager* assetManager)
 , mSoundEnabled(true)
 , mVolume(1.0f)
 {
+    // OpenAL 初期化（デバイス + コンテキスト）
     InitOpenAL();
+
+    // BGM デコード用一時バッファ
     mBgmDecodeBuffer.resize(BGM_CHUNK_SIZE);
 }
 
 SoundMixer::~SoundMixer()
 {
+    // BGM ソース・バッファ片付け
     ShutdownBGMSource();
 
-    // SE の後片付け
+    // SE 用ワンショットソースの片付け
     for (ALuint src : mOneShotSources)
     {
         alSourceStop(src);
@@ -37,11 +41,16 @@ SoundMixer::~SoundMixer()
     }
     mOneShotSources.clear();
 
+    // OpenAL デバイス/コンテキスト破棄
     ShutdownOpenAL();
 }
 
+//--------------------------------------
+// OpenAL 初期化 / 後始末
+//--------------------------------------
 void SoundMixer::InitOpenAL()
 {
+    // 既定のデバイスを開く
     mDevice = alcOpenDevice(nullptr);
     if (!mDevice)
     {
@@ -49,6 +58,7 @@ void SoundMixer::InitOpenAL()
         return;
     }
 
+    // コンテキスト作成
     mContext = alcCreateContext(mDevice, nullptr);
     if (!mContext)
     {
@@ -60,6 +70,7 @@ void SoundMixer::InitOpenAL()
 
     alcMakeContextCurrent(mContext);
 
+    // 距離減衰モデル（デフォルト: 逆数距離 + クランプ）
     alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 
     ALenum err = alGetError();
@@ -84,16 +95,21 @@ void SoundMixer::ShutdownOpenAL()
     }
 }
 
+//--------------------------------------
+// BGM 用ソース/バッファ準備・破棄
+//--------------------------------------
 void SoundMixer::InitBGMSource()
 {
     if (mBgmSource == 0)
     {
+        // ストリーミング用ソース + バッファ
         alGenSources(1, &mBgmSource);
         alGenBuffers(BGM_NUM_BUFFERS, mBgmBuffers);
 
+        // BGM は原点固定＆距離減衰なし（2D 的）
         alSource3f(mBgmSource, AL_POSITION, 0, 0, 0);
         alSourcef (mBgmSource, AL_ROLLOFF_FACTOR, 0.0f);
-        alSourcei (mBgmSource, AL_LOOPING, AL_FALSE);
+        alSourcei (mBgmSource, AL_LOOPING, AL_FALSE); // ループは自前で実装
     }
 }
 
@@ -101,8 +117,10 @@ void SoundMixer::ShutdownBGMSource()
 {
     if (mBgmSource != 0)
     {
+        // 再生停止
         alSourceStop(mBgmSource);
 
+        // キュー済みバッファを外す
         ALint queued = 0;
         alGetSourcei(mBgmSource, AL_BUFFERS_QUEUED, &queued);
         while (queued-- > 0)
@@ -111,6 +129,7 @@ void SoundMixer::ShutdownBGMSource()
             alSourceUnqueueBuffers(mBgmSource, 1, &buf);
         }
 
+        // ソース・バッファ削除
         alDeleteSources(1, &mBgmSource);
         alDeleteBuffers(BGM_NUM_BUFFERS, mBgmBuffers);
 
@@ -118,6 +137,9 @@ void SoundMixer::ShutdownBGMSource()
     }
 }
 
+//--------------------------------------
+// 全体設定
+//--------------------------------------
 void SoundMixer::SetBGMEnable(bool enable)
 {
     mBgmEnabled = enable;
@@ -138,8 +160,12 @@ void SoundMixer::SetVolume(float volume)
         alSourcef(mBgmSource, AL_GAIN, mVolume);
 }
 
+//--------------------------------------
+// BGM ロード / 再生制御
+//--------------------------------------
 bool SoundMixer::LoadBGM(const std::string& fileName)
 {
+    // AssetManager 経由で Music を取得
     mCurrentBGM = mAssetManager->GetMusic(fileName);
     return (mCurrentBGM != nullptr);
 }
@@ -150,7 +176,7 @@ void SoundMixer::PlayBGM()
 
     InitBGMSource();
 
-    // 既存キュー消去
+    // 既存キューをすべて外す
     alSourceStop(mBgmSource);
     ALint queued = 0;
     alGetSourcei(mBgmSource, AL_BUFFERS_QUEUED, &queued);
@@ -160,9 +186,10 @@ void SoundMixer::PlayBGM()
         alSourceUnqueueBuffers(mBgmSource, 1, &buf);
     }
 
+    // デコード位置を先頭に戻す
     mCurrentBGM->Rewind();
 
-    // 最初の複数バッファを埋める
+    // 最初に複数バッファを埋めてキューへ
     for (int i = 0; i < BGM_NUM_BUFFERS; ++i)
     {
         size_t bytes = mCurrentBGM->ReadChunk(
@@ -201,6 +228,9 @@ void SoundMixer::StopBGM()
     }
 }
 
+//--------------------------------------
+// 効果音（ワンショット）
+//--------------------------------------
 void SoundMixer::PlaySoundEffect(const std::string& fileName)
 {
     if (!mSoundEnabled) return;
@@ -208,18 +238,25 @@ void SoundMixer::PlaySoundEffect(const std::string& fileName)
     auto se = mAssetManager->GetSoundEffect(fileName);
     if (!se) return;
 
+    // 1 回使い捨てソースを生成
     ALuint src = 0;
     alGenSources(1, &src);
 
     alSourcei(src, AL_BUFFER, se->GetBuffer());
     alSourcef(src, AL_GAIN, mVolume);
-    alSource3f(src, AL_POSITION, 0, 0, 0);
-    alSourcef(src, AL_ROLLOFF_FACTOR, 0.0f);
+    alSource3f(src, AL_POSITION, 0, 0, 0);   // 現状は 2D 的に原点固定
+    alSourcef(src, AL_ROLLOFF_FACTOR, 0.0f); // 距離減衰なし
 
     alSourcePlay(src);
     mOneShotSources.push_back(src);
 }
 
+//--------------------------------------
+// 毎フレーム更新
+//  - リスナー位置更新（カメラの invViewMatrix ベース）
+//  - BGM ストリーミング
+//  - 再生終了した SE ソースの削除
+//--------------------------------------
 void SoundMixer::Update(float,
                         const Matrix4& invViewMatrix)
 {
@@ -228,9 +265,8 @@ void SoundMixer::Update(float,
     //====================
     Vector3 pos      = invViewMatrix.GetTranslation();
     Vector3 up       = invViewMatrix.GetYAxis();
-    Vector3 forward  = invViewMatrix.GetZAxis();   // -Z が前向き
+    Vector3 forward  = invViewMatrix.GetZAxis();   // 左手系: +Z が奥 → 手前が前向きなので -Z を前とみなす
     forward = forward * -1.0f;
-
 
     alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
 
@@ -240,7 +276,7 @@ void SoundMixer::Update(float,
     };
     alListenerfv(AL_ORIENTATION, ori);
 
-    float vel[3] = {0,0,0};
+    float vel[3] = {0, 0, 0};
     alListenerfv(AL_VELOCITY, vel);
 
     //====================
@@ -256,6 +292,7 @@ void SoundMixer::Update(float,
             ALuint buf = 0;
             alSourceUnqueueBuffers(mBgmSource, 1, &buf);
 
+            // 次のチャンクをデコード
             size_t bytes = mCurrentBGM->ReadChunk(
                 mBgmDecodeBuffer.data(),
                 BGM_CHUNK_SIZE
@@ -277,7 +314,7 @@ void SoundMixer::Update(float,
             }
             else
             {
-                // ループ
+                // 曲末に到達 → ループ再生
                 mCurrentBGM->Rewind();
                 bytes = mCurrentBGM->ReadChunk(
                     mBgmDecodeBuffer.data(),
@@ -303,7 +340,7 @@ void SoundMixer::Update(float,
     }
 
     //====================
-    // SE 削除チェック
+    // SE ソースの掃除
     //====================
     std::vector<ALuint> alive;
     alive.reserve(mOneShotSources.size());

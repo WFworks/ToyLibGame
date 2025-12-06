@@ -4,54 +4,75 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <algorithm> // ★ 後で使う
+#include <algorithm>
 
 namespace toy {
 
-// アクター管理
+//-------------------------------------------------------------
+// Actor
+// ・ToyLib の基本単位となるエンティティ
+// ・Component を保持し、Update/Transform/Input を制御する
+// ・親子関係に対応し、ローカル座標／ワールド座標を管理する
+//-------------------------------------------------------------
 class Actor
 {
 public:
+    //---------------------------------------------------------
+    // Actor の状態
+    //---------------------------------------------------------
     enum State
-    { // アクターの状態
-        EActive,
-        EPaused,
-        EDead
+    {
+        EActive,   // 通常動作
+        EPaused,   // 更新停止
+        EDead      // 削除予約
     };
     
-    // コンストラクタ
     Actor(class Application* a);
-    // デストラクタ
     virtual ~Actor();
     
-    //========================
-    // 親子関係まわり（追加）
-    //========================
-    // 親を設定（keepWorld=trueで現在のワールド位置を維持）
+    //=========================================================
+    // 親子関係（Transform 階層）
+    //=========================================================
+    
+    // 親を設定（※ keepWorld=true ならワールド位置を維持する機能に対応予定）
     void SetParent(Actor* newParent);
+    
     Actor* GetParent() const { return mParent; }
     const std::vector<Actor*>& GetChildren() const { return mChildren; }
     
-    // ワールド行列をDirtyにして、子にも伝播
+    // ワールド行列を再計算する必要があることを通知し、子へ伝播
     void MarkWorldDirty();
     
-    //========================
-    // Update系（既存）
-    //========================
-    void Update(float deltaTime);
-    void UpdateComponents(float deltaTime);
-    virtual void UpdateActor(float deltaTime) { };
+    //=========================================================
+    // 更新処理（Actor が毎フレーム行うこと）
+    //=========================================================
     
+    // フレーム更新（内部 → コンポーネント → 派生 Actor の順）
+    void Update(float deltaTime);
+    
+    // Component 更新
+    void UpdateComponents(float deltaTime);
+    
+    // 派生 Actor が override する更新処理
+    virtual void UpdateActor(float deltaTime) {}
+    
+    //=========================================================
     // 入力処理
+    //=========================================================
+    
+    // 入力を全 Component に伝える
     void ProcessInput(const struct InputState& state);
+    
+    // Actor 固有の入力処理
     virtual void ActorInput(const struct InputState& state);
     
-    //========================
-    // トランスフォーム
-    //========================
-    // ★ワールド座標として扱うAPI
+    //=========================================================
+    // トランスフォーム（ローカル → ワールド）
+    //=========================================================
+    
+    // ※ mPosition は「親がいればローカル座標」「親がなければワールド」
     Vector3 GetPosition() const { return mPosition; }
-    void SetPosition(const Vector3& pos); // ← inlineやめて実装は.cppへ
+    void SetPosition(const Vector3& pos);   // 実装は .cpp
     
     float GetScale() const { return mScale; }
     void SetScale(float sc) { mScale = sc; MarkWorldDirty(); }
@@ -59,30 +80,38 @@ public:
     const Quaternion& GetRotation() const { return mRotation; }
     void SetRotation(const Quaternion& rot) { mRotation = rot; MarkWorldDirty(); }
     
-    // 座標系を更新（親がいれば親のWorldも考慮）
+    // 親のワールドを考慮してワールド行列を作成
     void ComputeWorldTransform();
-    // ワールドマトリックスを取得
+    
+    // ワールド行列取得
     const Matrix4 GetWorldTransform() const { return mWorldTransform; }
     void SetWorldTransform(const Matrix4& mat) { mWorldTransform = mat; }
     
-    // 方向ベクトル（とりあえずローカル回転ベースのまま）
+    // 向きベクトル（ローカル回転から算出）
     virtual Vector3 GetForward() { return Vector3::Transform(Vector3::UnitZ, mRotation); }
-    virtual Vector3 GetRight()   { return Vector3::Transform(Vector3::UnitX, mRotation);}
+    virtual Vector3 GetRight()   { return Vector3::Transform(Vector3::UnitX, mRotation); }
     virtual Vector3 GetUpward()  { return Vector3::Transform(Vector3::UnitY, mRotation); }
     
+    // Forward を直接セットする（内部で回転を調整）
     void SetForward(const Vector3& dir);
     
-    // ステータス
+    //=========================================================
+    // State / Application
+    //=========================================================
+    
     State GetState() const { return mStatus; }
     void SetState(State state) { mStatus = state; }
     
-    // アプリ
     class Application* GetApp() { return mApp; }
     
-    // コンポーネント関連（既存）
+    //=========================================================
+    // Component 管理
+    //=========================================================
+    
     void AddComponent(std::unique_ptr<class Component> component);
     void RemoveComponent(class Component* component);
     
+    // Component 生成（CreateActor と同様に Owner = this）
     template <typename T, typename... Args>
     T* CreateComponent(Args&&... args)
     {
@@ -92,6 +121,7 @@ public:
         return rawPtr;
     }
     
+    // 最初に見つかった T を返す
     template <typename T>
     T* GetComponent() const
     {
@@ -105,6 +135,7 @@ public:
         return nullptr;
     }
     
+    // 該当 Component をすべて返す
     template <typename T>
     std::vector<T*> GetAllComponents() const
     {
@@ -120,31 +151,38 @@ public:
         return results;
     }
     
+    // Actor 識別 ID
     void SetActorID(const std::string actorID) { mActorID = actorID; }
     std::string GetActorID() const { return mActorID; }
     
     
 private:
-    // マトリックス＆ローカルTRS
-    Matrix4     mWorldTransform;
-    Vector3     mPosition;   // ★親がいれば「親ローカル」、いなければワールド
+    //---------------------------------------------------------
+    // トランスフォーム（ローカル）
+    //---------------------------------------------------------
+    
+    Matrix4     mWorldTransform;         // ワールド行列
+    Vector3     mPosition;               // 親あり：ローカル位置／親なし：ワールド位置
     Quaternion  mRotation;
     float       mScale;
     bool        mIsRecomputeWorldTransform;
     
-    // 親子（追加）
+    //---------------------------------------------------------
+    // 親子関係
+    //---------------------------------------------------------
     Actor* mParent = nullptr;
     std::vector<Actor*> mChildren;
     
-    // コンポーネント
+    //---------------------------------------------------------
+    // Component / Application
+    //---------------------------------------------------------
     std::vector<std::unique_ptr<class Component>> mComponents;
-    // アプリ
     class Application* mApp;
     
-    // ステータス
+    //---------------------------------------------------------
+    // Actor 状態 / 識別子
+    //---------------------------------------------------------
     enum State mStatus;
-    
-    // actor ID
     std::string mActorID;
 };
 

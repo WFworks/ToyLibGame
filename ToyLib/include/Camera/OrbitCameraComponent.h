@@ -5,50 +5,78 @@
 
 namespace toy {
 
-// ターゲットActorの周りを公転するカメラ
+//--------------------------------------
+// OrbitCameraComponent
+// -------------------------------------
+// ・ターゲット Actor の周囲を“公転”するカメラ
+// ・基準は左手座標系（+Z が奥方向）
+// ・俯瞰ゲーム/フィールドアクション用カメラに最適
+//--------------------------------------
 class OrbitCameraComponent : public CameraComponent
 {
 public:
     OrbitCameraComponent(class Actor* owner);
     
+    // 入力処理（左右＝公転、上下＝高さ、ホイール＝ズーム）
     void ProcessInput(const struct InputState& state) override;
+    
+    // 毎フレーム更新（位置更新 & View 行列適用）
     void Update(float deltaTime) override;
     
-    float GetYawSpeed() const { return mYawSpeed; }
-    void  SetYawSpeed(float speed) { mYawSpeed = speed; }
+    // 設定用
+    float GetYawSpeed() const                { return mYawSpeed; }
+    void  SetYawSpeed(float speed)           { mYawSpeed = speed; }
     
 private:
-    //======================
-    // 基本状態
-    //======================
-    // ターゲットからのオフセット
+    //==============================
+    // カメラの基礎プロパティ
+    //==============================
+    
+    // ターゲット中心からのオフセット
+    //   （Y は高さ、XZ 平面は正規化して距離と回転で決定）
     Vector3 mOffset;
-    // Upベクトル（Y軸固定）
+    
+    // 常に固定の Up ベクトル（通常は Y 軸）
     Vector3 mUpVector;
+
+    //==============================
+    // 公転（水平回転）
+    //==============================
     
-    //======================
-    // 水平方向（公転）
-    //======================
-    float mYawSpeed;        // 現在のヨー角速度（ラジアン/秒）
+    // ヨー角速度（ラジアン/秒）
+    //   +…左回り（反時計回り）
+    //   -…右回り
+    float mYawSpeed;
+
+    //==============================
+    // ズーム（距離）
+    //==============================
+
+    // 実際の距離
+    float mDistance;
+
+    // スムーズズーム用：目標距離
+    float mTargetDistance;
+
+    // ズーム下限/上限
+    float mMinDistance;
+    float mMaxDistance;
+
+    //==============================
+    // 高さ（オフセット Y）
+    //==============================
     
-    //======================
-    // 距離（ズーム）
-    //======================
-    float mDistance;        // 現在のカメラ距離
-    float mTargetDistance;  // 目標のカメラ距離（スムーズに寄せる用）
-    float mMinDistance;     // 近づける下限
-    float mMaxDistance;     // 離せる上限
-    
-    //======================
-    // 高さオフセット（Y）
-    //======================
-    float mMinOffsetY;      // 最低高さ（オフセットY）
-    float mMaxOffsetY;      // 最高高さ（オフセットY）
-    
-    //======================
-    // 入力状態（1フレーム分）
-    //======================
-    float mHeightInput;     // 上下入力（-1.0 ～ 1.0） 上を正とする
+    float mMinOffsetY;      // カメラの最低位置（Y）
+    float mMaxOffsetY;      // カメラの最高位置（Y）
+
+    //==============================
+    // 入力蓄積（ProcessInput → Update）
+    //==============================
+
+    // 高さ操作（-1 ～ +1）
+    //   ・+1 = 上へ
+    //   ・-1 = 下へ
+    float mHeightInput;
 };
 
 } // namespace toy

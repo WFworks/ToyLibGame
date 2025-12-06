@@ -6,49 +6,92 @@
 
 namespace toy {
 
-// Meshを管理するComponent
+//------------------------------------------------------------
+// MeshComponent
+//   ・3Dメッシュ（静的 / スキンメッシュ）を描画するコンポーネント
+//   ・Mesh, Shader, LightingManager などの描画リソースを保持
+//   ・各種描画モード（トゥーン / シャドウ）に対応
+//------------------------------------------------------------
 class MeshComponent : public VisualComponent
 {
 public:
-    MeshComponent(class Actor* a, int drawOrder = 100, VisualLayer layer = VisualLayer::Effect3D, bool isSkeletal = false);
+    //--------------------------------------------------------
+    // コンストラクタ
+    // a         : 所有Actor
+    // drawOrder : 描画順序
+    // layer     : VisualLayer（通常3D、エフェクト3D等）
+    // isSkeletal: スキンメッシュかどうか
+    //--------------------------------------------------------
+    MeshComponent(class Actor* a,
+                  int drawOrder = 100,
+                  VisualLayer layer = VisualLayer::Effect3D,
+                  bool isSkeletal = false);
+
     virtual ~MeshComponent();
     
-    // 描画 override
+    //--------------------------------------------------------
+    // Draw()
+    //   ・通常のメッシュ描画
+    //--------------------------------------------------------
     virtual void Draw();
+
+    //--------------------------------------------------------
+    // DrawShadow()
+    //   ・影描画専用（ShadowMap生成用）
+    //--------------------------------------------------------
     virtual void DrawShadow();
     
-    virtual void SetMesh(std::shared_ptr<class Mesh> m) { mMesh = m; }              // メッシュセット
-    void SetTextureIndex(unsigned int index) { mTextureIndex = index; }    // テクスチャGetter
-    
+    //--------------------------------------------------------
+    // Mesh / Texture 設定
+    //--------------------------------------------------------
+    virtual void SetMesh(std::shared_ptr<class Mesh> m) { mMesh = m; }
+    void SetTextureIndex(unsigned int index) { mTextureIndex = index; }
+
+    //--------------------------------------------------------
+    // Skeletal / Static メッシュ状態
+    //--------------------------------------------------------
     bool GetIsSkeletal() const { return mIsSkeletal; }
-    std::shared_ptr<VertexArray> GetVertexArray(int id) const;
-    
-    void SetToonRender(const bool t, const float f = 1.05f) { mIsToon = t; mContourFactor = f; }
-    void SetContourFactor(const float f) { mContourFactor = f; }
-    
+
+    // 複数 VAO を持つメッシュ（マルチマテリアル等）へのアクセス
+    std::shared_ptr<class VertexArray> GetVertexArray(int id) const;
+
+    //--------------------------------------------------------
+    // トゥーン描画設定（輪郭強調）
+    //--------------------------------------------------------
+    void SetToonRender(bool t, float f = 1.05f)
+    {
+        mIsToon = t;
+        mContourFactor = f;
+    }
+    void SetContourFactor(float f) { mContourFactor = f; }
     bool GetToon() const { return mIsToon; }
-    
-    // 再生するモーションのID（SkerltalMeshでオーバーライドする。インターフェース確保のため）
-    virtual void SetAnimID(const unsigned int animID, const bool mode) {}
+
+    //--------------------------------------------------------
+    // アニメーションの現在IDをセット（SkeletalMeshComponent が override）
+    //--------------------------------------------------------
+    virtual void SetAnimID(unsigned int animID, bool mode) {}
     
 protected:
-    std::shared_ptr<class Mesh>  mMesh;      // メッシュ
-    unsigned int mTextureIndex;    // TextureID
-    
-    
-    //bool mIsVisible;
-    bool mIsSkeletal;
-    
-    std::shared_ptr<class Texture> mShadowMapTexture;
-    
+    //--------------------------------------------------------
+    // 保持している描画リソース
+    //--------------------------------------------------------
+    std::shared_ptr<class Mesh>  mMesh;      // 描画対象メッシュ
+    unsigned int mTextureIndex;              // 使用するメッシュ内テクスチャインデックス
+
+    bool mIsSkeletal;                         // スキンメッシュかどうか
+
+    std::shared_ptr<class Texture> mShadowMapTexture; // 影用テクスチャ（必要に応じて）
+
+    // ライティング・シェーダー
     std::shared_ptr<class LightingManager> mLightingManger;
-    std::shared_ptr<class Shader> mShader;
-    std::shared_ptr<class Shader> mShadowShader;
-    
-    
-    // 輪郭強調
-    bool mIsToon;
-    float mContourFactor;
+    std::shared_ptr<class Shader> mShader;         // 通常描画用シェーダ
+    std::shared_ptr<class Shader> mShadowShader;   // シャドウマップ描画用シェーダ
+
+    //--------------------------------------------------------
+    // トゥーン（輪郭）描画設定
+    //--------------------------------------------------------
+    bool  mIsToon;          // true なら toon + Outline
+    float mContourFactor;   // 1.05f など。輪郭スケール係数
 };
 
 } // namespace toy

@@ -9,7 +9,7 @@
 namespace toy {
 
 SoundEffect::SoundEffect()
-: mBuffer(0)
+    : mBuffer(0)
 {
 }
 
@@ -31,31 +31,37 @@ bool SoundEffect::Load(const std::string& fileName, AssetManager* manager)
     ALenum  format = 0;
     ALsizei freq   = 0;
 
+    // 16bit PCM の WAV を読み込む（モノラル／ステレオのみ対応）
     if (!LoadWav16(fullPath, data, format, freq))
     {
         std::cerr << "[SoundEffect] Failed to load wav: " << fullPath.c_str() << std::endl;
         return false;
     }
 
+    // OpenAL バッファ生成
     alGenBuffers(1, &mBuffer);
     ALenum err = alGetError();
     if (err != AL_NO_ERROR)
     {
-        std::cerr << "[SoundEffect] alGenBuffers error: " << err << std::endl;;
+        std::cerr << "[SoundEffect] alGenBuffers error: " << err << std::endl;
         mBuffer = 0;
         return false;
     }
 
-    alBufferData(mBuffer,
-                 format,
-                 data.data(),
-                 static_cast<ALsizei>(data.size()),
-                 freq);
+    // PCM データを OpenAL バッファに転送
+    alBufferData(
+        mBuffer,
+        format,
+        data.data(),
+        static_cast<ALsizei>(data.size()),
+        freq
+    );
 
     err = alGetError();
     if (err != AL_NO_ERROR)
     {
-        std::cerr << "[SoundEffect] alBufferData error: " << err << "(file=" << fullPath.c_str() << std::endl;;
+        std::cerr << "[SoundEffect] alBufferData error: " << err
+                  << "(file=" << fullPath.c_str() << std::endl;
         alDeleteBuffers(1, &mBuffer);
         mBuffer = 0;
         return false;
@@ -65,19 +71,19 @@ bool SoundEffect::Load(const std::string& fileName, AssetManager* manager)
 }
 
 //------------------------------------------
-// RIFF チャンクを読む WAV ローダ
+// 単純な RIFF/WAVE ローダ（16bit PCM 用）
 //------------------------------------------
 struct RiffHeader
 {
     char     id[4];      // "RIFF"
-    uint32_t size;       // 全体サイズ - 8
+    uint32_t size;       // ファイルサイズ - 8
     char     wave[4];    // "WAVE"
 };
 
 struct ChunkHeader
 {
-    char     id[4];      // "fmt " とか "data"
-    uint32_t size;       // チャンクサイズ
+    char     id[4];      // "fmt " / "data" など
+    uint32_t size;       // チャンクのデータサイズ
 };
 
 bool SoundEffect::LoadWav16(const std::string& fullPath,
@@ -92,6 +98,7 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
         return false;
     }
 
+    // RIFF/WAVE ヘッダ読み込み
     RiffHeader riff{};
     if (std::fread(&riff, sizeof(RiffHeader), 1, fp) != 1)
     {
@@ -117,19 +124,18 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
 
     std::vector<char> dataChunk;
 
-    // チャンクを順番に走査
+    // fmt チャンク／data チャンクを順に走査
     while (!foundData)
     {
         ChunkHeader ch{};
         if (std::fread(&ch, sizeof(ChunkHeader), 1, fp) != 1)
         {
-            break; // EOF or error
+            break; // EOF またはエラー
         }
 
         if (std::strncmp(ch.id, "fmt ", 4) == 0)
         {
-            // fmt チャンク
-            // 基本の PCM フォーマット
+            // --- fmt チャンク（フォーマット情報） ---
             struct FmtChunkBase
             {
                 uint16_t audioFormat;
@@ -150,7 +156,7 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
                 return false;
             }
 
-            // 残りがあればスキップ
+            // 余りがあればスキップ
             if (ch.size > toRead)
             {
                 std::fseek(fp, ch.size - toRead, SEEK_CUR);
@@ -165,10 +171,11 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
         }
         else if (std::strncmp(ch.id, "data", 4) == 0)
         {
-            // data チャンク本体
+            // --- data チャンク（サンプル本体） ---
             if (!foundFmt)
             {
-                std::cerr << "[SoundEffect] data chunk before fmt chunk: " << fullPath.c_str() << std::endl;
+                std::cerr << "[SoundEffect] data chunk before fmt chunk: "
+                          << fullPath.c_str() << std::endl;
                 std::fclose(fp);
                 return false;
             }
@@ -187,7 +194,7 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
         }
         else
         {
-            // その他のチャンクはスキップ
+            // それ以外のチャンクはまとめてスキップ
             std::fseek(fp, ch.size, SEEK_CUR);
         }
     }
@@ -196,35 +203,43 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
 
     if (!foundFmt || !foundData)
     {
-        std::cerr << "[SoundEffect] Missing fmt or data chunk: " << fullPath.c_str() << std::endl;
+        std::cerr << "[SoundEffect] Missing fmt or data chunk: "
+                  << fullPath.c_str() << std::endl;
         return false;
     }
 
+    // PCM 以外は対象外
     if (audioFormat != 1)
     {
-        std::cerr << "[SoundEffect] Non-PCM format not supported: " << fullPath.c_str() << std::endl;
+        std::cerr << "[SoundEffect] Non-PCM format not supported: "
+                  << fullPath.c_str() << std::endl;
         return false;
     }
 
+    // 対応ビット数チェック
     if (bitsPerSample != 8 && bitsPerSample != 16)
     {
-        std::cerr << "[SoundEffect] Only 8/16bit supported: " << fullPath.c_str() << "(" << bitsPerSample << " bits)" << std::endl;
+        std::cerr << "[SoundEffect] Only 8/16bit supported: "
+                  << fullPath.c_str() << " (" << bitsPerSample << " bits)" << std::endl;
         return false;
     }
 
+    // モノラル／ステレオのみ対応
     if (numChannels < 1 || numChannels > 2)
     {
-        std::cerr << "[SoundEffect] Only mono/stereo supported: " << fullPath.c_str() << " (ch=" << numChannels << ")" << std::endl;
+        std::cerr << "[SoundEffect] Only mono/stereo supported: "
+                  << fullPath.c_str() << " (ch=" << numChannels << ")" << std::endl;
         return false;
     }
 
-    outFreq   = static_cast<ALsizei>(sampleRate);
-    outData   = std::move(dataChunk);
+    outFreq = static_cast<ALsizei>(sampleRate);
+    outData = std::move(dataChunk);
 
-    if (numChannels == 1 && bitsPerSample == 8)  outFormat = AL_FORMAT_MONO8;
-    if (numChannels == 1 && bitsPerSample == 16) outFormat = AL_FORMAT_MONO16;
-    if (numChannels == 2 && bitsPerSample == 8)  outFormat = AL_FORMAT_STEREO8;
-    if (numChannels == 2 && bitsPerSample == 16) outFormat = AL_FORMAT_STEREO16;
+    // OpenAL のフォーマットに変換
+    if (numChannels == 1 && bitsPerSample == 8)   outFormat = AL_FORMAT_MONO8;
+    if (numChannels == 1 && bitsPerSample == 16)  outFormat = AL_FORMAT_MONO16;
+    if (numChannels == 2 && bitsPerSample == 8)   outFormat = AL_FORMAT_STEREO8;
+    if (numChannels == 2 && bitsPerSample == 16)  outFormat = AL_FORMAT_STEREO16;
 
     return true;
 }

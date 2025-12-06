@@ -24,45 +24,54 @@ Texture::~Texture()
     Unload();
 }
 
-//--------------------------------------
+//============================================================
 // 画像ファイル読み込み（SDL3_image）
-//--------------------------------------
+//============================================================
 bool Texture::Load(const std::string& fileName, AssetManager* assetManager)
 {
+    // AssetManager で設定された AssetsPath を基準にフルパスを組み立てる
     std::string fullName = assetManager->GetAssetsPath() + fileName;
 
     SDL_Surface* image = IMG_Load(fullName.c_str());
     if (!image)
     {
-        std::cerr << "Failed to load image : " << fullName.c_str() << SDL_GetError() << " : " << std::endl;
+        std::cerr << "[Texture] Failed to load image: "
+                  << fullName << " : " << SDL_GetError() << std::endl;
         return false;
     }
 
-    // ---- 1) OpenGL 向けにフォーマットを統一 ----
-    //   SDL3 でも使える SDL_ConvertSurface を利用
+    // --------------------------------------------------------
+    // 1) OpenGL 用フォーマットへ変換（ABGR8888 → RGBA 相当）
+    //    ※ SDL3 でも SDL_ConvertSurface は利用可能
+    // --------------------------------------------------------
     SDL_Surface* conv = SDL_ConvertSurface(image, SDL_PIXELFORMAT_ABGR8888);
-    SDL_DestroySurface(image);          // 元の surface は不要なので解放
+    SDL_DestroySurface(image); // 元 surface は破棄
 
     if (!conv)
     {
-        std::cerr << "SDL_ConvertSurface failed: " << SDL_GetError() << std::endl;
+        std::cerr << "[Texture] SDL_ConvertSurface failed: "
+                  << SDL_GetError() << std::endl;
         return false;
     }
 
     const int w = conv->w;
     const int h = conv->h;
 
-    // ---- 2) 行パディング対策: UNPACK_ALIGNMENT=1 にする ----
+    // --------------------------------------------------------
+    // 2) 行パディング対策
+    //    UNPACK_ALIGNMENT=1 にして 4byte アライメントを気にしないようにする
+    // --------------------------------------------------------
     GLint prevUnpack = 0;
     glGetIntegerv(GL_UNPACK_ALIGNMENT, &prevUnpack);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    // ---- 3) OpenGL テクスチャ作成 ----
+    // --------------------------------------------------------
+    // 3) OpenGL テクスチャ生成
+    //    ABGR8888 だが little endian では RGBA 順と互換になるため GL_RGBA で扱う
+    // --------------------------------------------------------
     glGenTextures(1, &mTextureID);
     glBindTexture(GL_TEXTURE_2D, mTextureID);
 
-    // conv は ABGR8888 だが、little endian では RGBA 順と互換になるので
-    // フォーマットは GL_RGBA として扱う
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
@@ -70,7 +79,7 @@ bool Texture::Load(const std::string& fileName, AssetManager* assetManager)
         w,
         h,
         0,
-        GL_RGBA,           // 取り込みフォーマット
+        GL_RGBA,           // 入力フォーマット
         GL_UNSIGNED_BYTE,
         conv->pixels
     );
@@ -80,7 +89,7 @@ bool Texture::Load(const std::string& fileName, AssetManager* assetManager)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    // alignment を元に戻す
+    // 元の alignment に戻す
     glPixelStorei(GL_UNPACK_ALIGNMENT, prevUnpack);
 
     mWidth  = w;
@@ -90,33 +99,35 @@ bool Texture::Load(const std::string& fileName, AssetManager* assetManager)
     return true;
 }
 
-
-/////--------------------------------------
-// メモリから読み込み（埋め込みテクスチャ）
-//--------------------------------------
+//============================================================
+// メモリ上の画像データから読み込み（埋め込みテクスチャなど）
+//   - Assimp の aiTexture などに対応
+//============================================================
 bool Texture::LoadFromMemory(const void* data, int size)
 {
-    // SDL3: SDL_RWops → SDL_IOStream
+    // SDL3: SDL_RWops の代わりに SDL_IOStream を使用
     SDL_IOStream* io = SDL_IOFromConstMem(data, size);
     if (!io)
     {
-        std::cerr << "Failed IOFromConstMem: " << SDL_GetError() << std::endl;
+        std::cerr << "[Texture] SDL_IOFromConstMem failed: "
+                  << SDL_GetError() << std::endl;
         return false;
     }
 
-    // SDL3_image: IMG_Load_RW → IMG_Load_IO
-    // 第二引数 true で、読み込み後に io をクローズしてくれる
+    // SDL3_image: IMG_Load_IO
+    //   第二引数 true で、読み込み終了後に io を自動クローズ
     SDL_Surface* image = IMG_Load_IO(io, true);
     if (!image)
     {
-        std::cerr << "Failed to load image from memory: " << SDL_GetError() << std::endl;
+        std::cerr << "[Texture] Failed to load image from memory: "
+                  << SDL_GetError() << std::endl;
         return false;
     }
 
-    // SDL3: format は enum 値。アルファ有無で RGBA/RGB を決める
+    // SDL3: ピクセルフォーマットからアルファ有無を判定
     bool hasAlpha = SDL_ISPIXELFORMAT_ALPHA(image->format);
-    GLenum srcFormat  = hasAlpha ? GL_RGBA  : GL_RGB;
-    GLenum internal   = hasAlpha ? GL_RGBA8 : GL_RGB8;
+    GLenum srcFormat = hasAlpha ? GL_RGBA : GL_RGB;
+    GLenum internal  = hasAlpha ? GL_RGBA8 : GL_RGB8;
 
     glGenTextures(1, &mTextureID);
     glBindTexture(GL_TEXTURE_2D, mTextureID);
@@ -143,9 +154,10 @@ bool Texture::LoadFromMemory(const void* data, int size)
     return true;
 }
 
-//--------------------------------------
-// 生のピクセルから作成（フォントなど）
-//--------------------------------------
+//============================================================
+// 生のピクセルから作成（RGBA 前提）
+//   - フォントレンダリング結果などをそのままテクスチャ化
+//============================================================
 bool Texture::LoadFromMemory(const void* data, int width, int height)
 {
     if (mTextureID != 0)
@@ -173,9 +185,10 @@ bool Texture::LoadFromMemory(const void* data, int width, int height)
     return true;
 }
 
-//--------------------------------------
-// レンダリング用テクスチャ
-//--------------------------------------
+//============================================================
+// レンダリングターゲット用テクスチャ（カラー）
+//   - ポストエフェクト用 FBO のアタッチ先などで使用
+//============================================================
 void Texture::CreateForRendering(int w, int h, unsigned int format)
 {
     mWidth  = w;
@@ -195,9 +208,10 @@ void Texture::CreateForRendering(int w, int h, unsigned int format)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
-//--------------------------------------
-// シャドウマップ
-//--------------------------------------
+//============================================================
+// シャドウマップ用テクスチャ（depth）
+//   - sampler2DShadow 前提の深度比較テクスチャ
+//============================================================
 void Texture::CreateShadowMap(int width, int height)
 {
     mWidth  = width;
@@ -221,11 +235,14 @@ void Texture::CreateShadowMap(int width, int height)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 }
 
-//--------------------------------------
-// 自前生成系（レンズフレアなど）
-//--------------------------------------
-bool Texture::CreateAlphaCircle(int size, float centerX, float centerY,
-                                Vector3 color, float blendPow)
+//============================================================
+// 自前生成（レンズフレア用などの円形グラデーション）
+//============================================================
+bool Texture::CreateAlphaCircle(int size,
+                                float centerX,
+                                float centerY,
+                                Vector3 color,
+                                float blendPow)
 {
     if (size <= 0) return false;
 
@@ -241,6 +258,8 @@ bool Texture::CreateAlphaCircle(int size, float centerX, float centerY,
             float dx = x - cx;
             float dy = y - cy;
             float dist = std::sqrt(dx * dx + dy * dy) / (size / 3.0f);
+
+            // 外側に行くほどアルファが減衰
             float alpha = 1.0f - std::pow(std::clamp(dist, 0.0f, 1.0f), blendPow);
 
             int index = (y * size + x) * 4;
@@ -254,8 +273,12 @@ bool Texture::CreateAlphaCircle(int size, float centerX, float centerY,
     glGenTextures(1, &mTextureID);
     glBindTexture(GL_TEXTURE_2D, mTextureID);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_RGBA,
+        size, size, 0,
+        GL_RGBA, GL_UNSIGNED_BYTE,
+        pixels.data()
+    );
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -267,8 +290,13 @@ bool Texture::CreateAlphaCircle(int size, float centerX, float centerY,
     return true;
 }
 
-bool Texture::CreateRadialRays(int size, int numRays,
-                               float fadePow, float rayStrength,
+//============================================================
+// 自前生成（放射状の光芒・ゴッドレイ風テクスチャ）
+//============================================================
+bool Texture::CreateRadialRays(int size,
+                               int numRays,
+                               float fadePow,
+                               float rayStrength,
                                float intensityScale)
 {
     if (size <= 0 || numRays <= 0) return false;
@@ -290,6 +318,7 @@ bool Texture::CreateRadialRays(int size, int numRays,
             float angle = std::atan2(dy, dx);
             float ray   = std::abs(std::sin(angle * numRays));
 
+            // 距離減衰 × 光芒の強さ
             float alpha = (1.0f - std::clamp(dist, 0.0f, 1.0f));
             alpha = std::pow(alpha, fadePow) * ray * rayStrength;
             alpha = std::clamp(alpha * intensityScale, 0.0f, 1.0f);
@@ -305,8 +334,12 @@ bool Texture::CreateRadialRays(int size, int numRays,
     glGenTextures(1, &mTextureID);
     glBindTexture(GL_TEXTURE_2D, mTextureID);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_RGBA,
+        size, size, 0,
+        GL_RGBA, GL_UNSIGNED_BYTE,
+        pixels.data()
+    );
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -318,9 +351,10 @@ bool Texture::CreateRadialRays(int size, int numRays,
     return true;
 }
 
-//--------------------------------------
-// 任意ピクセル→テクスチャ
-//--------------------------------------
+//============================================================
+// 任意ピクセル列 → テクスチャ
+//   - hasAlpha=false の場合は RGB テクスチャとして扱う
+//============================================================
 bool Texture::CreateFromPixels(const void* pixels,
                                int width, int height, bool hasAlpha)
 {
@@ -359,18 +393,18 @@ bool Texture::CreateFromPixels(const void* pixels,
     return true;
 }
 
-//--------------------------------------
-// Bind
-//--------------------------------------
+//============================================================
+// OpenGL へのバインド
+//============================================================
 void Texture::SetActive(int unit)
 {
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, mTextureID);
 }
 
-//--------------------------------------
-// 解放
-//--------------------------------------
+//============================================================
+// リソース解放
+//============================================================
 void Texture::Unload()
 {
     if (mTextureID != 0)

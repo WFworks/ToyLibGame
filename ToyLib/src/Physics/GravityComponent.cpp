@@ -8,6 +8,13 @@
 
 namespace toy {
 
+//------------------------------------------------------------------------------
+// コンストラクタ
+//------------------------------------------------------------------------------
+// ・初期Y速度は 0。
+// ・重力加速度はデフォルトで -2.8f（ゲーム全体で調整する前提）。
+// ・ジャンプ初速は 50.0f。
+//------------------------------------------------------------------------------
 GravityComponent::GravityComponent(Actor* a)
 : Component(a)
 , mVelocityY(0.0f)
@@ -17,46 +24,65 @@ GravityComponent::GravityComponent(Actor* a)
 {
 }
 
+//------------------------------------------------------------------------------
+// Update
+//------------------------------------------------------------------------------
+// ・mVelocityY に重力加速度を加算して位置更新。
+// ・PhysWorld::GetNearestGroundY() を使って足元の最も近い地面Yを取得。
+// ・足コライダー（C_FOOT）AABB の min.y と groundY を比較して、
+//   次フレームの足元が groundY を下回る場合は接地とみなし、
+//   Y位置を補正して mVelocityY を 0 / mIsGrounded = true にする。
+//------------------------------------------------------------------------------
 void GravityComponent::Update(float deltaTime)
 {
-    //if (mIsGrounded) return;
-    // 重力加速度を加算
+    // 重力加速度を加算（毎フレーム下向きに加速）
     mVelocityY += mGravityAccel;
-    // 現在座標を取得
+    
+    // 現在の Actor 座標
     Vector3 pos = GetOwner()->GetPosition();
-    // 設置判定に使うコライダーを取得（C_FOOT）
+    
+    // 設置判定に使う足コライダーを取得（C_FOOT を持つ Collider）
     ColliderComponent* collider = FindFootCollider();
     if (!collider) return;
     
-    
-    // 地面の高さを取得
+    // 足元より下方向の中で「最も近い地面の高さ」を取得
     float groundY = -std::numeric_limits<float>::max();
-    if (GetOwner()->GetApp()->GetPhysWorld()
-        ->GetNearestGroundY(GetOwner(), groundY))
+    if (GetOwner()->GetApp()->GetPhysWorld()->GetNearestGroundY(GetOwner(), groundY))
     {
-        // 自分より下に地面がある
-        // AABBから最低座標を取得
+        // 自分の真下に何らかの地面候補が存在する
+        
+        // 足コライダーのワールドAABBから「足元のY」を取得
         float footY = collider->GetBoundingVolume()->GetWorldAABB().min.y;
-        if (footY+mVelocityY*deltaTime < groundY)
+        
+        // このフレームの更新後に足元が地面を突き抜けるかをチェック
+        if (footY + mVelocityY * deltaTime < groundY)
         {
-            float offset = pos.y - footY;
-            pos.y = groundY + offset+0.01;
-            mVelocityY = 0.0f;
-            mIsGrounded = true;
+            // 足元が groundY を下回ってしまうので、ぴったり乗るように補正
+            float offset = pos.y - footY;             // Actorの原点から足元までのオフセット
+            pos.y = groundY + offset + 0.01f;         // ほんの少し浮かせてめり込み防止
+            mVelocityY = 0.0f;                        // 落下速度リセット
+            mIsGrounded = true;                       // 接地状態
             GetOwner()->SetPosition(pos);
             return;
         }
     }
     else
     {
-        // 自分より下に地面がない
+        // 自分より下に地面が見つからない → 空中扱い
         mIsGrounded = false;
     }
+    
+    // 通常の落下処理（地面に当たらなかった場合）
     pos.y += mVelocityY * deltaTime;
     GetOwner()->SetPosition(pos);
 }
 
-
+//------------------------------------------------------------------------------
+// Jump
+//------------------------------------------------------------------------------
+// ・接地中（mIsGrounded == true）のときだけジャンプ初速を与える。
+// ・ジャンプ後は mIsGrounded を false にする。
+//------------------------------------------------------------------------------
 void GravityComponent::Jump()
 {
     if (mIsGrounded)
@@ -65,6 +91,14 @@ void GravityComponent::Jump()
         mIsGrounded = false;
     }
 }
+
+//------------------------------------------------------------------------------
+// FindFootCollider
+//------------------------------------------------------------------------------
+// ・Actor に紐づく ColliderComponent 群から、C_FOOT フラグを持つものを探す。
+// ・足用 Collider（カプセルや小さめAABB）を用意しておき、
+//   それを地面判定専用に使う前提のヘルパー。
+//------------------------------------------------------------------------------
 ColliderComponent* GravityComponent::FindFootCollider()
 {
     for (auto* comp : GetOwner()->GetAllComponents<ColliderComponent>())

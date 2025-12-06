@@ -17,61 +17,108 @@ ShadowSpriteComponent::ShadowSpriteComponent(Actor* owner, int drawOrder)
 , mScaleWidth(1.0f)
 , mScaleHeight(1.0f)
 {
-    mLayer = VisualLayer::Effect3D; // 足元に描く
+    // 3D 空間上のエフェクトとして描画（地面に張り付くタイプ）
+    mLayer = VisualLayer::Effect3D;
+
+    // 通常のスプライト用シェーダを使用（簡易影テクスチャを貼る）
     mShader = GetOwner()->GetApp()->GetRenderer()->GetShader("Sprite");
     
+    // 影用のテクスチャを自前生成（黒のアルファ付き円）
+    //   size      : 256x256
+    //   center    : (0.5, 0.3) 少し手前寄り
+    //   color     : 黒
+    //   blendPow  : 0.8（エッジの落ち方）
     mTexture = std::make_shared<Texture>();
     mTexture->CreateAlphaCircle(256, 0.5f, 0.3f, Vector3(0.f, 0.f, 0.f), 0.8f);
 }
 
 ShadowSpriteComponent::~ShadowSpriteComponent()
 {
-    
+    // 特に明示的な破棄は不要（smart pointer／エンジン側管理に任せる）
 }
 
 void ShadowSpriteComponent::SetTexture(std::shared_ptr<Texture> tex)
 {
+    // デフォルトの丸影テクスチャを差し替えたい場合に使用
     mTexture = tex;
 }
 
 void ShadowSpriteComponent::Draw()
 {
+    // 非表示またはテクスチャ未設定なら何もしない
     if (!mIsVisible || mTexture == nullptr) return;
     
+    // 太陽光がほぼ無いなら影は描かない
     float sunIntensity = mLightingManager->GetSunIntensity();
     if (sunIntensity <= 0.01f)
     {
         return;
     }
     
+    // 影は通常のアルファブレンド
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    
-    float width = static_cast<float>(mTexture->GetWidth()) * mScaleWidth;
+    // ----------------------------------------
+    // 影スプライトのスケールを決定
+    // ----------------------------------------
+    float width  = static_cast<float>(mTexture->GetWidth())  * mScaleWidth;
     float height = static_cast<float>(mTexture->GetHeight()) * mScaleHeight;
-    Matrix4 scale = Matrix4::CreateScale(width * mOffsetScale, height * mOffsetScale*3, 1.0f);
+
+    // mOffsetScale で全体の大きさを調整
+    // ※高さ側は *3 して、やや楕円気味（足元影の潰れ感を演出）
+    Matrix4 scale = Matrix4::CreateScale(
+        width  * mOffsetScale,
+        height * mOffsetScale * 3.0f,
+        1.0f
+    );
     
-    // 光の方向から回転角を計算（XZ平面）
-    Vector3 lightDir = GetOwner()->GetApp()->GetRenderer()->GetLightingManager()->GetLightDirection();
+    // ----------------------------------------
+    // 光源方向に合わせて影の向きを変える
+    //   ・XZ 平面に射影したライトベクトルから回転角を求める
+    //   ・影を「光と反対側に伸びる楕円」として表現
+    // ----------------------------------------
+    Vector3 lightDir = GetOwner()->GetApp()
+        ->GetRenderer()
+        ->GetLightingManager()
+        ->GetLightDirection();
+    
+    // XZ 平面での向きだけ使う
     lightDir.y = 0.0f;
-    if (lightDir.LengthSq() < 0.0001f) lightDir = Vector3(0, 0, 1);
+    if (lightDir.LengthSq() < 0.0001f)
+        lightDir = Vector3(0, 0, 1);
     lightDir.Normalize();
+    
     float angle = atan2f(lightDir.x, lightDir.z);
     Matrix4 rotY = Matrix4::CreateRotationY(angle);
     
+    // X 軸回転 90度で「地面に寝かせる」
     Matrix4 rotX = Matrix4::CreateRotationX(Math::ToRadians(90.0f));
-    Matrix4 trans = Matrix4::CreateTranslation(GetOwner()->GetPosition() + mOffsetPosition);
+    
+    // Actor の位置 + オフセット に配置
+    Matrix4 trans = Matrix4::CreateTranslation(
+        GetOwner()->GetPosition() + mOffsetPosition
+    );
+    
+    // 最終ワールド行列
     Matrix4 world = scale * rotX * rotY * trans;
     
+    // ----------------------------------------
+    // 描画セットアップ
+    // ----------------------------------------
     mShader->SetActive();
+    
     auto renderer = GetOwner()->GetApp()->GetRenderer();
     Matrix4 view = renderer->GetViewMatrix();
     Matrix4 proj = renderer->GetProjectionMatrix();
+    
     mShader->SetMatrixUniform("uViewProj", view * proj);
     mShader->SetMatrixUniform("uWorldTransform", world);
-    mTexture->SetActive(0); // ShadowSprite用ユニット
+    
+    // 影用テクスチャをバインド
+    mTexture->SetActive(0); // ShadowSprite 用テクスチャユニット
     mShader->SetTextureUniform("uTexture", 0);
     
+    // フルスクリーンクアッド or 汎用スプライト用の VAO を使用
     mVertexArray->SetActive();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }

@@ -4,7 +4,6 @@
 #include "Asset/Geometry/Polygon.h"
 #include "Asset/Geometry/VertexArray.h"
 #include "Engine/Render/Shader.h"
-
 #include "Engine/Core/Application.h"
 #include "Engine/Render/Renderer.h"
 #include "Asset/Material/Texture.h"
@@ -16,37 +15,51 @@ const int NUM_VERTEX = 12;
 
 namespace toy {
 
+//------------------------------------------------------------------------------
 // コンストラクタ
+// ・AABB / OBB / Polygon を初期化
+// ・デバッグモード時はワイヤーフレーム用コンポーネントを生成
+//------------------------------------------------------------------------------
 BoundingVolumeComponent::BoundingVolumeComponent(Actor* a)
 : Component(a)
 , mRadius(0.0f)
 {
     mBoundingBox = std::make_shared<Cube>();
-    mObb = std::make_shared<OBB>();
+    mObb         = std::make_shared<OBB>();
     mPolygons.reset(new Polygon[NUM_VERTEX]);
     
+    // デバッグ時のみワイヤーフレームを生成して可視化
     if (GetOwner()->GetApp()->GetRenderer()->IsDebugMode())
     {
         mWireframe = std::make_unique<WireframeComponent>(GetOwner(), 1000);
-        mWireframe->SetColor(Vector3(1,0,0.5f));
+        mWireframe->SetColor(Vector3(1, 0, 0.5f));
     }
 }
 
+//------------------------------------------------------------------------------
 // デストラクタ
+//------------------------------------------------------------------------------
 BoundingVolumeComponent::~BoundingVolumeComponent()
 {
-    
 }
 
-
+//------------------------------------------------------------------------------
+// OnUpdateWorldTransform
+// ・アクターのワールド変換が更新されたタイミングで呼ばれる。
+// ・OBB の中心・軸・半径・バウンディングスフィア半径を再計算。
+//------------------------------------------------------------------------------
 void BoundingVolumeComponent::OnUpdateWorldTransform()
 {
-    // バウンディングボックスパラメータをセット
+    // OBB の中心（ワールド位置）
     mObb->pos = GetOwner()->GetPosition();
+    
     float sc1 = GetOwner()->GetScale();
+    
+    // ローカル AABB をスケールして OBB の min/max として保持
     mObb->max = mBoundingBox->max * sc1;
     mObb->min = mBoundingBox->min * sc1;
     
+    // 回転行列から OBB の軸を取得
     Quaternion q1 = GetOwner()->GetRotation();
     Matrix4 mRot1 = Matrix4::CreateFromQuaternion(q1);
     
@@ -54,53 +67,57 @@ void BoundingVolumeComponent::OnUpdateWorldTransform()
     mObb->axisY = mRot1.GetYAxis();
     mObb->axisZ = mRot1.GetZAxis();
     
-    // 半径を設定
-    mObb->radius = //Vector3::Dot(comp1->GetBoundingBox()->max, comp1->GetBoundingBox()->min);
-    Vector3((fabsf(mObb->max.x) + fabsf(mObb->min.x)) / 2,
-            (fabsf(mObb->max.y) + fabsf(mObb->min.y)) / 2,
-            (fabsf(mObb->max.z) + fabsf(mObb->min.z)) / 2);
+    // 各軸方向の「半径」（幅/高さ/奥行きの半分相当）を算出
+    mObb->radius = Vector3(
+        (fabsf(mObb->max.x) + fabsf(mObb->min.x)) / 2,
+        (fabsf(mObb->max.y) + fabsf(mObb->min.y)) / 2,
+        (fabsf(mObb->max.z) + fabsf(mObb->min.z)) / 2
+    );
     
-    
-    // 角度、AXIS、ちょっと怪しいかも。。。
+    // 簡易的な回転情報（軸の対角要素）
+    // ※ SAT 判定自体は axisX/Y/Z を使用する想定
     mObb->rot = Vector3(mObb->axisX.x, mObb->axisY.y, mObb->axisZ.z);
-    // バウンディングスフィア
+    
+    // バウンディングスフィア半径を更新
     mRadius = mObb->radius.Length();
-    
-    
 }
 
-// バウンディングボリュームを計算
+//------------------------------------------------------------------------------
+// ComputeBoundingVolume（VA から生成）
+// ・複数 VertexArray のポリゴン群からローカル AABB を計算。
+// ・その後、デバッグ用の VAO とポリゴン配列を生成する。
+//------------------------------------------------------------------------------
 void BoundingVolumeComponent::ComputeBoundingVolume(const std::vector<std::shared_ptr<VertexArray>> va)
 {
-    
-    // 複数VertexArrayをまとめて計算
+    // 複数 VertexArray をまとめて min/max を更新
     for (const auto& v : va)
     {
         const auto& polygons = v->GetPolygons();
         for (const auto& poly : polygons)
         {
-            //const auto poly = p;
+            mBoundingBox->min.x = std::min({ mBoundingBox->min.x, poly.a.x, poly.b.x, poly.c.x });
+            mBoundingBox->max.x = std::max({ mBoundingBox->max.x, poly.a.x, poly.b.x, poly.c.x });
             
-            mBoundingBox->min.x = std::min({mBoundingBox->min.x, poly.a.x, poly.b.x, poly.c.x});
-            mBoundingBox->max.x = std::max({mBoundingBox->max.x, poly.a.x, poly.b.x, poly.c.x});
+            mBoundingBox->min.y = std::min({ mBoundingBox->min.y, poly.a.y, poly.b.y, poly.c.y });
+            mBoundingBox->max.y = std::max({ mBoundingBox->max.y, poly.a.y, poly.b.y, poly.c.y });
             
-            mBoundingBox->min.y = std::min({mBoundingBox->min.y, poly.a.y, poly.b.y, poly.c.y});
-            mBoundingBox->max.y = std::max({mBoundingBox->max.y, poly.a.y, poly.b.y, poly.c.y});
-            
-            mBoundingBox->min.z = std::min({mBoundingBox->min.z, poly.a.z, poly.b.z, poly.c.z});
-            mBoundingBox->max.z = std::max({mBoundingBox->max.z, poly.a.z, poly.b.z, poly.c.z});
+            mBoundingBox->min.z = std::min({ mBoundingBox->min.z, poly.a.z, poly.b.z, poly.c.z });
+            mBoundingBox->max.z = std::max({ mBoundingBox->max.z, poly.a.z, poly.b.z, poly.c.z });
         }
     }
     
+    // デバッグ用の VAO と、AABB からのポリゴン配列を生成
     CreateVArray();
     CreatePolygons();
-    
 }
 
-// ポリゴンデータを生成
+//------------------------------------------------------------------------------
+// CreatePolygons
+// ・AABB（min/max）から 6 面 × 2 三角形 = 12 ポリゴンを生成。
+// ・ローカル空間でのポリゴン情報として PhysWorld などに提供する。
+//------------------------------------------------------------------------------
 void BoundingVolumeComponent::CreatePolygons()
 {
-    
     Vector3 V0(mBoundingBox->min.x, mBoundingBox->min.y, mBoundingBox->min.z);
     Vector3 V1(mBoundingBox->max.x, mBoundingBox->min.y, mBoundingBox->min.z);
     Vector3 V2(mBoundingBox->max.x, mBoundingBox->min.y, mBoundingBox->max.z);
@@ -111,63 +128,71 @@ void BoundingVolumeComponent::CreatePolygons()
     Vector3 V7(mBoundingBox->min.x, mBoundingBox->max.y, mBoundingBox->max.z);
     
     // Z- 面（前）
-    mPolygons[0] = { V0, V4, V5 };
-    mPolygons[1] = { V0, V5, V1 };
+    mPolygons[0]  = { V0, V4, V5 };
+    mPolygons[1]  = { V0, V5, V1 };
     
     // X+ 面（右）
-    mPolygons[2] = { V1, V5, V6 };
-    mPolygons[3] = { V1, V6, V2 };
+    mPolygons[2]  = { V1, V5, V6 };
+    mPolygons[3]  = { V1, V6, V2 };
     
-    // Z+ 面（背）
-    mPolygons[4] = { V2, V6, V7 };
-    mPolygons[5] = { V2, V7, V3 };
+    // Z+ 面（背面）
+    mPolygons[4]  = { V2, V6, V7 };
+    mPolygons[5]  = { V2, V7, V3 };
     
     // X- 面（左）
-    mPolygons[6] = { V3, V7, V4 };
-    mPolygons[7] = { V3, V4, V0 };
+    mPolygons[6]  = { V3, V7, V4 };
+    mPolygons[7]  = { V3, V4, V0 };
     
     // Y+ 面（上）
-    mPolygons[8] = { V4, V7, V6 };
-    mPolygons[9] = { V4, V6, V5 };
+    mPolygons[8]  = { V4, V7, V6 };
+    mPolygons[9]  = { V4, V6, V5 };
     
     // Y- 面（下）
     mPolygons[10] = { V3, V0, V1 };
     mPolygons[11] = { V3, V1, V2 };
-    
 }
 
-
-// Min Maxを直接指定
+//------------------------------------------------------------------------------
+// ComputeBoundingVolume（min/max 直接指定）
+// ・エディタや JSON から AABB を直指定したい場合に使用。
+//------------------------------------------------------------------------------
 void BoundingVolumeComponent::ComputeBoundingVolume(const Vector3& min, const Vector3& max)
 {
     mBoundingBox->min = min;
     mBoundingBox->max = max;
+    
     CreateVArray();
     CreatePolygons();
 }
 
-// バウンディングボックスを手動調整する（場所とサイズ（倍率））
+//------------------------------------------------------------------------------
+// AdjustBoundingBox
+// ・既存の AABB に対して、位置オフセットとスケールを適用して再構成。
+// ・「読み込んだモデルの当たり判定をちょっとだけ広げる/ずらす」用途など。
+//------------------------------------------------------------------------------
 void BoundingVolumeComponent::AdjustBoundingBox(const Vector3& pos, const Vector3& sc)
 {
-    
+    // 平行移動
     mBoundingBox->max += pos;
     mBoundingBox->min += pos;
     
+    // 各軸でスケール
     mBoundingBox->max.x *= sc.x;
     mBoundingBox->min.x *= sc.x;
     mBoundingBox->max.y *= sc.y;
     mBoundingBox->min.y *= sc.y;
     mBoundingBox->max.z *= sc.z;
     mBoundingBox->min.z *= sc.z;
+    
     CreateVArray();
     CreatePolygons();
-    
 }
 
-
-
-
-// デバッグ用
+//------------------------------------------------------------------------------
+// CreateVArray
+// ・AABB をもとにボックス用頂点バッファを作り、デバッグ用 VAO を生成。
+// ・WireframeComponent に渡すことで境界ボックスを可視化する。
+//------------------------------------------------------------------------------
 void BoundingVolumeComponent::CreateVArray()
 {
     // ボックス用頂点バッファ（座標、法線、UV）
@@ -181,10 +206,10 @@ void BoundingVolumeComponent::CreateVArray()
         mBoundingBox->max.x, mBoundingBox->max.y, mBoundingBox->max.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, // 5
         mBoundingBox->min.x, mBoundingBox->min.y, mBoundingBox->max.z, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // 6
         mBoundingBox->min.x, mBoundingBox->max.y, mBoundingBox->max.z, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f  // 7
-        
     };
     
-    unsigned int index[] = {
+    unsigned int index[] =
+    {
         0, 1, 3,
         3, 2, 0,
         
@@ -202,25 +227,31 @@ void BoundingVolumeComponent::CreateVArray()
         
         2, 4, 6,
         6, 0, 2
-        
-        
     };
     
     if (mWireframe)
     {
-        mWireframe->SetVertexArray(std::make_shared<VertexArray>(verts, 8, (unsigned int*)index, (unsigned int)36));
+        mWireframe->SetVertexArray(
+            std::make_shared<VertexArray>(
+                verts,
+                8,
+                (unsigned int*)index,
+                (unsigned int)36));
     }
-    
 }
 
-// ワールド空間でのバウンディングボックスを取得
+//------------------------------------------------------------------------------
+// GetWorldAABB
+// ・スケールと位置を反映した「ワールド空間の AABB」を返す。
+// ・回転は無視されるので、ざっくりとした広めの当たり判定として利用。
+//------------------------------------------------------------------------------
 Cube BoundingVolumeComponent::GetWorldAABB() const
 {
     Cube worldBox;
     if (!mBoundingBox) return worldBox;
     
-    Vector3 pos = GetOwner()->GetPosition();
-    float scale = GetOwner()->GetScale();
+    Vector3 pos   = GetOwner()->GetPosition();
+    float   scale = GetOwner()->GetScale();
     
     worldBox.min = mBoundingBox->min * scale + pos;
     worldBox.max = mBoundingBox->max * scale + pos;

@@ -4,49 +4,50 @@
 
 namespace toy {
 
+//------------------------------------------------------------------------------
+// コンストラクタ
+//------------------------------------------------------------------------------
 FPSMoveComponent::FPSMoveComponent(class Actor* a, int order)
 : MoveComponent(a, order)
-, mTurnSpeed(180.f)
-, mSpeed(7.f)
+, mTurnSpeed(180.f)   // 左右の回転速度
+, mSpeed(7.f)         // 前進・後退速度
 {
-    
 }
 
 FPSMoveComponent::~FPSMoveComponent()
 {
-    
 }
 
-
+//------------------------------------------------------------------------------
+// 入力処理（移動量・回転量を設定）
+//------------------------------------------------------------------------------
 void FPSMoveComponent::ProcessInput(const struct InputState& state)
 {
+    if (!mIsMovable) return;
     
-    if(!mIsMovable) return;
-    
-    mForwardSpeed = mSpeed * state.Controller.GetLeftStick().y;
+    // 左スティック：前後・旋回
+    mForwardSpeed = mSpeed     * state.Controller.GetLeftStick().y;
     mAngularSpeed = mTurnSpeed * state.Controller.GetLeftStick().x;
     
+    // キーボード（DPad）補助入力
     if (state.IsButtonDown(GameButton::DPadLeft))
-    {
         mAngularSpeed = -mTurnSpeed;
-    }
     if (state.IsButtonDown(GameButton::DPadRight))
-    {
-        mAngularSpeed = mTurnSpeed;
-    }
+        mAngularSpeed =  mTurnSpeed;
     if (state.IsButtonDown(GameButton::DPadUp))
-    {
-        mForwardSpeed = mSpeed;
-    }
+        mForwardSpeed =  mSpeed;
     if (state.IsButtonDown(GameButton::DPadDown))
-    {
         mForwardSpeed = -mSpeed;
-    }
 }
 
+//------------------------------------------------------------------------------
+// FPS移動処理（回転→前後移動）
+//------------------------------------------------------------------------------
 void FPSMoveComponent::Update(float deltaTime)
 {
-    // 回転（Y軸）
+    //------------------------------
+    // 1. 回転（左右旋回 / Y軸）
+    //------------------------------
     if (!Math::NearZero(mAngularSpeed))
     {
         float angle = Math::ToRadians(mAngularSpeed * deltaTime);
@@ -55,15 +56,20 @@ void FPSMoveComponent::Update(float deltaTime)
         GetOwner()->SetRotation(rot);
     }
     
-    // 前進・後退（RayCCD付き）
+    //------------------------------
+    // 2. 前進・後退（RayCCDつき）
+    //------------------------------
     if (!Math::NearZero(mForwardSpeed))
     {
         Vector3 moveDir = GetOwner()->GetForward();
-        moveDir.y = 0.0f;
+        moveDir.y = 0.0f; // 水平移動のみ
+        
         if (moveDir.LengthSq() > Math::NearZeroEpsilon)
         {
             moveDir.Normalize();
             Vector3 displacement = moveDir * mForwardSpeed;
+            
+            // 壁判定＋押し戻しを含む安全移動
             TryMoveWithRayCheck(displacement, deltaTime);
         }
     }

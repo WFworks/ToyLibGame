@@ -25,6 +25,7 @@ SoundComponent::SoundComponent(Actor* owner, int updateOrder)
 
 SoundComponent::~SoundComponent()
 {
+    // 自前のソースを停止・破棄
     Stop();
     if (mSource != 0)
     {
@@ -33,14 +34,22 @@ SoundComponent::~SoundComponent()
     }
 }
 
+//--------------------------------------
+// 再生するサウンド（SE名）を指定
+//--------------------------------------
 void SoundComponent::SetSound(const std::string& fileName)
 {
     mSoundName = fileName;
 }
 
+//--------------------------------------
+// 再生開始
+//--------------------------------------
 void SoundComponent::Play()
 {
     if (mSoundName.empty()) return;
+
+    // 排他再生モードなら、すでに再生中のときは無視
     if (mIsExclusive && IsPlaying()) return;
 
     auto* app    = GetOwner()->GetApp();
@@ -48,26 +57,35 @@ void SoundComponent::Play()
     auto sound   = assets->GetSoundEffect(mSoundName);
     if (!sound) return;
 
+    // ソース生成（初回のみ）
     if (mSource == 0)
     {
         alGenSources(1, &mSource);
 
-        // 一回だけでいい設定
-        alSourcef(mSource, AL_REFERENCE_DISTANCE, 3.0f);  // ここまではほぼフル音量
-        alSourcef(mSource, AL_MAX_DISTANCE, 50.0f);       // これ以上はあまり変わらない
-        alSourcef(mSource, AL_ROLLOFF_FACTOR, 1.0f);      // 減衰の強さ
+        // 距離減衰に関するパラメータ（3D SE 用）
+        // ※ mUseDistanceAttenuation のオン/オフに応じて
+        //    ここを分ける実装も可能
+        alSourcef(mSource, AL_REFERENCE_DISTANCE, 3.0f);  // この距離まではほぼフル音量
+        alSourcef(mSource, AL_MAX_DISTANCE,      50.0f);  // これ以上離れてもあまり変わらない
+        alSourcef(mSource, AL_ROLLOFF_FACTOR,    1.0f);   // 減衰の強さ
     }
 
+    // バッファ・ボリューム・ループ設定
     alSourcei(mSource, AL_BUFFER, sound->GetBuffer());
     alSourcef(mSource, AL_GAIN, mVolume);
     alSourcei(mSource, AL_LOOPING, mIsLoop ? AL_TRUE : AL_FALSE);
 
-    // 位置だけ OpenAL に渡す
+    // 現在の Actor 位置を OpenAL ソースに反映
     auto pos = GetOwner()->GetPosition();
     alSource3f(mSource, AL_POSITION, pos.x, pos.y, pos.z);
 
+    // 再生開始
     alSourcePlay(mSource);
 }
+
+//--------------------------------------
+// 再生停止
+//--------------------------------------
 void SoundComponent::Stop()
 {
     if (mSource != 0)
@@ -76,6 +94,9 @@ void SoundComponent::Stop()
     }
 }
 
+//--------------------------------------
+// 再生中かどうか
+//--------------------------------------
 bool SoundComponent::IsPlaying() const
 {
     if (mSource == 0) return false;
@@ -85,8 +106,12 @@ bool SoundComponent::IsPlaying() const
     return (state == AL_PLAYING);
 }
 
+//--------------------------------------
+// 毎フレーム更新
+//--------------------------------------
 void SoundComponent::Update(float)
 {
+    // 自動再生フラグが立っていて、まだ未再生なら一度だけ再生
     if (mAutoPlay && !mHasPlayed)
     {
         Play();
@@ -105,15 +130,13 @@ void SoundComponent::Update(float)
             alSource3f(mSource, AL_POSITION, pos.x, pos.y, pos.z);
         }
 
-        // ループしない場合、再生終了後にフラグをリセットしたりイベント飛ばしたりできる
+        // ループしない場合、再生終了後にフラグリセットなどを行いたければここで処理
         if (!mIsLoop && state == AL_STOPPED)
         {
-            // TODO: 必要ならここで何かイベントを飛ばす or フラグをリセット
-            // 例:
-            // mHasPlayed = false;
+            // TODO: 必要ならここでイベント通知やフラグリセットを行う
+            // 例: mHasPlayed = false;
         }
     }
 }
 
 } // namespace toy
-

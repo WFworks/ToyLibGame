@@ -13,97 +13,138 @@
 
 namespace toy {
 
-// アニメーション対応のメッシュを管理するクラス
+
+
+// アニメーション対応メッシュ
 class Mesh
 {
 public:
     Mesh();
     ~Mesh();
-    
+
     // メッシュファイルを読み込む
-    virtual bool Load(const std::string& fileName, class AssetManager* assetMamager, bool isRightHanded = false);
-    // メッシュとリソースの開放
+    // isRightHanded = true のとき右手系 → 左手系などの変換を行う想定
+    virtual bool Load(const std::string& fileName,
+                      class AssetManager* assetMamager,
+                      bool isRightHanded = false);
+
+    // メッシュとリソースの解放
     void Unload();
-    
-    // メッシュの頂点配列（VAO）を取得
-    const std::vector<std::shared_ptr<class VertexArray>>& GetVertexArray() { return mVertexArray; }
-    
-    // マテリアルを取得
+
+    // 頂点配列（VAO）を取得
+    // （1つのファイル内に複数 aiMesh がある場合に対応）
+    const std::vector<std::shared_ptr<class VertexArray>>& GetVertexArray()
+    {
+        return mVertexArray;
+    }
+
+    // マテリアルを取得（メッシュインデックスに対応）
     std::shared_ptr<class Material> GetMaterial(size_t index);
-    
-    // 使用するシェーダー名を取得
+
+    // 使用するシェーダー名を取得（"Mesh", "Skinned" など）
     const std::string& GetShaderName() const { return mShaderName; }
-    // スペキュラー強度を取得
+
+    // スペキュラー強度
     float GetSpecPower() const { return mSpecPower; }
-    
-    // Assimpで読み込まれたシーンへのポインタ
+
+    // Assimp のシーンアクセス（必要があれば）
     const aiScene* GetScene() const { return mScene; }
-    
-    // 指定時刻における姿勢行列（各ボーン）を計算する
-    void ComputePoseAtTime(float animationTime, const aiAnimation* pAnimation, std::vector<Matrix4>& outTransforms);
-    
-    // 読み込まれたアニメーションクリップを取得
-    const std::vector<struct AnimationClip>& GetAnimationClips() const { return mAnimationClips; }
-    // アニメーションが存在するかどうか
+
+    // 指定時刻のボーン姿勢（スキンメッシュ用）を計算
+    void ComputePoseAtTime(float animationTime,
+                           const aiAnimation* pAnimation,
+                           std::vector<Matrix4>& outTransforms);
+
+    // 読み込まれているアニメーションクリップ一覧
+    const std::vector<class AnimationClip>& GetAnimationClips() const
+    {
+        return mAnimationClips;
+    }
+
+    // アニメーションが1つ以上存在するか
     bool HasAnimation() const { return !mAnimationClips.empty(); }
-    
+
 private:
-    // メッシュデータの読み込み（ボーンの有無を判断）
+    // メッシュデータ読み込み（頂点/インデックス、ボーン有無の判定）
     void LoadMeshData();
-    // マテリアルの読み込み
+
+    // マテリアル読み込み
     void LoadMaterials(class AssetManager* assetMamager);
-    // アニメーションクリップの読み込み
+
+    // アニメーションクリップ読み込み
     void LoadAnimations();
-    
-    // 通常メッシュの生成（ボーンなし）
+
+    // 通常メッシュ生成（ボーンなし）
     void CreateMesh(const aiMesh* m);
-    // スキンメッシュの生成（ボーンあり）
+
+    // スキンメッシュ生成（ボーンあり）
     void CreateMeshBone(const aiMesh* m);
-    // ボーン情報の読み込み
+
+    // 単一 aiMesh のボーン情報を収集
     void LoadBones(const aiMesh* m, std::vector<struct VertexBoneData>& bones);
-    
-    // ボーン階層を再帰的に計算
-    void ComputeBoneHierarchy(float animationTime, const aiNode* pNode, const Matrix4& parentTransform, const aiAnimation* pAnimation);
-    // 指定ノード名に一致するアニメーションチャネルを検索
-    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string& nodeName);
-    
-    // 補間計算：スケール / 回転 / 平行移動
-    void CalcInterpolatedScaling(Vector3& outVec, float animationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedRotation(Quaternion& outVec, float animationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedPosition(Vector3& outV, float animationTime, const aiNodeAnim* pNodeAnim);
-    
-    // 補間対象のキーインデックスを検索
-    unsigned int FindScaling(float animationTime, const aiNodeAnim* pNodeAnim);
-    unsigned int FindRotation(float animationTime, const aiNodeAnim* pNodeAnim);
-    unsigned int FindPosition(float animationTime, const aiNodeAnim* pNodeAnim);
-    
-    
-    // Assimpのシーンデータ
-    const aiScene* mScene;
+
+    // ボーン階層を再帰的に巡回してボーン行列を計算
+    void ComputeBoneHierarchy(float animationTime,
+                              const aiNode* pNode,
+                              const Matrix4& parentTransform,
+                              const aiAnimation* pAnimation);
+
+    // ノード名に一致するアニメーションチャネルを探す
+    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation,
+                                   const std::string& nodeName);
+
+    // 補間計算（スケール / 回転 / 平行移動）
+    void CalcInterpolatedScaling(Vector3& outVec,
+                                 float animationTime,
+                                 const aiNodeAnim* pNodeAnim);
+
+    void CalcInterpolatedRotation(Quaternion& outQuat,
+                                  float animationTime,
+                                  const aiNodeAnim* pNodeAnim);
+
+    void CalcInterpolatedPosition(Vector3& outVec,
+                                  float animationTime,
+                                  const aiNodeAnim* pNodeAnim);
+
+    // 補間に使うキーインデックスを探す
+    unsigned int FindScaling(float animationTime,
+                             const aiNodeAnim* pNodeAnim);
+    unsigned int FindRotation(float animationTime,
+                              const aiNodeAnim* pNodeAnim);
+    unsigned int FindPosition(float animationTime,
+                              const aiNodeAnim* pNodeAnim);
+
+private:
+    // Assimp シーンデータ
     Assimp::Importer mImporter;
-    
-    // ボーン名からインデックスをマップ
+    const aiScene*   mScene;
+
+    // ボーン名 → ボーンインデックス
     std::map<std::string, unsigned int> mBoneMapping;
+
     // ボーン数
     unsigned int mNumBones;
-    // 各ボーンのオフセット行列や最終変換行列など
+
+    // ボーンごとのオフセット行列・最終変換行列
     std::vector<struct BoneInfo> mBoneInfo;
+
     // ルートノードの逆変換行列
     Matrix4 mGlobalInverseTransform;
-    
-    // 頂点配列オブジェクト（1メッシュにつき1つ）
+
+    // 頂点配列（1ファイルに複数メッシュがある場合も考慮）
     std::vector<std::shared_ptr<class VertexArray>> mVertexArray;
-    // マテリアル
+
+    // マテリアル一覧（VertexArray の MaterialIndex と対応）
     std::vector<std::shared_ptr<class Material>> mMaterials;
-    
-    // 読み込まれたアニメーションクリップ
-    std::vector<struct AnimationClip> mAnimationClips;
-    
-    // 使用するシェーダー名
+
+    // アニメーションクリップ一覧
+    std::vector<class AnimationClip> mAnimationClips;
+
+    // 使用シェーダー名（例："Mesh", "Skinned"）
     std::string mShaderName;
+
     // スペキュラー係数
     float mSpecPower;
-    
 };
 
-} //  namespace toy
+} // namespace toy

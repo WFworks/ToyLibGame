@@ -4,13 +4,30 @@
 #include <assimp/scene.h>
 
 namespace toy {
-// アニメーションクリップ情報
+
+//======================================================================
+// AnimationClip
+//   - Assimp から取得した aiAnimation 1本分をラップする軽量構造体
+//   - 「クリップ名」「Assimp の生ポインタ」「長さ」「再生レート」を保持
+//   - 実際のポーズ計算は Mesh::ComputePoseAtTime() などが担当
+//======================================================================
 struct AnimationClip
 {
-    std::string mName;              // アニメーション名（Node名 or ファイル内での識別用）
-    const aiAnimation* mAnimation;  // Assimpから渡された生データ
-    float mDuration;                // 再生時間（Ticks）
-    float mTicksPerSecond;          // 1秒あたりのTick数
+    // クリップ名
+    //  - FBX/GLTF 内のアニメーション名や、ゲーム側での識別子を入れる
+    std::string       mName;
+
+    // Assimp のアニメーションデータ（所有権は Assimp/Mesh 側）
+    //  - AnimationPlayer などがこのポインタを使ってサンプリングする
+    const aiAnimation* mAnimation = nullptr;
+
+    // アニメーションの長さ（Assimp の Tick 単位）
+    //  - 実際の再生時間(sec) = mDuration / mTicksPerSecond
+    float             mDuration        = 0.0f;
+
+    // 1秒あたりの Tick 数
+    //  - Assimp の mTicksPerSecond をキャッシュ
+    float             mTicksPerSecond  = 0.0f;
 };
 
 } // namespace toy

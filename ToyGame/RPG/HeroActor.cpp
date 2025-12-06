@@ -52,14 +52,13 @@ HeroActor::HeroActor(toy::Application* a)
     mCollComp->SetDisp(true);
 
     // --- 移動コンポーネント ---
-    //mMoveComp = CreateComponent<MoveComponent>();
-    //mMoveComp = CreateComponent<FPSMoveComponent>();
+    //mMoveComp = CreateComponent<toy::FPSMoveComponent>();
     mMoveComp = CreateComponent<toy::DirMoveComponent>();
     
     
     // --- カメラコンポーネント ---
     mCameraComp = CreateComponent<toy::OrbitCameraComponent>();
-    //mCameraComp = CreateComponent<FollowCameraComponent>();
+    //mCameraComp = CreateComponent<toy::FollowCameraComponent>();
     
 
     mGravComp = CreateComponent<toy::GravityComponent>();

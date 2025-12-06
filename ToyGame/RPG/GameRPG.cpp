@@ -14,7 +14,7 @@ GameRPG::GameRPG()
     InitAssetManager("ToyGame/Assets/RPG/", GetRenderer()->GetWindowDisplayScale());
     
     GetTimeOfDaySystem()->SetTimeScale(30.f);
-    GetTimeOfDaySystem()->SetTime(19);
+    GetTimeOfDaySystem()->SetTime(16);
 }
 
 GameRPG::~GameRPG()
@@ -264,7 +264,7 @@ void GameRPG::LoadData()
     mWeather->SetWeatherDome(dome);
     //mWeather->SetWeatherOverlay(overlay);
     skyActor->SetPosition(Vector3(0.f, -0.f, 0.f));
-    mWeather->ChangeWeather(toy::WeatherType::RAIN);
+    mWeather->ChangeWeather(toy::WeatherType::CLEAR);
     
     
     // BGM

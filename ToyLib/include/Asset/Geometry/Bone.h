@@ -3,54 +3,56 @@
 #include "Utils/MathUtil.h"
 #include <cstring>
 
-// ４本まで
-const unsigned int NUM_BONES_PER_VERTEX = 4;
-
 namespace toy {
 
-// 頂点ごとのBoneデータ
+// 1頂点あたり影響を持つボーン数（最大4本）
+constexpr unsigned int NUM_BONES_PER_VERTEX = 4;
+
+//==============================================================
+// VertexBoneData
+//   - 1頂点に影響するボーンIDとウェイトを保持
+//   - 実際の追加処理は VertexBoneData::AddBoneData() (cpp側) で行う
+//==============================================================
 struct VertexBoneData
 {
-    // コンストラクタ
+    unsigned int IDs[NUM_BONES_PER_VERTEX];   // ボーンID
+    float        Weights[NUM_BONES_PER_VERTEX]; // 各ボーンのウェイト
+
     VertexBoneData()
     {
         Reset();
-    };
-    
-    // 頂点に影響あるBoneのID
-    unsigned int IDs[NUM_BONES_PER_VERTEX];
-    // 影響するウェイト
-    float Weights[NUM_BONES_PER_VERTEX];
-    
-    
-    // ゼロにリセット
+    }
+
+    // すべてのボーンID/ウェイトを 0 クリア
     void Reset()
     {
-        for(int i = 0; i < NUM_BONES_PER_VERTEX; i++)
+        for (unsigned int i = 0; i < NUM_BONES_PER_VERTEX; ++i)
         {
-            IDs[i] = 0;
+            IDs[i]     = 0;
             Weights[i] = 0.0f;
         }
-        
     }
-    
-    // 頂点データにボーンとウェイトを追加
-    void AddBoneData(unsigned int BoneID, float Weight);
+
+    // 頂点に影響するボーンIDとウェイトを追加
+    // 実装は VertexBoneData.cpp 側
+    void AddBoneData(unsigned int boneID, float weight);
 };
 
-
-// Bone情報格納用
+//==============================================================
+// BoneInfo
+//   - 各ボーンごとの変換情報
+//   - BoneOffset: モデル空間 → ボーンローカルへのオフセット行列
+//   - FinalTransformation: アニメーション適用後の最終行列（スキニング用）
+//==============================================================
 struct BoneInfo
 {
-    Matrix4 BoneOffset;
-    Matrix4 FinalTransformation;
-    
-    
+    Matrix4 BoneOffset;          // オフセット行列（BindPoseで埋める）
+    Matrix4 FinalTransformation; // アニメ後の最終行列（GPUに送る）
+
     BoneInfo()
+        : BoneOffset(Matrix4::Identity)
+        , FinalTransformation(Matrix4::Identity)
     {
-        memset(&BoneOffset, 0, sizeof(BoneOffset));
-        memset(&FinalTransformation, 0, sizeof(FinalTransformation));
-        
     }
 };
 

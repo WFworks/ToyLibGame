@@ -16,61 +16,75 @@ class AssetManager;
 class Music;
 class SoundEffect;
 
+//--------------------------------------
+// サウンド制御クラス
+//  - OpenAL を使った BGM/SE ミキサー
+//  - AssetManager から Music/SoundEffect を取得して再生
+//  - BGM はストリーミング再生、SE はワンショット再生を想定
+//--------------------------------------
 class SoundMixer
 {
 public:
+    // AssetManager は外部から渡す（所有権は持たない）
     SoundMixer(AssetManager* assetManager);
     ~SoundMixer();
 
+    // 有効/無効の切り替え（BGM/SE）
     void SetBGMEnable(bool enable);
     void SetSoundEnable(bool enable);
+
+    // 全体ボリューム（0.0〜1.0 を想定）
     void SetVolume(float volume);
 
+    // BGM 読み込み＆制御
     bool LoadBGM(const std::string& fileName);
     void PlayBGM();
     void StopBGM();
 
+    // 効果音のワンショット再生
     void PlaySoundEffect(const std::string& fileName);
 
-    // Renderer から invViewMatrix を渡す
+    // 毎フレーム呼び出し
+    //  - BGM のストリーミング更新
+    //  - カメラ位置（invViewMatrix）からリスナー位置・向きを更新
     void Update(float deltaTime, const Matrix4& invViewMatrix);
 
 private:
-    // OpenAL 基本
+    // OpenAL 初期化/終了
     void InitOpenAL();
     void ShutdownOpenAL();
 
-    // BGM
+    // BGM 用ソース/バッファの初期化/破棄
     void InitBGMSource();
     void ShutdownBGMSource();
 
 private:
-    AssetManager* mAssetManager;
+    AssetManager* mAssetManager;     // アセット取得用ポインタ（非所有）
 
-    // OpenAL デバイス/コンテキスト
-    ALCdevice*  mDevice;
-    ALCcontext* mContext;
+    // OpenAL デバイス／コンテキスト
+    ALCdevice*  mDevice   = nullptr;
+    ALCcontext* mContext  = nullptr;
 
-    // SE（ワンショット）
+    // 効果音（ワンショット再生用ソース群）
     std::vector<ALuint> mOneShotSources;
 
-    // BGM ストリーミング
-    static constexpr int BGM_NUM_BUFFERS = 4;
-    static constexpr int BGM_CHUNK_SIZE  = 32 * 1024;
+    // --- BGM ストリーミング用設定 ---
+    static constexpr int BGM_NUM_BUFFERS = 4;          // ローテーションするバッファ数
+    static constexpr int BGM_CHUNK_SIZE  = 32 * 1024;  // 一度にデコードするバイト数
 
-    ALuint mBgmSource;
-    ALuint mBgmBuffers[BGM_NUM_BUFFERS];
+    ALuint mBgmSource = 0;                             // BGM 再生用のソース
+    ALuint mBgmBuffers[BGM_NUM_BUFFERS]{};             // BGM 用バッファ群
 
-    bool  mBgmPlaying;
-    bool  mBgmLoop;
+    bool  mBgmPlaying = false;                         // 再生中フラグ
+    bool  mBgmLoop    = true;                          // ループ再生するか
 
-    std::shared_ptr<Music> mCurrentBGM;
-    std::vector<unsigned char> mBgmDecodeBuffer;   // ← 修正点：unsigned char
+    std::shared_ptr<Music> mCurrentBGM;                // 現在再生中の BGM
+    std::vector<unsigned char> mBgmDecodeBuffer;       // デコード先バッファ（mpg123 → PCM）
 
-    // 共通設定
-    bool  mBgmEnabled;
-    bool  mSoundEnabled;
-    float mVolume;
+    // 共通設定（ミュート系／音量）
+    bool  mBgmEnabled   = true;                        // BGM 全体の ON/OFF
+    bool  mSoundEnabled = true;                        // 効果音 全体の ON/OFF
+    float mVolume       = 1.0f;                        // 全体ボリューム
 };
 
 } // namespace toy

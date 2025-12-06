@@ -7,25 +7,39 @@
 namespace toy {
 
 CameraComponent::CameraComponent(Actor* a, int updateOrder)
-: Component(a, updateOrder)
+    : Component(a, updateOrder)
 {
+    // カメラ計算に利用する補助アクター
+    // （これを使って位置・向きの独立計算を行う）
     mCameraActor = std::make_unique<Actor>(GetOwner()->GetApp());
 }
 
+//----------------------------------------------------------------------
+// View 行列を Renderer に登録
+//----------------------------------------------------------------------
 void CameraComponent::SetViewMatrix(const Matrix4& view)
 {
     GetOwner()->GetApp()->GetRenderer()->SetViewMatrix(view);
 }
 
+//----------------------------------------------------------------------
+// カメラ位置を Renderer に渡す
+//   ※現状では Renderer で保持していないため未使用
+//----------------------------------------------------------------------
 void CameraComponent::SetCameraPosition(const Vector3& pos)
 {
-    //GetOwner()->GetApp()->GetRenderer()->SetCameraPosition(pos);
+    // GetOwner()->GetApp()->GetRenderer()->SetCameraPosition(pos);
 }
 
-void CameraComponent::Update(float deltaTime)
+//----------------------------------------------------------------------
+// カメラの現在位置を Renderer から取得し、内部変数に反映
+//   - FollowCamera / OrbitCamera などの派生クラスが View を更新
+//   - この基底クラスは「現在の View 行列からカメラ位置だけ抜き出す」
+//----------------------------------------------------------------------
+void CameraComponent::Update(float)
 {
-    auto inView = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix();
-    mCameraPosition = inView.GetTranslation();
+    auto invView = GetOwner()->GetApp()->GetRenderer()->GetInvViewMatrix();
+    mCameraPosition = invView.GetTranslation();
 }
 
 } // namespace toy

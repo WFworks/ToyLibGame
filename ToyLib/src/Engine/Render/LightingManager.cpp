@@ -3,41 +3,61 @@
 
 namespace toy {
 
+//-------------------------------------------------------------
+// コンストラクタ
+// ・太陽光の強さはデフォルト 1.0
+//-------------------------------------------------------------
 LightingManager::LightingManager()
 : mSunIntensity(1.f)
 {
-    
 }
 
 LightingManager::~LightingManager()
 {
-    
 }
 
 
-void LightingManager::ApplyToShader(std::shared_ptr<Shader> shader, const Matrix4& viewMatrix)
+//-------------------------------------------------------------
+// ApplyToShader()
+// ・現在のライティング関連パラメーターを GLSL シェーダーに送る
+// ・Renderer → 各 VisualComponent 描画時に呼ばれる想定
+//-------------------------------------------------------------
+void LightingManager::ApplyToShader(std::shared_ptr<Shader> shader,
+                                    const Matrix4& viewMatrix)
 {
-    // カメラポジション（ビュー行列の逆行列から取得）
+    //---------------------------------------------------------
+    // カメラ位置（シェーダーで Specular 計算等に利用）
+    // ・View 行列の逆行列からカメラのワールド位置を取得
+    //---------------------------------------------------------
     Matrix4 invView = viewMatrix;
     invView.Invert();
     shader->SetVectorUniform("uCameraPos", invView.GetTranslation());
     
-    // アンビエント
+    //---------------------------------------------------------
+    // アンビエントライト（全体のベースカラー）
+    //---------------------------------------------------------
     shader->SetVectorUniform("uAmbientLight", mAmbientColor);
     
-    // 太陽の強さ
+    //---------------------------------------------------------
+    // 太陽光の強さ（スカイドーム・シーン全体の明るさ調整）
+    //---------------------------------------------------------
     shader->SetFloatUniform("uSunIntensity", mSunIntensity);
     
-    // ライト方向を再計算（Target - Position）
-    shader->SetVectorUniform("uDirLight.mDirection", mDirLight.GetDirection());
-    shader->SetVectorUniform("uDirLight.mDiffuseColor", mDirLight.DiffuseColor);
-    shader->SetVectorUniform("uDirLight.mSpecColor", mDirLight.SpecColor);
+    //---------------------------------------------------------
+    // ディレクショナルライト
+    // ・mDirection は常に Normalize(Target - Position)
+    //---------------------------------------------------------
+    shader->SetVectorUniform("uDirLight.mDirection",     mDirLight.GetDirection());
+    shader->SetVectorUniform("uDirLight.mDiffuseColor",  mDirLight.DiffuseColor);
+    shader->SetVectorUniform("uDirLight.mSpecColor",     mDirLight.SpecColor);
     
-    // フォグ情報
-    shader->SetFloatUniform("uFoginfo.maxDist", mFog.MaxDist);
-    shader->SetFloatUniform("uFoginfo.minDist", mFog.MinDist);
-    shader->SetVectorUniform("uFoginfo.color", mFog.Color);
-    
+    //---------------------------------------------------------
+    // フォグ設定
+    // ・フォグ距離（min/max）と色
+    //---------------------------------------------------------
+    shader->SetFloatUniform ("uFoginfo.maxDist", mFog.MaxDist);
+    shader->SetFloatUniform ("uFoginfo.minDist", mFog.MinDist);
+    shader->SetVectorUniform("uFoginfo.color",   mFog.Color);
 }
 
 } // namespace toy
