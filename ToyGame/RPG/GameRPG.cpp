@@ -75,7 +75,7 @@ void GameRPG::InitGame()
     auto fireSound = fireActor->CreateComponent<toy::SoundComponent>();
     fireSound->SetSound("fire.wav");
     fireSound->SetLoop(true);
-    fireSound->SetVolume(2.f);
+    fireSound->SetVolume(0.5f);
     fireSound->SetUseDistanceAttenuation(true);
     fireSound->Play();
 
@@ -254,7 +254,7 @@ void GameRPG::LoadData()
     // BGM
     GetSoundMixer()->LoadBGM("MusMus-BGM-112.mp3");
     GetSoundMixer()->PlayBGM();
-    GetSoundMixer()->SetVolume(0.2);
+    GetSoundMixer()->SetVolume(0.1);
     
     
     
