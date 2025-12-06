@@ -19,7 +19,7 @@ SoundMixer::SoundMixer(AssetManager* assetManager)
 , mBgmLoop(true)
 , mBgmEnabled(true)
 , mSoundEnabled(true)
-, mVolume(0.3f)
+, mVolume(1.0f)
 {
     InitOpenAL();
     mBgmDecodeBuffer.resize(BGM_CHUNK_SIZE);
