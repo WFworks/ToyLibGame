@@ -47,9 +47,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 if(WIN32)
     message(STATUS "Configuring for Windows build")
 
-    find_package(SDL2 CONFIG REQUIRED)
-    find_package(SDL2_image CONFIG REQUIRED)
-    find_package(SDL2_ttf CONFIG REQUIRED)
+    find_package(SDL3 CONFIG REQUIRED)
+    find_package(SDL3_image CONFIG REQUIRED)
+    find_package(SDL3_ttf CONFIG REQUIRED)
     find_package(GLEW CONFIG REQUIRED)
     find_package(OpenGL REQUIRED)
     find_package(assimp CONFIG REQUIRED)
@@ -91,9 +91,9 @@ if(WIN32)
 
     target_link_libraries(${PROJECT_NAME}
         OpenGL32
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-        SDL2_ttf::SDL2_ttf
+        SDL3::SDL3
+        SDL3_image::SDL3_image
+        SDL3_ttf::SDL3_ttf
         GLEW::GLEW
         assimp::assimp
         OpenAL::OpenAL
@@ -114,15 +114,17 @@ if(WIN32)
     # ========================
 
     set(DLL_FILES
-        "${VCPKG_BIN_DIR}/SDL2.dll"
-        "${VCPKG_BIN_DIR}/SDL2_image.dll"
+        "${VCPKG_BIN_DIR}/SDL3.dll"
+        "${VCPKG_BIN_DIR}/SDL3_image.dll"
         "${VCPKG_BIN_DIR}/jpeg62.dll"
         "${VCPKG_BIN_DIR}/libpng16.dll"
         "${VCPKG_BIN_DIR}/zlib1.dll"
-        "${VCPKG_BIN_DIR}/SDL2_ttf.dll"
+        "${VCPKG_BIN_DIR}/SDL3_ttf.dll"
         "${VCPKG_BIN_DIR}/glew32.dll"
         "${VCPKG_BIN_DIR}/assimp-vc143-mt.dll"
         "${VCPKG_BIN_DIR}/fmt.dll"
+        "${VCPKG_BIN_DIR}/freetype.dll"
+        "${VCPKG_BIN_DIR}/bz2.dll"
         # OpenAL-soft 本体
         "${VCPKG_BIN_DIR}/openal32.dll"
 
