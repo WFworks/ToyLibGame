@@ -1,10 +1,10 @@
-// Asset/Audio/SoundEffect.cpp
 #include "Asset/Audio/SoundEffect.h"
 #include "Asset/AssetManager.h"
 
 #include <cstdio>
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 
 namespace toy {
 
@@ -33,7 +33,7 @@ bool SoundEffect::Load(const std::string& fileName, AssetManager* manager)
 
     if (!LoadWav16(fullPath, data, format, freq))
     {
-        std::printf("[SoundEffect] Failed to load wav: %s\n", fullPath.c_str());
+        std::cerr << "[SoundEffect] Failed to load wav: " << fullPath.c_str() << std::endl;
         return false;
     }
 
@@ -41,7 +41,7 @@ bool SoundEffect::Load(const std::string& fileName, AssetManager* manager)
     ALenum err = alGetError();
     if (err != AL_NO_ERROR)
     {
-        std::printf("[SoundEffect] alGenBuffers error: 0x%x\n", err);
+        std::cerr << "[SoundEffect] alGenBuffers error: " << err << std::endl;;
         mBuffer = 0;
         return false;
     }
@@ -55,8 +55,7 @@ bool SoundEffect::Load(const std::string& fileName, AssetManager* manager)
     err = alGetError();
     if (err != AL_NO_ERROR)
     {
-        std::printf("[SoundEffect] alBufferData error: 0x%x (file=%s)\n",
-                    err, fullPath.c_str());
+        std::cerr << "[SoundEffect] alBufferData error: " << err << "(file=" << fullPath.c_str() << std::endl;;
         alDeleteBuffers(1, &mBuffer);
         mBuffer = 0;
         return false;
@@ -89,7 +88,7 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
     FILE* fp = std::fopen(fullPath.c_str(), "rb");
     if (!fp)
     {
-        std::printf("[SoundEffect] fopen failed: %s\n", fullPath.c_str());
+        std::cerr << "[SoundEffect] fopen failed: " << fullPath.c_str() << std::endl;
         return false;
     }
 
@@ -103,7 +102,7 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
     if (std::strncmp(riff.id, "RIFF", 4) != 0 ||
         std::strncmp(riff.wave, "WAVE", 4) != 0)
     {
-        std::printf("[SoundEffect] Not a RIFF/WAVE file: %s\n", fullPath.c_str());
+        std::cerr << "[SoundEffect] Not a RIFF/WAVE file: " << fullPath.c_str() << std::endl;
         std::fclose(fp);
         return false;
     }
@@ -169,7 +168,7 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
             // data チャンク本体
             if (!foundFmt)
             {
-                std::printf("[SoundEffect] data chunk before fmt chunk: %s\n", fullPath.c_str());
+                std::cerr << "[SoundEffect] data chunk before fmt chunk: " << fullPath.c_str() << std::endl;
                 std::fclose(fp);
                 return false;
             }
@@ -197,27 +196,25 @@ bool SoundEffect::LoadWav16(const std::string& fullPath,
 
     if (!foundFmt || !foundData)
     {
-        std::printf("[SoundEffect] Missing fmt or data chunk: %s\n", fullPath.c_str());
+        std::cerr << "[SoundEffect] Missing fmt or data chunk: " << fullPath.c_str() << std::endl;
         return false;
     }
 
     if (audioFormat != 1)
     {
-        std::printf("[SoundEffect] Non-PCM format not supported: %s\n", fullPath.c_str());
+        std::cerr << "[SoundEffect] Non-PCM format not supported: " << fullPath.c_str() << std::endl;
         return false;
     }
 
     if (bitsPerSample != 8 && bitsPerSample != 16)
     {
-        std::printf("[SoundEffect] Only 8/16bit supported: %s (%d bits)\n",
-                    fullPath.c_str(), bitsPerSample);
+        std::cerr << "[SoundEffect] Only 8/16bit supported: " << fullPath.c_str() << "(" << bitsPerSample << " bits)" << std::endl;
         return false;
     }
 
     if (numChannels < 1 || numChannels > 2)
     {
-        std::printf("[SoundEffect] Only mono/stereo supported: %s (ch=%d)\n",
-                    fullPath.c_str(), numChannels);
+        std::cerr << "[SoundEffect] Only mono/stereo supported: " << fullPath.c_str() << " (ch=" << numChannels << ")" << std::endl;
         return false;
     }
 
