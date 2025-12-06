@@ -10,6 +10,7 @@ namespace toy {
 
 AssetManager::AssetManager()
 : mAssetsPath("ToyGame/Assets") // デフォルト値
+, mWindowDisplayScale(1.0f)
 {
 }
 
@@ -143,7 +144,7 @@ std::shared_ptr<TextFont> AssetManager::GetFont(const std::string& fileName, int
     //   fullPath = mAssetsPath + fileName;
     // としておく（fileName 側で "/Fonts/xxx.ttf" などを渡す想定）
     const std::string fullPath = mAssetsPath + fileName;
-    if (!font->Load(fullPath, pointSize))
+    if (!font->Load(fullPath, pointSize * mWindowDisplayScale))
     {
         std::cerr << "[AssetManager] Failed to load font: "
         << fullPath << " (size: " << pointSize << ")"

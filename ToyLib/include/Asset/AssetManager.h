@@ -28,6 +28,8 @@ public:
     void UnloadData();
     
     void SetAssetsPath(const std::string &path) { mAssetsPath = path; }
+
+	void SetWindowDisplayScale(float scale) { mWindowDisplayScale = scale; }
 private:
     std::unordered_map<std::string, std::shared_ptr<class Texture>> mTextures;
     std::unordered_map<std::string, std::shared_ptr<class Mesh>> mMeshes;
@@ -36,6 +38,9 @@ private:
     std::unordered_map<std::string, std::shared_ptr<class TextFont>> mTextFonts;
     
     std::string mAssetsPath;
+
+	// DPIスケールを保持しておく
+    float mWindowDisplayScale;
 };
 
 } // namespace toy

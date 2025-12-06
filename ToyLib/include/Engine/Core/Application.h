@@ -54,7 +54,7 @@ protected:
     virtual void ShutdownGame() {}
     
     // アセットディレクトリのパスの設定
-    void SetAssetsPath(const std::string& path);
+    void InitAssetManager(const std::string& path, float dpi = 1.0f);
     
 private:
     

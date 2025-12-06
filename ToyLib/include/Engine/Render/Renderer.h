@@ -94,7 +94,8 @@ public:
     // テキストからテクスチャを生成する
     std::shared_ptr<class Texture> CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<class TextFont> font);
     
-    
+	// DPIスケール取得    
+	float GetWindowDisplayScale() const { return mWindowDisplayScale; }
 private:
     // セッティング読み込み
     bool LoadSettings(const std::string& filePath);
@@ -166,6 +167,9 @@ private:
     
     // 表示オブジェクトのカウンター（Debug/Test用）
     unsigned int mCntDrawObject;
+
+    // DPIスケール
+    float mWindowDisplayScale;
 };
 
 } // namespace toy

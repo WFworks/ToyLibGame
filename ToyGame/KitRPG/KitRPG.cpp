@@ -9,7 +9,7 @@
 KitRPG::KitRPG()
 : Game()
 {
-    SetAssetsPath("GameApp/Assets/RPG/");
+    InitAssetManager("GameApp/Assets/RPG/");
 }
 
 void KitRPG::Setup()

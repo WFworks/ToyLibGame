@@ -11,7 +11,7 @@ TOYLIB_REGISTER_APP(GameRPG)
 GameRPG::GameRPG()
 : toy::Application()
 {
-    SetAssetsPath("ToyGame/Assets/RPG/");
+    InitAssetManager("ToyGame/Assets/RPG/", GetRenderer()->GetWindowDisplayScale());
     
     GetTimeOfDaySystem()->SetTimeScale(30.f);
 }
@@ -29,7 +29,7 @@ void GameRPG::InitGame()
 
     // スプライト
     auto spActor = CreateActor<toy::Actor>();
-    spActor->SetPosition(Vector3(-460.0f, -330.0f, 0.0f));
+    spActor->SetPosition(Vector3(-500.0f, -360.0f, 0.0f));
     spActor->SetScale(1);
     auto spSprite = spActor->CreateComponent<toy::SpriteComponent>(100, toy::VisualLayer::UI);
     spSprite->SetTexture(GetAssetManager()->GetTexture("HealthBar.png"));
@@ -135,36 +135,6 @@ void GameRPG::LoadData()
     auto minionActor = CreateActor<MinionActor>();
     minionActor->SetParent(hero);
     
-    // wolf
-    auto wolfActor = CreateActor<toy::Actor>();
-    auto wolfMesh = wolfActor->CreateComponent<toy::SkeletalMeshComponent>();
-    wolfMesh->SetMesh(GetAssetManager()->GetMesh("wolf.fbx"));
-
-    wolfActor->SetPosition(Vector3(-20, 0.f, 0));
-    wolfActor->SetScale(0.1f);
-    q = Quaternion(Vector3::UnitY, Math::ToRadians(180));
-    wolfActor->SetRotation(q);
-    auto wolfCollider = wolfActor->CreateComponent<toy::ColliderComponent>();
-    wolfCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("wolf.fbx")->GetVertexArray());
-    wolfCollider->GetBoundingVolume()->AdjustBoundingBox(Vector3(0.0f, 35, 30), Vector3(0.9, 0.9, 0.6));
-    wolfCollider->SetDisp(true);
-    wolfCollider->SetFlags(toy::C_GROUND | toy::C_WALL | toy::C_FOOT);
-    wolfActor->CreateComponent<toy::GravityComponent>();
-    auto animPlayer = wolfMesh->GetAnimPlayer();
-    animPlayer->Play(2);
-    
-    auto wolfSound = wolfActor->CreateComponent<toy::SoundComponent>();
-    wolfSound->SetSound("growling.wav");
-    wolfSound->SetLoop(true);
-    wolfSound->SetUseDistanceAttenuation(true);
-    wolfSound->Play();
-    
-    
-    
-    auto stanMove = stanActor->CreateComponent<toy::FollowMoveComponent>();
-    stanMove->SetTarget(hero);
-    stanMove->SetFollowSpeed(1);
-    stanActor->CreateComponent<toy::GravityComponent>();
 
     
     
@@ -225,6 +195,10 @@ void GameRPG::LoadData()
     brickCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("brick.x")->GetVertexArray());
     brickCollider->SetFlags(toy::C_GROUND | toy::C_WALL );
 
+
+
+
+
     // 地面
     auto b = CreateActor<toy::Actor>();
     auto g = b->CreateComponent<toy::MeshComponent>(false);
@@ -244,6 +218,41 @@ void GameRPG::LoadData()
         GetPhysWorld()->SetGroundPolygons(polys); // or 統合してまとめる
     }
     
+
+
+    // wolf
+    auto wolfActor = CreateActor<toy::Actor>();
+    auto wolfMesh = wolfActor->CreateComponent<toy::SkeletalMeshComponent>();
+    wolfMesh->SetMesh(GetAssetManager()->GetMesh("wolf.fbx"));
+
+    wolfActor->SetPosition(Vector3(-20, 0.f, 0));
+    wolfActor->SetScale(0.1f);
+    q = Quaternion(Vector3::UnitY, Math::ToRadians(180));
+    wolfActor->SetRotation(q);
+    auto wolfCollider = wolfActor->CreateComponent<toy::ColliderComponent>();
+    wolfCollider->GetBoundingVolume()->ComputeBoundingVolume(GetAssetManager()->GetMesh("wolf.fbx")->GetVertexArray());
+    wolfCollider->GetBoundingVolume()->AdjustBoundingBox(Vector3(0.0f, 35, 30), Vector3(0.9, 0.9, 0.6));
+    wolfCollider->SetDisp(true);
+    wolfCollider->SetFlags(toy::C_GROUND | toy::C_WALL | toy::C_FOOT);
+    wolfActor->CreateComponent<toy::GravityComponent>();
+    auto animPlayer = wolfMesh->GetAnimPlayer();
+    animPlayer->Play(2);
+
+    auto wolfSound = wolfActor->CreateComponent<toy::SoundComponent>();
+    wolfSound->SetSound("growling.wav");
+    wolfSound->SetLoop(true);
+    wolfSound->SetUseDistanceAttenuation(true);
+    wolfSound->Play();
+
+
+
+    auto stanMove = stanActor->CreateComponent<toy::FollowMoveComponent>();
+    stanMove->SetTarget(hero);
+    stanMove->SetFollowSpeed(1);
+    stanActor->CreateComponent<toy::GravityComponent>();
+
+
+
     // スカイドーム
     auto skyActor = CreateActor<toy::Actor>();
     auto dome = skyActor->CreateComponent<toy::WeatherDomeComponent>();
@@ -268,7 +277,7 @@ void GameRPG::LoadData()
     auto fnt = GetAssetManager()->GetFont("rounded-mplus-1c-bold.ttf", 24);
     // テキスト用 Actor を作成
     auto uiActor = CreateActor<toy::Actor>();
-    uiActor->SetPosition(Vector3(500.0f, 320.0f, 0.0f)); // 2Dスクリーン座標として扱う
+    uiActor->SetPosition(Vector3(600.0f, 360.0f, 0.0f)); // 2Dスクリーン座標として扱う
 
     auto textComp = uiActor->CreateComponent<toy::TextSpriteComponent>();
     textComp->SetFont(fnt);

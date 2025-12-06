@@ -44,39 +44,59 @@ void SpriteComponent::SetTexture(std::shared_ptr<Texture> tex)
 
 void SpriteComponent::Draw()
 {
-    
-    // 表示可能かチェック
     if (!mIsVisible || mTexture == nullptr) return;
-    
-    
-    glDisable(GL_DEPTH_TEST);           // UIなどZ不要な場合
-    glDepthMask(GL_FALSE);              // Zバッファ書き込みOFF
-    glEnable(GL_BLEND);                 // アルファブレンドON
+
+    // ---- ブレンド/深度設定 ----
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
     glBlendFunc(mIsBlendAdd ? GL_ONE : GL_SRC_ALPHA,
-                mIsBlendAdd ? GL_ONE : GL_ONE_MINUS_SRC_ALPHA);
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); // カラーバッファは有効
-    
-    // 座標計算
-    float width = static_cast<float>(mTexWidth) * mScaleWidth;
-    float height = static_cast<float>(mTexHeight) * mScaleHeight;
-    
-    Matrix4 scaleMat = Matrix4::CreateScale(width, height, 1.0f);
-    Matrix4 world = scaleMat * GetOwner()->GetWorldTransform();
-    
-    
+        mIsBlendAdd ? GL_ONE : GL_ONE_MINUS_SRC_ALPHA);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    auto* app = GetOwner()->GetApp();
+    auto* renderer = app->GetRenderer();
+
+    // ウィンドウの DPI スケール（100%→1.0, 150%→1.5 など）
+    float dpi = renderer->GetWindowDisplayScale();
+
+    // テクスチャの「最終的な画面上サイズ」（ピクセルベース）
+    float texW = static_cast<float>(mTexWidth);
+    float texH = static_cast<float>(mTexHeight);
+    float width = texW * mScaleWidth * dpi;
+    float height = texH * mScaleHeight * dpi;
+
+    // 論理座標の位置 → DPI を掛けてピクセル座標に変換
+    Vector3 pos = GetOwner()->GetPosition();   // ここは論理 1280x720 ベース想定
+    pos.x *= dpi;
+    pos.y *= dpi;
+    // pos.z はたぶん 0 のままで OK（UI なら）
+
+    // 2D 用 World 行列（スケール＋平行移動）
+    Matrix4 world = Matrix4::CreateScale(width, height, 1.0f);
+    world *= Matrix4::CreateTranslation(pos);
+
+    // ---- シェーダ設定 ----
     mShader->SetActive();
-    Matrix4 view = GetOwner()->GetApp()->GetRenderer()->GetViewMatrix();
-    mShader->SetMatrixUniform("uViewProj", Matrix4::CreateSimpleViewProj(mScreenWidth, mScreenHeight));
+
+    float screenW = renderer->GetScreenWidth();
+    float screenH = renderer->GetScreenHeight();
+
+    Matrix4 viewProj = Matrix4::CreateSimpleViewProj(screenW, screenH);
+    mShader->SetMatrixUniform("uViewProj", viewProj);
+
     mTexture->SetActive(0);
     mShader->SetTextureUniform("uTexture", 0);
     mShader->SetMatrixUniform("uWorldTransform", world);
+
+    Matrix4 view = renderer->GetViewMatrix();
     mLightingManager->ApplyToShader(mShader, view);
-    
+
+    // ---- 描画 ----
     mVertexArray->SetActive();
-    // 描画
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-    
-    // 戻す
+
+    // ---- 戻す ----
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
 }

@@ -45,6 +45,8 @@ Renderer::Renderer()
 , mShaderPath("ToyLib/Shaders/")
 , mCntDrawObject(0)
 , mSkyDomeComp(nullptr)
+, mLightSpaceMatrix(Matrix4::Identity)
+, mWindowDisplayScale(1.0f)
 {
     mLightingManager = std::make_shared<LightingManager>();
     LoadSettings("ToyLib/Settings/Renderer_Settings.json");
@@ -55,6 +57,165 @@ Renderer::~Renderer()
 {
 }
 
+bool Renderer::Initialize()
+{
+    // -----------------------------
+    // OpenGL コンテキスト属性設定
+    // -----------------------------
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
+    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+
+    unsigned int WINDOW_FLAGS = SDL_WINDOW_OPENGL;
+    if (mIsFullScreen)
+    {
+        WINDOW_FLAGS |= SDL_WINDOW_FULLSCREEN;
+    }
+
+    // -----------------------------
+    // 設定ファイル読み込み済の論理サイズ
+    // （例：1280×720）
+    // -----------------------------
+    const int logicalW = static_cast<int>(mScreenWidth);
+    const int logicalH = static_cast<int>(mScreenHeight);
+
+    // -----------------------------
+    // ここで DPI スケールを取得
+    // -----------------------------
+    float contentScale = 1.0f;
+
+    SDL_DisplayID primary = SDL_GetPrimaryDisplay();
+    if (primary != 0)
+    {
+        // Windows 150% => 1.5 / macOS Retina => 2.0
+        float s = SDL_GetDisplayContentScale(primary);
+        if (s > 0.0f)
+        {
+            contentScale = s;
+        }
+    }
+
+    // -----------------------------
+    // DPI を掛けた「実際に作るウィンドウサイズ」
+    // -----------------------------
+    int windowW = static_cast<int>(logicalW * contentScale);
+    int windowH = static_cast<int>(logicalH * contentScale);
+
+    // -----------------------------
+    // ウィンドウ生成（DPI反映）
+    // -----------------------------
+    mWindow = SDL_CreateWindow(
+        mStrTitle.c_str(),
+        windowW,
+        windowH,
+        WINDOW_FLAGS
+    );
+
+    if (!mWindow)
+    {
+        std::cerr << "Unable to create window: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    SDL_SetWindowPosition(mWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+    // -----------------------------
+    // OpenGL コンテキスト
+    // -----------------------------
+    mGLContext = SDL_GL_CreateContext(mWindow);
+    if (!mGLContext)
+    {
+        std::cerr << "Failed to create GL context: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    // -----------------------------
+    // 垂直同期
+    // -----------------------------
+    SDL_GL_SetSwapInterval(1);
+
+    // -----------------------------
+    // CreateWindow 後 → 実ピクセル取得（最重要）
+    // HiDPI では windowW/windowH と差が出る可能性あり
+    // -----------------------------
+    int pixelW = 0;
+    int pixelH = 0;
+    SDL_GetWindowSizeInPixels(mWindow, &pixelW, &pixelH);
+
+    // 描画用 ScreenWidth/Height は「実ピクセル」
+    mScreenWidth = static_cast<float>(pixelW);
+    mScreenHeight = static_cast<float>(pixelH);
+
+    // -----------------------------
+    // このウィンドウに対する DPI スケール（ウィンドウ基準）
+    // -----------------------------
+    mWindowDisplayScale = SDL_GetWindowDisplayScale(mWindow);
+    if (mWindowDisplayScale <= 0.0f)
+    {
+        mWindowDisplayScale = 1.0f;
+    }
+
+    // -----------------------------
+    // OpenGL viewport をピクセルに合わせる
+    // -----------------------------
+    glViewport(0, 0, pixelW, pixelH);
+
+    // -----------------------------
+    // GLEW 初期化
+    // -----------------------------
+    glewExperimental = GL_TRUE;
+    if (glewInit() != GLEW_OK)
+    {
+        std::cerr << "Failed to initialize GLEW" << std::endl;
+        return false;
+    }
+
+    // -----------------------------
+    // シェーダー類ロード
+    // -----------------------------
+    if (!LoadShaders())
+    {
+        return false;
+    }
+
+    // -----------------------------
+    // その他初期化（既存処理）
+    // -----------------------------
+    CreateSpriteVerts();
+    CreateFullScreenQuad();
+
+    if (!InitializeShadowMapping())
+    {
+        return false;
+    }
+
+    SetClearColor(mClearColor);
+
+    mSkyDomeComp = nullptr;
+    mCntDrawObject = 0;
+
+    std::cout << "[Renderer] DPI-aware Init Complete. "
+        << "Logical(" << logicalW << "x" << logicalH << ") "
+        << "Window(" << windowW << "x" << windowH << ") "
+        << "Pixels(" << pixelW << "x" << pixelH << ") "
+        << "Scale=" << mWindowDisplayScale
+        << std::endl;
+
+    return true;
+}
+
+
+
+/*
 // ウィンドウ生成とGL初期化
 bool Renderer::Initialize()
 {
@@ -121,6 +282,7 @@ bool Renderer::Initialize()
     
     return true;
 }
+*/
 
 // リリース処理
 void Renderer::Shutdown()

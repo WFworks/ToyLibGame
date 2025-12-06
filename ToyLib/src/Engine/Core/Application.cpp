@@ -244,9 +244,10 @@ void Application::UpdateFrame()
 }
 
 // アセットディレクトリの設定
-void Application::SetAssetsPath(const std::string &path)
+void Application::InitAssetManager(const std::string &path, float dpi)
 {
     mAssetManager->SetAssetsPath(path);
+	mAssetManager->SetWindowDisplayScale(dpi);
 }
 
 
