@@ -62,6 +62,8 @@ bool Renderer::LoadSettings(const std::string& filePath)
     {
         JsonHelper::GetFloat(data["screen"], "width",      mScreenWidth);
         JsonHelper::GetFloat(data["screen"], "height",     mScreenHeight);
+        JsonHelper::GetFloat(data["screen"], "width",      mVirtualWidth);
+        JsonHelper::GetFloat(data["screen"], "height",     mVirtualHeight);
         JsonHelper::GetBool (data["screen"], "fullscreen", mIsFullScreen);
     }
     

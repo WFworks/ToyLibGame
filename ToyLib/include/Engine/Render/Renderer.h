@@ -84,6 +84,9 @@ public:
     float GetScreenWidth() const { return mScreenWidth; }
     float GetScreenHeight() const { return mScreenHeight; }
     
+    float GetVirtualWidth() const { return mVirtualWidth; }
+    float GetVirtualHeight() const { return mVirtualHeight; }
+    
     // DPI スケール（Retina 等でのスケーリング用）
     float GetWindowDisplayScale() const { return mWindowDisplayScale; }
     
@@ -174,9 +177,11 @@ private:
     // ウィンドウタイトル
     std::string mStrTitle;
     
-    // スクリーンサイズ
+    // スクリーンサイズ (物理・仮想)
     float mScreenWidth;
     float mScreenHeight;
+    float mVirtualWidth;
+    float mVirtualHeight;
     bool  mIsFullScreen;
     
     // 視野角（Perspective FOV／度）

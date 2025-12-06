@@ -75,14 +75,15 @@ void SpriteComponent::Draw()
     // 2D 用 World 行列（スケール＋平行移動）
     Matrix4 world = Matrix4::CreateScale(width, height, 1.0f);
     world *= Matrix4::CreateTranslation(pos);
+    
+    // 論理解像度を設定
+    float vw = renderer->GetVirtualWidth();
+    float vh = renderer->GetVirtualHeight();
+    Matrix4 viewProj = Matrix4::CreateSimpleViewProj(vw, vh);
 
     // ---- シェーダ設定 ----
     mShader->SetActive();
 
-    float screenW = renderer->GetScreenWidth();
-    float screenH = renderer->GetScreenHeight();
-
-    Matrix4 viewProj = Matrix4::CreateSimpleViewProj(screenW, screenH);
     mShader->SetMatrixUniform("uViewProj", viewProj);
 
     mTexture->SetActive(0);
