@@ -8,6 +8,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 namespace toy {
 
@@ -33,8 +34,7 @@ bool Texture::Load(const std::string& fileName, AssetManager* assetManager)
     SDL_Surface* image = IMG_Load(fullName.c_str());
     if (!image)
     {
-        SDL_Log("Failed to load image %s: %s",
-                fullName.c_str(), SDL_GetError());
+        std::cerr << "Failed to load image %s: %s" << fullName.c_str() << SDL_GetError() << std::endl;
         return false;
     }
 
@@ -45,7 +45,7 @@ bool Texture::Load(const std::string& fileName, AssetManager* assetManager)
 
     if (!conv)
     {
-        SDL_Log("SDL_ConvertSurface failed: %s", SDL_GetError());
+        std::cerr << "SDL_ConvertSurface failed: " << SDL_GetError() << std::endl;
         return false;
     }
 
@@ -100,7 +100,7 @@ bool Texture::LoadFromMemory(const void* data, int size)
     SDL_IOStream* io = SDL_IOFromConstMem(data, size);
     if (!io)
     {
-        SDL_Log("Failed IOFromConstMem: %s", SDL_GetError());
+        std::cerr << "Failed IOFromConstMem: " << SDL_GetError() << std::endl;
         return false;
     }
 
@@ -109,7 +109,7 @@ bool Texture::LoadFromMemory(const void* data, int size)
     SDL_Surface* image = IMG_Load_IO(io, true);
     if (!image)
     {
-        SDL_Log("Failed to load image from memory: %s", SDL_GetError());
+        std::cerr << "Failed to load image from memory: " << SDL_GetError() << std::endl;
         return false;
     }
 

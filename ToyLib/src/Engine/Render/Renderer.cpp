@@ -84,7 +84,7 @@ bool Renderer::Initialize()
     
     if (!mWindow )
     {
-        std::cout << "Unable to create window" << std::endl;
+        std::cerr << "Unable to create window" << std::endl;
         return false;
     }
     SDL_SetWindowPosition(mWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
@@ -93,7 +93,7 @@ bool Renderer::Initialize()
     mGLContext = SDL_GL_CreateContext(mWindow);
     if (!mGLContext)
     {
-        std::cout << "Failed to create GL context: " << SDL_GetError() << std::endl;
+        std::cerr << "Failed to create GL context: " << SDL_GetError() << std::endl;
         return false;
     }
 
@@ -104,7 +104,7 @@ bool Renderer::Initialize()
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
     {
-        std::cout << "Failed to initialize GLEW" << std::endl;
+        std::cerr << "Failed to initialize GLEW" << std::endl;
         return false;
     }
     

@@ -420,7 +420,7 @@ bool InputSystem::LoadButtonConfig(const std::string& filePath)
         }
     }
 
-    std::cout << "[InputSystem] Loaded button config: "
+    std::cerr << "[InputSystem] Loaded button config: "
               << filePath << std::endl;
     return true;
 }

@@ -538,11 +538,11 @@ void Mesh::LoadAnimations()
     
     if (!mScene || mScene->mNumAnimations == 0)
     {
-        std::cout << "[Mesh] No animations found in scene." << std::endl;
+        std::cerr << "[Mesh] No animations found in scene." << std::endl;
         return;
     }
     
-    std::cout << "[Mesh] Found " << mScene->mNumAnimations << " animation(s)." << std::endl;
+    std::cerr << "[Mesh] Found " << mScene->mNumAnimations << " animation(s)." << std::endl;
     
     for (unsigned int i = 0; i < mScene->mNumAnimations; i++)
     {
