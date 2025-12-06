@@ -58,8 +58,10 @@ void SpriteComponent::Draw()
     auto* renderer = app->GetRenderer();
 
     // ウィンドウの DPI スケール（100%→1.0, 150%→1.5 など）
-    float dpi = renderer->GetWindowDisplayScale();
-
+    // フルスクリーン時はDPIを1.0に固定
+    float dpi = renderer->IsFullScreen()
+              ? 1.0f
+              : renderer->GetWindowDisplayScale();
     // テクスチャの「最終的な画面上サイズ」（ピクセルベース）
     float texW = static_cast<float>(mTexWidth);
     float texH = static_cast<float>(mTexHeight);

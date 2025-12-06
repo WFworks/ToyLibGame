@@ -87,6 +87,8 @@ public:
     float GetVirtualWidth() const { return mVirtualWidth; }
     float GetVirtualHeight() const { return mVirtualHeight; }
     
+    bool IsFullScreen() const { return mIsFullScreen; }
+    
     // DPI スケール（Retina 等でのスケーリング用）
     float GetWindowDisplayScale() const { return mWindowDisplayScale; }
     
