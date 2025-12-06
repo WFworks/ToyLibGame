@@ -4,7 +4,6 @@
 
 #include <GL/glew.h>
 #include <string>
-#include <SDL2/SDL.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>

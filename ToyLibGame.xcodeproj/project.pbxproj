@@ -323,9 +323,9 @@
 					"/opt/homebrew/opt/openal-soft/lib",
 				);
 				OTHER_LDFLAGS = (
-					"-lSDL2",
-					"-lSDL2_image",
-					"-lSDL2_ttf",
+					"-lSDL3",
+					"-lSDL3_image",
+					"-lSDL3_ttf",
 					"-lGLEW",
 					"-lassimp",
 					"-lopenal",
@@ -354,9 +354,9 @@
 					"/opt/homebrew/opt/openal-soft/lib",
 				);
 				OTHER_LDFLAGS = (
-					"-lSDL2",
-					"-lSDL2_image",
-					"-lSDL2_ttf",
+					"-lSDL3",
+					"-lSDL3_image",
+					"-lSDL3_ttf",
 					"-lGLEW",
 					"-lassimp",
 					"-lopenal",

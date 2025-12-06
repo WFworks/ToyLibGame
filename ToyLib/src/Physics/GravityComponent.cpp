@@ -4,6 +4,7 @@
 #include "Physics/BoundingVolumeComponent.h"
 #include "Physics/PhysWorld.h"
 #include "Engine/Core/Application.h"
+#include <limits>
 
 namespace toy {
 
@@ -29,7 +30,7 @@ void GravityComponent::Update(float deltaTime)
     
     
     // 地面の高さを取得
-    float groundY = -FLT_MAX;
+    float groundY = -std::numeric_limits<float>::max();
     if (GetOwner()->GetApp()->GetPhysWorld()
         ->GetNearestGroundY(GetOwner(), groundY))
     {

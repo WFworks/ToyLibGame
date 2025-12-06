@@ -351,7 +351,7 @@ bool PhysWorld::GetNearestGroundY(const Actor* a, float& outY) const
     const Cube box = foot->GetBoundingVolume()->GetWorldAABB();
     
     
-    float highest = -FLT_MAX;
+    float highest = -std::numeric_limits<float>::max();
     bool found = false;
     
     float footY = box.min.y;
@@ -394,7 +394,7 @@ bool PhysWorld::GetNearestGroundY(const Actor* a, float& outY) const
 
 float PhysWorld::GetGroundHeightAt(const Vector3& pos) const
 {
-    float highestY = -FLT_MAX;
+    float highestY = -std::numeric_limits<float>::max();
     for (const auto& poly : mTerrainPolygons)
     {
         if (IsInPolygon(&poly, pos))
