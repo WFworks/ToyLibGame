@@ -47,9 +47,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 if(WIN32)
     message(STATUS "Configuring for Windows build")
 
-    find_package(SDL2 CONFIG REQUIRED)
-    find_package(SDL2_image CONFIG REQUIRED)
-    find_package(SDL2_ttf CONFIG REQUIRED)
+    find_package(SDL3 CONFIG REQUIRED)
+    find_package(SDL3_image CONFIG REQUIRED)
+    find_package(SDL3_ttf CONFIG REQUIRED)
     find_package(GLEW CONFIG REQUIRED)
     find_package(OpenGL REQUIRED)
     find_package(assimp CONFIG REQUIRED)
@@ -91,9 +91,9 @@ if(WIN32)
 
     target_link_libraries(${PROJECT_NAME}
         OpenGL32
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-        SDL2_ttf::SDL2_ttf
+        SDL3::SDL3
+        SDL3_image::SDL3_image
+        SDL3_ttf::SDL3_ttf
         GLEW::GLEW
         assimp::assimp
         OpenAL::OpenAL
@@ -114,15 +114,17 @@ if(WIN32)
     # ========================
 
     set(DLL_FILES
-        "${VCPKG_BIN_DIR}/SDL2.dll"
-        "${VCPKG_BIN_DIR}/SDL2_image.dll"
+        "${VCPKG_BIN_DIR}/SDL3.dll"
+        "${VCPKG_BIN_DIR}/SDL3_image.dll"
         "${VCPKG_BIN_DIR}/jpeg62.dll"
         "${VCPKG_BIN_DIR}/libpng16.dll"
         "${VCPKG_BIN_DIR}/zlib1.dll"
-        "${VCPKG_BIN_DIR}/SDL2_ttf.dll"
+        "${VCPKG_BIN_DIR}/SDL3_ttf.dll"
         "${VCPKG_BIN_DIR}/glew32.dll"
         "${VCPKG_BIN_DIR}/assimp-vc143-mt.dll"
         "${VCPKG_BIN_DIR}/fmt.dll"
+        "${VCPKG_BIN_DIR}/freetype.dll"
+        "${VCPKG_BIN_DIR}/bz2.dll"
         # OpenAL-soft 本体
         "${VCPKG_BIN_DIR}/openal32.dll"
 
@@ -143,17 +145,29 @@ elseif(UNIX AND NOT APPLE)
     message(STATUS "Configuring for Linux build")
 
     find_package(OpenGL REQUIRED)
-    find_package(PkgConfig REQUIRED)
 
-    # SDL2 / image / ttf / GLEW / assimp は pkg-config でOK
-    pkg_check_modules(SDL2 REQUIRED sdl2)
-    pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
-    pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
-    pkg_check_modules(ASSIMP REQUIRED assimp)
-    find_package(GLEW REQUIRED)
-    find_package(OpenAL REQUIRED)   # openal-soft で解決されることが多い
+    # SDL3 系
+    find_package(SDL3        REQUIRED)
+    find_package(SDL3_image  REQUIRED)
+    find_package(SDL3_ttf    REQUIRED)
 
-    # ==== mpg123 を pkg-config ではなく手動で探す ====
+    find_package(GLEW   REQUIRED)
+    find_package(assimp REQUIRED)
+    find_package(OpenAL REQUIRED)
+
+    find_package(fmt CONFIG REQUIRED)
+
+    # ========================
+    # vcpkg のルートとトリプレット（必要なら使う）
+    # ========================
+    set(VCPKG_ROOT "$ENV{HOME}/Repos/vcpkg")
+    set(VCPKG_TRIPLET "x64-linux")
+
+    set(VCPKG_INC_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/include")
+    set(VCPKG_LIB_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/lib")
+    set(VCPKG_BIN_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/bin")
+
+    # ==== mpg123 を手動で探す ====
     find_path(MPG123_INCLUDE_DIR
         NAMES mpg123.h
         PATHS
@@ -176,10 +190,10 @@ elseif(UNIX AND NOT APPLE)
         message(FATAL_ERROR "mpg123 not found. Install libmpg123-dev (Debian/Ubuntu) or mpg123-devel / mpg123 for your distro.")
     endif()
 
-    include_directories(
-        ${SDL2_INCLUDE_DIRS}
-        ${SDL2_IMAGE_INCLUDE_DIRS}
-        ${SDL2_TTF_INCLUDE_DIRS}
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        ${SDL3_INCLUDE_DIRS}
+        ${SDL3_IMAGE_INCLUDE_DIRS}
+        ${SDL3_TTF_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIRS}
         ${ASSIMP_INCLUDE_DIRS}
         ${OPENAL_INCLUDE_DIR}
@@ -187,29 +201,31 @@ elseif(UNIX AND NOT APPLE)
     )
 
     target_link_libraries(${PROJECT_NAME}
-        ${OPENGL_LIBRARIES}
-        ${SDL2_LIBRARIES}
-        ${SDL2_IMAGE_LIBRARIES}
-        ${SDL2_TTF_LIBRARIES}
-        ${GLEW_LIBRARIES}
-        ${ASSIMP_LIBRARIES}
-        OpenAL::OpenAL
+        OpenGL::GL
+        SDL3::SDL3
+        SDL3_image::SDL3_image
+        SDL3_ttf::SDL3_ttf
+        GLEW::GLEW
+        assimp::assimp
+	OpenAL::OpenAL
+	fmt::fmt
         ${MPG123_LIBRARY}
     )
-
 elseif(APPLE)
     message(STATUS "Configuring for macOS build")
 
     find_package(OpenGL REQUIRED)
 
-    find_package(SDL2 REQUIRED HINTS /opt/homebrew/opt/sdl2)
-    find_package(SDL2_image REQUIRED HINTS /opt/homebrew/opt/sdl2_image)
-    find_package(SDL2_ttf REQUIRED HINTS /opt/homebrew/opt/sdl2_ttf)
-    find_package(GLEW REQUIRED HINTS /opt/homebrew/opt/glew)
+    # SDL3 系 (Homebrew のパスを HINTS に追加)
+    find_package(SDL3        REQUIRED CONFIG HINTS /opt/homebrew/opt/sdl3)
+    find_package(SDL3_image  REQUIRED CONFIG HINTS /opt/homebrew/opt/sdl3_image)
+    find_package(SDL3_ttf    REQUIRED CONFIG HINTS /opt/homebrew/opt/sdl3_ttf)
+
+    find_package(GLEW   REQUIRED HINTS /opt/homebrew/opt/glew)
     find_package(ASSIMP REQUIRED HINTS /opt/homebrew/opt/assimp)
     find_package(OpenAL REQUIRED HINTS /opt/homebrew/opt/openal-soft)
 
-    # ==== mpg123 を pkg-config じゃなくて直接探す ====
+    # ==== mpg123 を直接探す ====
     find_path(MPG123_INCLUDE_DIR
         NAMES mpg123.h
         HINTS
@@ -230,11 +246,9 @@ elseif(APPLE)
         message(FATAL_ERROR "mpg123 not found. Please install with 'brew install mpg123'.")
     endif()
 
+    # 必要なものだけ明示的に追加（SDL3 系は imported target に任せられる）
     target_include_directories(${PROJECT_NAME} PRIVATE
         /opt/homebrew/include
-        ${SDL2_INCLUDE_DIRS}
-        ${SDL2_IMAGE_INCLUDE_DIRS}
-        ${SDL2_TTF_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIRS}
         ${ASSIMP_INCLUDE_DIRS}
         ${OPENAL_INCLUDE_DIR}
@@ -243,9 +257,9 @@ elseif(APPLE)
 
     target_link_libraries(${PROJECT_NAME}
         OpenGL::GL
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-        SDL2_ttf::SDL2_ttf
+        SDL3::SDL3
+        SDL3_image::SDL3_image
+        SDL3_ttf::SDL3_ttf
         GLEW::GLEW
         assimp::assimp
         ${OPENAL_LIBRARY}

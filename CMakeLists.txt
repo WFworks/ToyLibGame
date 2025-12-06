@@ -155,6 +155,8 @@ elseif(UNIX AND NOT APPLE)
     find_package(assimp REQUIRED)
     find_package(OpenAL REQUIRED)
 
+    find_package(fmt CONFIG REQUIRED)
+
     # ========================
     # vcpkg のルートとトリプレット（必要なら使う）
     # ========================
@@ -205,7 +207,8 @@ elseif(UNIX AND NOT APPLE)
         SDL3_ttf::SDL3_ttf
         GLEW::GLEW
         assimp::assimp
-        ${OPENAL_LIBRARY}
+	OpenAL::OpenAL
+	fmt::fmt
         ${MPG123_LIBRARY}
     )
 elseif(APPLE)
