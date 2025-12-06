@@ -54,45 +54,48 @@ void SpriteComponent::Draw()
         mIsBlendAdd ? GL_ONE : GL_ONE_MINUS_SRC_ALPHA);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-    auto* app = GetOwner()->GetApp();
-    auto* renderer = app->GetRenderer();
+    auto* renderer = GetOwner()->GetApp()->GetRenderer();
 
-    // ウィンドウの DPI スケール（100%→1.0, 150%→1.5 など）
-    // フルスクリーン時はDPIを1.0に固定
-    //float dpi = renderer->IsFullScreen()
-    //          ? 1.0f
-    //          : renderer->GetWindowDisplayScale();
-	float dpi = static_cast<float>(renderer->GetScreenWidth()) / static_cast<float>(renderer->GetVirtualWidth());
+    // 物理解像度
+    float sw = renderer->GetScreenWidth();
+    float sh = renderer->GetScreenHeight();
 
-    // テクスチャの「最終的な画面上サイズ」（ピクセルベース）
-    float texW = static_cast<float>(mTexWidth);
-    float texH = static_cast<float>(mTexHeight);
-    float width = texW * mScaleWidth * dpi;
-    float height = texH * mScaleHeight * dpi;
-
-    // 論理座標の位置 → DPI を掛けてピクセル座標に変換
-    Vector3 pos = GetOwner()->GetPosition();   // ここは論理 1280x720 ベース想定
-    pos.x *= dpi;
-    pos.y *= dpi;
-    // pos.z はたぶん 0 のままで OK（UI なら）
-
-    // 2D 用 World 行列（スケール＋平行移動）
-    Matrix4 world = Matrix4::CreateScale(width, height, 1.0f);
-    world *= Matrix4::CreateTranslation(pos);
-    
-    // 論理解像度を設定
+    // 論理解像度
     float vw = renderer->GetVirtualWidth();
     float vh = renderer->GetVirtualHeight();
-    Matrix4 viewProj = Matrix4::CreateSimpleViewProj(vw, vh);
 
-    // ---- シェーダ設定 ----
+    if (vw <= 0.0f) vw = sw;
+    if (vh <= 0.0f) vh = sh;
+
+    // 同アスペクト前提ならこれでOK
+    float sx = sw / vw;
+    float sy = sh / vh;
+    // 論理→物理変換は「小さい方」に合わせる（アスペクト比維持）
+    float scale = (sx < sy) ? sx : sy;
+
+    // サイズ
+    float texW = static_cast<float>(mTexWidth);
+    float texH = static_cast<float>(mTexHeight);
+    float width  = texW * mScaleWidth  * scale;
+    float height = texH * mScaleHeight * scale;
+
+    // 位置
+    Vector3 pos = GetOwner()->GetPosition();
+    pos.x *= scale;
+    pos.y *= scale;
+
+    // World / ViewProj
+    Matrix4 world = Matrix4::CreateScale(width, height, 1.0f);
+    world *= Matrix4::CreateTranslation(pos);
+
+    Matrix4 viewProj = Matrix4::CreateSimpleViewProj(sw, sh);
+
     mShader->SetActive();
-
     mShader->SetMatrixUniform("uViewProj", viewProj);
+    mShader->SetMatrixUniform("uWorldTransform", world);
 
     mTexture->SetActive(0);
     mShader->SetTextureUniform("uTexture", 0);
-    mShader->SetMatrixUniform("uWorldTransform", world);
 
     Matrix4 view = renderer->GetViewMatrix();
     mLightingManager->ApplyToShader(mShader, view);
