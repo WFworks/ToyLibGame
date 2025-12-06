@@ -152,7 +152,7 @@ elseif(UNIX AND NOT APPLE)
     find_package(SDL3_ttf    REQUIRED)
 
     find_package(GLEW   REQUIRED)
-    find_package(ASSIMP REQUIRED)
+    find_package(assimp REQUIRED)
     find_package(OpenAL REQUIRED)
 
     # ========================
