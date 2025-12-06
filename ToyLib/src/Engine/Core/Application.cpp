@@ -8,8 +8,8 @@
 #include "Engine/Runtime/TimeOfDaySystem.h"
 
 #include <algorithm>
-#include <SDL2/SDL_syswm.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <iostream>
 
 namespace toy {
@@ -40,19 +40,23 @@ bool Application::Initialize()
 {
     
     // SDL初期化
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+    if ( !SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD) )
     {
-        std::cout << "Failed to init SDL:" << SDL_GetError() << "" << std::endl;
+        std::cerr << "Failed to init SDL:" << SDL_GetError() << "" << std::endl;
         return false;
     }
     // TTFの初期化
-    TTF_Init();
+    if (!TTF_Init())
+    {
+        std::cerr << "TTF_Init failed: " << SDL_GetError() << std::endl;
+        return false;
+    }
     
     // Renderer初期化
     mRenderer->Initialize();
     
     // 入力システム初期化
-    mInputSys->Initialize();
+    mInputSys->Initialize(mRenderer->GetSDLWindow());
     mInputSys->LoadButtonConfig("ToyLib/Settings/InputConfig.json");
     
     // データ ロード、主にRendererに登録されるもの。
@@ -112,7 +116,7 @@ void Application::ProcessInput()
         switch (event.type)
         {
                 
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
                 mIsActive = false;
                 break;
         }
@@ -182,16 +186,20 @@ void Application::LoadData()
 void Application::UpdateFrame()
 {
     // FPS60固定
-    while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16))
-        ;
-    
-    float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
-    if (deltaTime > 0.05f)
+    // 60fps = 16ms
+    const Uint64 frameDurationNS = 16'000'000;  // 16ms → ナノ秒
+    Uint64 now = SDL_GetTicksNS();
+
+    while ((now - mTicksCount) < frameDurationNS)
     {
-        deltaTime = 0.05f;
+        SDL_Delay(1); // CPU負荷を軽減
+        now = SDL_GetTicksNS();
     }
-    mTicksCount = SDL_GetTicks();
-    
+
+    float deltaTime = (now - mTicksCount) / 1'000'000'000.0f; // ns → 秒
+    if (deltaTime > 0.05f) deltaTime = 0.05f;
+
+    mTicksCount = now;
     
     // ポーズ中以降の処理キャンセル
     if(mIsPause) return;

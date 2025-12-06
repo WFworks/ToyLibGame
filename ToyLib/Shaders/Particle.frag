@@ -23,5 +23,4 @@ void main()
     // テクスチャから色を計算
     outColor= texture(uTexture, fragTexCoord);
 
-   
 }

@@ -2,6 +2,7 @@
 #include "Engine/Render/LightingManager.h"
 #include "Utils/JsonHelper.h"
 #include <fstream>
+#include <iostream>
 
 namespace toy {
 
@@ -11,7 +12,7 @@ bool Renderer::LoadSettings(const std::string& filePath)
     std::ifstream file(filePath);
     if (!file.is_open())
     {
-        SDL_Log("Failed to open settings file: %s", filePath.c_str());
+        std::cerr << "Failed to open settings file: " << filePath.c_str() << std::endl;
         return false;
     }
     
@@ -22,7 +23,7 @@ bool Renderer::LoadSettings(const std::string& filePath)
     }
     catch (const std::exception& e)
     {
-        SDL_Log("JSON parse error: %s", e.what());
+        std::cerr << "JSON parse error: " << e.what() << std::endl;
         return false;
     }
     
@@ -93,7 +94,7 @@ bool Renderer::LoadSettings(const std::string& filePath)
         JsonHelper::GetInt(data["shadow"], "resolution_height", mShadowFBOHeight);
     }
     
-    SDL_Log("Loaded Renderer settings from %s", filePath.c_str());
+    std::cerr << "Loaded Renderer settings from " << filePath.c_str() << std::endl;
     return true;
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include <vector>
 #include <memory>
 #include <string>
@@ -86,7 +86,7 @@ private:
     // 時間管理
     std::unique_ptr<class TimeOfDaySystem> mTimeOfDaySys;
     // カウンター
-    unsigned int mTicksCount;
+    Uint64 mTicksCount;
     
     
     // アクティブなアクター

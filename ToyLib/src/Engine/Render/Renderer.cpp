@@ -80,21 +80,31 @@ bool Renderer::Initialize()
     }
     
     //ウインドウ生成
-    mWindow = SDL_CreateWindow(mStrTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, static_cast<int>(mScreenWidth), static_cast<int>(mScreenHeight), WINDOW_FLAGS);
+    mWindow = SDL_CreateWindow(mStrTitle.c_str(), static_cast<int>(mScreenWidth), static_cast<int>(mScreenHeight), WINDOW_FLAGS);
     
     if (!mWindow )
     {
-        std::cout << "Unable to create window" << std::endl;
+        std::cerr << "Unable to create window" << std::endl;
         return false;
     }
+    SDL_SetWindowPosition(mWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    
     // OpenGL コンテキスト生成
     mGLContext = SDL_GL_CreateContext(mWindow);
+    if (!mGLContext)
+    {
+        std::cerr << "Failed to create GL context: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    // 垂直同期を有効化したい場合
+    SDL_GL_SetSwapInterval(1);
     
     // GLEW初期化
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
     {
-        std::cout << "Failed to initialize GLEW" << std::endl;
+        std::cerr << "Failed to initialize GLEW" << std::endl;
         return false;
     }
     
@@ -115,9 +125,17 @@ bool Renderer::Initialize()
 // リリース処理
 void Renderer::Shutdown()
 {
-    SDL_GL_DeleteContext(mGLContext);
-    SDL_DestroyWindow(mWindow);
-    
+    if (mGLContext)
+    {
+        SDL_GL_DestroyContext(mGLContext);   // ← SDL3 ではこれ！
+        mGLContext = nullptr;
+    }
+
+    if (mWindow)
+    {
+        SDL_DestroyWindow(mWindow);
+        mWindow = nullptr;
+    }
 }
 
 // 描画処理
@@ -187,7 +205,7 @@ void Renderer::DrawVisualLayer(VisualLayer layer)
     }
     
     
-    
+    // --- デプス設定 ---
     if (layer == VisualLayer::UI || layer == VisualLayer::Background2D)
     {
         glDisable(GL_DEPTH_TEST);     // Zテスト不要
@@ -203,6 +221,7 @@ void Renderer::DrawVisualLayer(VisualLayer layer)
         glEnable(GL_DEPTH_TEST);      // 通常描画
         glDepthMask(GL_TRUE);         // 書き込みON
     }
+    
     
     
     for (auto& comp : mVisualComps)
@@ -239,38 +258,6 @@ void Renderer::DrawVisualLayer(VisualLayer layer)
     glDepthMask(GL_TRUE);
 }
 
-/*
- void Renderer::DrawVisualLayer(VisualLayer layer)
- {
- if (layer == VisualLayer::UI || layer == VisualLayer::Background2D)
- {
- glDisable(GL_DEPTH_TEST);     // Zテスト不要
- glDepthMask(GL_FALSE);        // 書き込みも不要（2D要素）
- }
- else if (layer == VisualLayer::Effect3D)
- {
- glEnable(GL_DEPTH_TEST);     // 粒同士のZ隠し合いを防ぐ
- glDepthMask(GL_FALSE);        // Zバッファ汚さない
- }
- else
- {
- glEnable(GL_DEPTH_TEST);      // 通常描画
- glDepthMask(GL_TRUE);         // 書き込みON
- }
- 
- 
- for (auto& comp : mVisualComps)
- {
- if (comp->IsVisible() && comp->GetLayer() == layer)
- {
- comp->Draw();
- }
- }
- 
- glEnable(GL_DEPTH_TEST); // 念のため戻す
- glDepthMask(GL_TRUE);
- }
- */
 
 //スプライト用ポリゴン
 void Renderer::CreateSpriteVerts()
@@ -566,6 +553,136 @@ bool Renderer::LoadShaders()
     return true;
 }
 
+std::shared_ptr<Texture> Renderer::CreateTextTexture(
+    const std::string& text,
+    const Vector3& color,
+    std::shared_ptr<TextFont> font)
+{
+    if (!font || !font->IsValid())
+    {
+        std::cerr << "[Renderer] CreateTextTexture: invalid font" << std::endl;
+        return nullptr;
+    }
+
+    if (text.empty())
+    {
+        return nullptr;
+    }
+
+    TTF_Font* nativeFont = font->GetNativeFont();
+
+    SDL_Color sdlColor;
+    sdlColor.r = static_cast<Uint8>(std::clamp(color.x, 0.0f, 1.0f) * 255.0f);
+    sdlColor.g = static_cast<Uint8>(std::clamp(color.y, 0.0f, 1.0f) * 255.0f);
+    sdlColor.b = static_cast<Uint8>(std::clamp(color.z, 0.0f, 1.0f) * 255.0f);
+    sdlColor.a = 255;
+
+    // SDL3_ttf: TTF_RenderText_Blended は wrapLength 付きの 4 引数
+    SDL_Surface* surface = TTF_RenderText_Blended(
+        nativeFont,
+        text.c_str(),
+        text.size(),   // ← ここが 0 ではなく length
+        sdlColor
+    );
+
+    if (!surface)
+    {
+        std::cerr << "[Renderer] TTF_RenderText_Blended failed: "
+                  << SDL_GetError() << std::endl;   // TTF_GetError は無い
+        return nullptr;
+    }
+
+    // OpenGL に渡しやすい RGBA8888 に変換
+    SDL_Surface* conv = SDL_ConvertSurface(
+        surface,
+        SDL_PIXELFORMAT_RGBA32   // SDL3 推奨の 32bit RGBA
+    );
+    SDL_DestroySurface(surface);
+
+    if (!conv)
+    {
+        std::cerr << "[Renderer] SDL_ConvertSurface failed: "
+                  << SDL_GetError() << std::endl;
+        return nullptr;
+    }
+
+
+    const int   width  = conv->w;
+    const int   height = conv->h;
+    const void* pixels = conv->pixels;
+
+    auto tex = std::make_shared<Texture>();
+    if (!tex->CreateFromPixels(pixels, width, height, /*hasAlpha=*/true))
+    {
+        SDL_DestroySurface(conv);
+        std::cerr << "[Renderer] CreateFromPixels failed" << std::endl;
+        return nullptr;
+    }
+
+    SDL_DestroySurface(conv);
+    return tex;
+}
+
+/*
+std::shared_ptr<Texture> Renderer::CreateTextTexture(
+    const std::string& text,
+    const Vector3&      color,
+    std::shared_ptr<TextFont> font)
+{
+    if (!font || !font->IsValid())
+    {
+        std::cerr << "[Renderer] CreateTextTexture: invalid font" << std::endl;
+        return nullptr;
+    }
+
+    if (text.empty())
+    {
+        return nullptr;
+    }
+
+    TTF_Font* nativeFont = font->GetNativeFont();
+
+    SDL_Color sdlColor;
+    sdlColor.r = static_cast<Uint8>(std::clamp(color.x, 0.0f, 1.0f) * 255.0f);
+    sdlColor.g = static_cast<Uint8>(std::clamp(color.y, 0.0f, 1.0f) * 255.0f);
+    sdlColor.b = static_cast<Uint8>(std::clamp(color.z, 0.0f, 1.0f) * 255.0f);
+    sdlColor.a = 255;
+
+    // SDL3_ttf: UTF-8 テキストをサーフェスに描画
+    SDL_Surface* surface = TTF_RenderText_Blended(
+        nativeFont,
+        text.c_str(),
+        0,
+        sdlColor
+    );
+    if (!surface)
+    {
+        std::cerr << "[Renderer] TTF_RenderText_Blended failed: "
+                  << SDL_GetError() << std::endl;   // ← TTF_GetError は無いので SDL_GetError
+        return nullptr;
+    }
+
+    // ※SDL3_ttf は通常 32bit RGBA 系フォーマットを返すので、
+    //   ひとまずそのまま OpenGL に渡してみる。
+    const void* pixels = surface->pixels;
+    const int   width  = surface->w;
+    const int   height = surface->h;
+
+    auto tex = std::make_shared<Texture>();
+    if (!tex->CreateFromPixels(pixels, width, height, true))
+    {
+        SDL_DestroySurface(surface);
+        std::cerr << "[Renderer] CreateFromPixels failed" << std::endl;
+        return nullptr;
+    }
+
+    SDL_DestroySurface(surface);
+    return tex;
+}
+*/
+
+
+/*
 std::shared_ptr<Texture> Renderer::CreateTextTexture(const std::string& text, const Vector3& color, std::shared_ptr<TextFont> font)
 {
     if (!font || !font->IsValid())
@@ -621,7 +738,7 @@ std::shared_ptr<Texture> Renderer::CreateTextTexture(const std::string& text, co
     
     // Texture を生成
     auto tex = std::make_shared<Texture>();
-    if (!tex->CreateFromPixels(pixels, width, height, /*hasAlpha=*/true))
+    if (!tex->CreateFromPixels(pixels, width, height, true))
     {
         SDL_FreeSurface(conv);
         std::cerr << "[Renderer] CreateFromPixels failed" << std::endl;
@@ -631,5 +748,5 @@ std::shared_ptr<Texture> Renderer::CreateTextTexture(const std::string& text, co
     SDL_FreeSurface(conv);
     return tex;
 }
-
+*/
 } // namespace toy

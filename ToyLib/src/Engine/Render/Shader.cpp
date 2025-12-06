@@ -137,14 +137,14 @@ bool Shader::CompileShader(const std::string& fileName, GLenum shaderType, GLuin
         // コンパイルできているか
         if (!IsCompiled(outShader))
         {
-            std::cout << "Failed to compile shader:" << fileName.c_str() << "" << std::endl;
+            std::cerr << "Failed to compile shader:" << fileName.c_str() << "" << std::endl;
             return false;
         }
         
     }
     else
     {
-        std::cout << "Shader file not found:" << fileName.c_str() << "" << std::endl;
+        std::cerr << "Shader file not found:" << fileName.c_str() << "" << std::endl;
         return false;
     }
     
@@ -163,7 +163,7 @@ bool Shader::IsCompiled(GLuint shader)
         char buffer[512];
         memset(buffer, 0, 512);
         glGetShaderInfoLog(shader, 511, nullptr, buffer);
-        std::cout << "GLSL Compile Failed:" <<  buffer << "" << std::endl;
+        std::cerr << "GLSL Compile Failed:" <<  buffer << "" << std::endl;
         return false;
     }
     
@@ -182,7 +182,7 @@ bool Shader::IsValidProgram()
         char buffer[512];
         memset(buffer, 0, 512);
         glGetProgramInfoLog(mShaderProgramID, 511, nullptr, buffer);
-        std::cout << "GLSL Link Failed:" << buffer << "" << std::endl;
+        std::cerr << "GLSL Link Failed:" << buffer << "" << std::endl;
         return false;
     }
     

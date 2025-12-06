@@ -24,12 +24,14 @@ bool TextFont::Load(const std::string& filePath, int pointSize)
         mFont = nullptr;
     }
     
-    mFont = TTF_OpenFont(filePath.c_str(), pointSize);
+    // SDL3_ttf では第2引数が float になっているのでキャストしておく
+    mFont = TTF_OpenFont(filePath.c_str(), static_cast<float>(pointSize));
     if (!mFont)
     {
-        std::cerr << "TTF_OpenFont failed: " << TTF_GetError()
-        << " (file: " << filePath << ", size: " << pointSize << ")"
-        << std::endl;
+        std::cerr << "TTF_OpenFont failed: " << SDL_GetError()
+                  << " (file: " << filePath
+                  << ", size: " << pointSize << ")"
+                  << std::endl;
         return false;
     }
     

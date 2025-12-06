@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Utils/MathUtil.h"
-#include <SDL2/SDL_scancode.h>
-#include <SDL2/SDL_gamecontroller.h>
 
+#include <SDL3/SDL.h>   // SDL3 はこれ1つでOK
 #include <string>
 #include <vector>
 #include <array>
@@ -23,8 +22,6 @@ enum ButtonState
 //======================
 // 論理ボタン（ゲーム用）
 //======================
-// 「Aボタンをジャンプにするか攻撃にするか」はゲーム側で決める。
-// ここでは「どの入力を取れるか」だけを決める。
 enum class GameButton
 {
     A,
@@ -36,13 +33,13 @@ enum class GameButton
     R1,
     R2,
     Start,
-    Select,    // Stop 的に使ってもいい
+    Select,
     DPadUp,
     DPadDown,
     DPadLeft,
     DPadRight,
 
-    KeyW,      // キーボード WASD
+    KeyW,
     KeyA,
     KeyS,
     KeyD,
@@ -56,11 +53,9 @@ enum class GameButton
 
 struct ButtonBinding
 {
-    std::vector<SDL_Scancode> Keyboard;               // キーボード
-    std::vector<SDL_GameControllerButton> Gamepad;    // パッドボタン
-    // 将来トリガー(L2/R2)をアナログ扱いするなら別枠を増やせる
+    std::vector<SDL_Scancode>      Keyboard; // キーボード
+    std::vector<SDL_GamepadButton> Gamepad;  // パッドボタン(SDL3)
 };
-
 
 //======================
 // 低レベル入力
@@ -76,33 +71,33 @@ public:
 
 private:
     const Uint8* mCurrState = nullptr;
-    Uint8 mPrevState[SDL_NUM_SCANCODES]{};
+    Uint8        mPrevState[SDL_SCANCODE_COUNT]{};
 };
 
-// コントローラー用
+// コントローラー用（SDL3: Gamepad）
 class ControllerState
 {
 public:
     friend class InputSystem;
 
-    bool GetButtonValue(SDL_GameControllerButton button) const;
-    ButtonState GetButtonState(SDL_GameControllerButton button) const;
+    bool GetButtonValue(SDL_GamepadButton button) const;
+    ButtonState GetButtonState(SDL_GamepadButton button) const;
 
-    const Vector2& GetLeftStick() const { return mLeftStick; }
+    const Vector2& GetLeftStick()  const { return mLeftStick;  }
     const Vector2& GetRightStick() const { return mRightStick; }
-    float GetLeftTrigger() const { return mLeftTrigger; }
+    float GetLeftTrigger()  const { return mLeftTrigger;  }
     float GetRightTrigger() const { return mRightTrigger; }
 
     bool GetIsConnected() const { return mIsConnected; }
 
 private:
-    Uint8 mCurrButtons[SDL_CONTROLLER_BUTTON_MAX]{};
-    Uint8 mPrevButtons[SDL_CONTROLLER_BUTTON_MAX]{};
-    Vector2 mLeftStick = Vector2::Zero;
+    Uint8   mCurrButtons[SDL_GAMEPAD_BUTTON_COUNT]{};
+    Uint8   mPrevButtons[SDL_GAMEPAD_BUTTON_COUNT]{};
+    Vector2 mLeftStick  = Vector2::Zero;
     Vector2 mRightStick = Vector2::Zero;
-    float mLeftTrigger = 0.0f;
-    float mRightTrigger = 0.0f;
-    bool mIsConnected = false;
+    float   mLeftTrigger  = 0.0f;
+    float   mRightTrigger = 0.0f;
+    bool    mIsConnected  = false;
 };
 
 // 入力情報のラッパー
@@ -114,11 +109,11 @@ struct InputState
     bool IsButtonDown(GameButton button) const;
     bool IsButtonPressed(GameButton button) const;
     bool IsButtonReleased(GameButton button) const;
-    void SetOwner(class InputSystem* inputSystem);
-private:
-    // InputSystem への弱い参照（生ポインタでOK）
-    const class InputSystem* mOwner = nullptr;
 
+    void SetOwner(class InputSystem* inputSystem);
+
+private:
+    const class InputSystem* mOwner = nullptr;
 };
 
 //======================
@@ -128,34 +123,22 @@ private:
 class InputSystem
 {
 public:
-    bool Initialize();
+    bool Initialize(SDL_Window* window);
     void Shutdown();
 
-    // SDL_PollEvents前に呼ぶ（前フレームの状態を保存）
-    void PrepareForUpdate();
-    // SDL_PollEventsの後に呼ぶ（現在の状態を取得）
-    void Update();
-    
-    // 低レベル状態
+    void PrepareForUpdate(); // SDL_PollEvents 前
+    void Update();           // SDL_PollEvents 後
+
     const InputState& GetState() const { return mState; }
 
-    //=======================
-    // ボタンコンフィグ
-    //=======================
-
-    // JSONから論理ボタンごとの設定を読み込む
-    // - filePath: 例 "ToyGame/Settings/InputConfig.json"
+    // JSON からバインディング読み込み
     bool LoadButtonConfig(const std::string& filePath);
 
-    //=======================
     // 論理ボタン問い合わせAPI
-    //=======================
+    bool IsButtonDown(GameButton button) const;
+    bool IsButtonPressed(GameButton button) const;
+    bool IsButtonReleased(GameButton button) const;
 
-    bool IsButtonDown(GameButton button) const;      // Held or Pressed
-    bool IsButtonPressed(GameButton button) const;   // このフレームで押された
-    bool IsButtonReleased(GameButton button) const;  // このフレームで離された
-    
-    
     void SetTextInputMode(bool enabled);
     bool IsTextInputMode() const { return mTextInputMode; }
 
@@ -163,14 +146,14 @@ private:
     float   Filter1D(int input);
     Vector2 Filter2D(int inputX, int inputY);
 
-    SDL_GameController* mController = nullptr;
-    InputState mState;
+    SDL_Gamepad* mGamepad = nullptr; // SDL3: Gamepad
+    InputState   mState;
 
-    // 論理ボタン → 実キー/ボタン
     std::array<ButtonBinding, static_cast<size_t>(GameButton::Count)> mButtonBindings;
-    
-    // テキスト入力を受け付けるか
+
     bool mTextInputMode = false;
+    
+    SDL_Window* mWindow = nullptr;
 };
 
 } // namespace toy

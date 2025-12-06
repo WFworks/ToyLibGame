@@ -12,7 +12,7 @@ public:
     Texture();
     ~Texture();
     
-    // テクスチャ読み込み（SDL2_image）
+    // テクスチャ読み込み（SDL3_image）
     bool Load(const std::string& fileName, class AssetManager* assetManager);
     // 埋め込みテクスチャ読み込み
     bool LoadFromMemory(const void* data, int size);
