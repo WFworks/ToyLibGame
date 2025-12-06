@@ -34,7 +34,7 @@ bool Texture::Load(const std::string& fileName, AssetManager* assetManager)
     SDL_Surface* image = IMG_Load(fullName.c_str());
     if (!image)
     {
-        std::cerr << "Failed to load image %s: %s" << fullName.c_str() << SDL_GetError() << std::endl;
+        std::cerr << "Failed to load image : " << fullName.c_str() << SDL_GetError() << " : " << std::endl;
         return false;
     }
 

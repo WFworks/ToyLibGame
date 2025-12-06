@@ -303,7 +303,7 @@ void InputSystem::Update()
 float InputSystem::Filter1D(int input)
 {
     const int deadZone = 250;
-    const int maxValue = 30000;
+    const float maxValue = 32767.0f;
 
     float retVal = 0.0f;
     int absValue = input > 0 ? input : -input;
