@@ -210,7 +210,7 @@ elseif(UNIX AND NOT APPLE)
         OpenAL::OpenAL
         ${MPG123_LIBRARY}
     )
-
+    
 elseif(APPLE)
     message(STATUS "Configuring for macOS build")
 
