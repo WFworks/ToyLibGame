@@ -13,7 +13,7 @@ GameRPG::GameRPG()
 {
     InitAssetManager("ToyGame/Assets/RPG/", GetRenderer()->GetWindowDisplayScale());
     
-    GetTimeOfDaySystem()->SetTimeScale(30.f);
+    GetTimeOfDaySystem()->SetTimeScale(6000.f);
     GetTimeOfDaySystem()->SetTime(16);
 }
 
@@ -258,13 +258,13 @@ void GameRPG::LoadData()
     auto skyActor = CreateActor<toy::Actor>();
     auto dome = skyActor->CreateComponent<toy::WeatherDomeComponent>();
     // オーバーレイ
-    //auto overlay = skyActor->CreateComponent<toy::WeatherOverlayComponent>();
+    auto overlay = skyActor->CreateComponent<toy::WeatherOverlayComponent>();
     
     mWeather = std::make_unique<toy::WeatherManager>();
     mWeather->SetWeatherDome(dome);
-    //mWeather->SetWeatherOverlay(overlay);
+    mWeather->SetWeatherOverlay(overlay);
     skyActor->SetPosition(Vector3(0.f, -0.f, 0.f));
-    mWeather->ChangeWeather(toy::WeatherType::CLEAR);
+    mWeather->ChangeWeather(toy::WeatherType::SNOW);
     
     
     // BGM

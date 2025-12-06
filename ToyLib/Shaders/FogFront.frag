@@ -1,124 +1,117 @@
 #version 410 core
 
+//======================================================================
+//  FogFront.frag
+//  ・画面前面に表示する「前景フォグ（白いもや）」
+//  ・距離ベースのアルファ + FBMノイズによるゆらぎ
+//======================================================================
+
 out vec4 FragColor;
 
-uniform float uTime;
-uniform vec2 uResolution;
-uniform float uFogAmount;
 
-// --- ハッシュベース簡易ノイズ関数 ---
+//======================================================================
+//  Uniforms
+//======================================================================
+
+uniform float uTime;        // 時間（ノイズアニメーション用）
+uniform vec2  uResolution;  // 画面サイズ（UV 正規化）
+uniform float uFogAmount;   // 全体の霧量スケール
+
+
+//======================================================================
+//  ハッシュベースの簡易ノイズ関数
+//  ・軽量で速い疑似乱数生成
+//======================================================================
 float hash(vec2 p)
 {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
 }
 
+
+//======================================================================
+//  2D Value Noise
+//  ・4つの格子点から補間してノイズを生成
+//======================================================================
 float noise(vec2 p)
 {
     vec2 i = floor(p);
     vec2 f = fract(p);
+
     float a = hash(i);
     float b = hash(i + vec2(1.0, 0.0));
     float c = hash(i + vec2(0.0, 1.0));
     float d = hash(i + vec2(1.0, 1.0));
+
+    // Hermite カーブで滑らかに補間
     vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+
+    // 二次元補間
+    return mix(a, b, u.x)
+         + (c - a) * u.y * (1.0 - u.x)
+         + (d - b) * u.x * u.y;
 }
 
+
+//======================================================================
+//  FBM (Fractal Brownian Motion)
+//  ・周波数を倍にしながら4層のノイズを合成
+//  ・フォグの「揺れ」を作る
+//======================================================================
 float fbm(vec2 p)
 {
-    float value = 0.0;
+    float value     = 0.0;
     float amplitude = 0.5;
+
     for (int i = 0; i < 4; i++)
     {
-        value += amplitude * noise(p);
-        p *= 2.0;
-        amplitude *= 0.5;
+        value     += amplitude * noise(p);
+        p         *= 2.0;        // 周波数UP
+        amplitude *= 0.5;        // 影響力DOWN
     }
     return value;
 }
 
+
+//======================================================================
+//  main()
+//======================================================================
 void main()
 {
-    // 正規化UV
+    //------------------------------------------------------------------
+    // Step 1 : 正規化UV（画面0〜1）
+    //------------------------------------------------------------------
     vec2 uv = gl_FragCoord.xy / uResolution;
-    
-    // アスペクト比補正付き中心ベクトル
+
+
+    //------------------------------------------------------------------
+    // Step 2 : 中心基準の座標に変更（-0.5〜0.5）
+    //          さらにアスペクト比補正で円形フォグを歪ませない
+    //------------------------------------------------------------------
     vec2 centeredUV = uv - 0.5;
     centeredUV.x *= uResolution.x / uResolution.y;
-    
-    // 距離からベースの霧強度
-    float dist = length(centeredUV);
+
+
+    //------------------------------------------------------------------
+    // Step 3 : 距離ベースのフォグ（中心 → 外側へ強くなる）
+    //------------------------------------------------------------------
+    float dist    = length(centeredUV);
     float baseFog = smoothstep(0.3, 0.8, dist);
 
-    // 動くノイズ（ゆらぎ）
+
+    //------------------------------------------------------------------
+    // Step 4 : FBM ノイズで揺れを加える
+    //------------------------------------------------------------------
     float n = fbm(centeredUV * 3.5 + vec2(uTime * 0.05, 0.0));
-    
-    // ゆらぎを合成
+
+
+    //------------------------------------------------------------------
+    // Step 5 : フォグの強さをノイズと合成
+    //------------------------------------------------------------------
     float fog = baseFog * mix(0.7, 1.0, n);
 
-    // 最終出力（白い霧、アルファ付き）
+
+    //------------------------------------------------------------------
+    // Step 6 : 出力（白いフォグ、アルファ付き）
+    //------------------------------------------------------------------
     FragColor = vec4(vec3(1.0), fog * uFogAmount);
 }
-
-/*
-#version 410 core
-
-out vec4 FragColor;
-in vec2 vTexCoord;
-
-uniform float uTime;
-uniform vec2 uResolution;
-uniform float uFogAmount;
-
-void main()
-{
-    vec2 uv = gl_FragCoord.xy / vec2(1920.0, 1080.0); // ← 強制的に正規化
-    float dist = length(uv - 0.5);
-    float fog = smoothstep(0.4, 0.8, dist);
-
-    FragColor = vec4(1.0, 1.0, 1.0, fog);
-}
-*/
-/*
-// --- fbmノイズ（柔らかく滑らか）
-float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-}
-float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
-    vec2 u = f*f*(3.0 - 2.0*f);
-    return mix(a, b, u.x) + (c - a)*u.y*(1.0 - u.x) + (d - b)*u.x*u.y;
-}
-float fbm(vec2 p) {
-    float v = 0.0;
-    float amp = 0.5;
-    for (int i = 0; i < 5; i++)
-    {
-        v += amp * noise(p);
-        p *= 2.0;
-        amp *= 0.5;
-    }
-    return v;
-}
-
-void main()
-{
-    vec2 uv = gl_FragCoord.xy / uResolution;
-
-    // 擬似的に「奥に向かう」感（中央が薄く、端が濃く）
-    float depthFactor = smoothstep(0.4, 1.0, length(uv - 0.5));
-
-    // 動くノイズ
-    float fogNoise = fbm(uv * 3.0 + vec2(uTime * 0.05, 0.0));
-
-    // 霧の最終強度
-    float fogAlpha = fogNoise * depthFactor * uFogAmount * 0.4;
-
-    FragColor = vec4(vec3(1.0), fogAlpha);
-}
-*/

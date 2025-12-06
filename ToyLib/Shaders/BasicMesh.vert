@@ -1,35 +1,60 @@
-#version 410
+#version 410 core
 
-// Uniforms
+//======================================================================
+// BasicMesh.vert
+// ・通常メッシュ用のベーシックな頂点シェーダ
+// ・スキニングなし
+// ・ワールド行列と ViewProj で位置を変換
+// ・Phong や Toon など共通のフラグメントシェーダへ値を渡す
+//======================================================================
+
+
+//-----------------------------------------------------------------------
+//  Uniforms
+//-----------------------------------------------------------------------
+// ワールド変換行列（モデル → ワールド）
 uniform mat4 uWorldTransform;
+
+// ビュー射影行列（ワールド → クリップ空間）
 uniform mat4 uViewProj;
 
-// Attribute（頂点座標、法線、UV）
-layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec3 inNormal;
-layout(location = 2) in vec2 inTexCoord;
 
-// フラグメントシェーダーに渡すUV
-out vec2 fragTexCoord;
-// フラグメントシェーダーに渡す法線ベクトル
-out vec3 fragNormal;
-// フラグメントシェーダーに渡す頂点座標
-out vec3 fragWorldPos;
+//-----------------------------------------------------------------------
+//  Attributes（頂点属性）
+//-----------------------------------------------------------------------
+// layout(location = X) は VAO との対応
+layout(location = 0) in vec3 inPosition;   // 頂点座標（ローカル）
+layout(location = 1) in vec3 inNormal;     // 法線ベクトル（ローカル）
+layout(location = 2) in vec2 inTexCoord;   // UV座標
 
+
+//-----------------------------------------------------------------------
+//  出力（Fragment Shader へ渡す）
+//-----------------------------------------------------------------------
+// ※視点空間ではなく「ワールド空間」で渡すのが ToyLib の基本設計
+out vec2 fragTexCoord;     // UV座標
+out vec3 fragNormal;       // ワールド法線
+out vec3 fragWorldPos;     // 頂点のワールド座標
+
+
+//-----------------------------------------------------------------------
+//  main
+//-----------------------------------------------------------------------
 void main()
 {
-    // コンバート
-    vec4 pos = vec4(inPosition, 1.0);
-    // 頂点座標のワールド変換
-    pos = pos * uWorldTransform;
-    // フラグメントシェーダーに渡すワールド座標
-    fragWorldPos = pos.xyz;
-    // 投影座標
-    gl_Position = pos * uViewProj;
+    // --------- ローカル → ワールド座標変換 ----------------------------
+    vec4 worldPos = vec4(inPosition, 1.0) * uWorldTransform;
 
-    // 法線ベクトルのワールド変換
+    // FSへ渡すワールド座標
+    fragWorldPos = worldPos.xyz;
+
+    // --------- ワールド法線の計算 --------------------------------------
+    // mat3 でワールド行列の回転スケール部分だけ抽出し、正規化する
     fragNormal = normalize(mat3(uWorldTransform) * inNormal);
 
-    // UV座標
+    // --------- クリップ空間への変換（描画用） ---------------------------
+    gl_Position = worldPos * uViewProj;
+
+    // --------- UV ------------------------------------------------------
     fragTexCoord = inTexCoord;
 }
