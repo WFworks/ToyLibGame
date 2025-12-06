@@ -264,7 +264,7 @@ void GameRPG::LoadData()
     mWeather->SetWeatherDome(dome);
     mWeather->SetWeatherOverlay(overlay);
     skyActor->SetPosition(Vector3(0.f, -0.f, 0.f));
-    mWeather->ChangeWeather(toy::WeatherType::SNOW);
+    mWeather->ChangeWeather(toy::WeatherType::CLEAR);
     
     
     // BGM

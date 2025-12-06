@@ -60,11 +60,11 @@ bool Renderer::LoadSettings(const std::string& filePath)
     //---------------------------------------------------------
     if (data.contains("screen"))
     {
-        JsonHelper::GetFloat(data["screen"], "width",      mScreenWidth);
-        JsonHelper::GetFloat(data["screen"], "height",     mScreenHeight);
-        JsonHelper::GetFloat(data["screen"], "width",      mVirtualWidth);
-        JsonHelper::GetFloat(data["screen"], "height",     mVirtualHeight);
-        JsonHelper::GetBool (data["screen"], "fullscreen", mIsFullScreen);
+        JsonHelper::GetFloat(data["screen"], "width",           mScreenWidth);
+        JsonHelper::GetFloat(data["screen"], "height",          mScreenHeight);
+        JsonHelper::GetFloat(data["screen"], "virtual_with",    mVirtualWidth);
+        JsonHelper::GetFloat(data["screen"], "virtual_height",  mVirtualHeight);
+        JsonHelper::GetBool (data["screen"], "fullscreen",      mIsFullScreen);
     }
     
     //---------------------------------------------------------
