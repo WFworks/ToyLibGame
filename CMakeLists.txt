@@ -144,8 +144,9 @@ if(WIN32)
 elseif(UNIX AND NOT APPLE)
     message(STATUS "Configuring for Linux build")
 
+    find_package(OpenGL REQUIRED)
 
-    # SDL3 系 (Homebrew のパスを HINTS に追加)
+    # SDL3 系
     find_package(SDL3        REQUIRED)
     find_package(SDL3_image  REQUIRED)
     find_package(SDL3_ttf    REQUIRED)
@@ -154,20 +155,17 @@ elseif(UNIX AND NOT APPLE)
     find_package(ASSIMP REQUIRED)
     find_package(OpenAL REQUIRED)
 
-
     # ========================
-    # vcpkg のルートとトリプレット
+    # vcpkg のルートとトリプレット（必要なら使う）
     # ========================
-    # 必要なら自分の環境に合わせてここだけ変えてOK
-    set(VCPKG_ROOT "~/Repos/vcpkg")
+    set(VCPKG_ROOT "$ENV{HOME}/Repos/vcpkg")
     set(VCPKG_TRIPLET "x64-linux")
 
     set(VCPKG_INC_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/include")
     set(VCPKG_LIB_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/lib")
     set(VCPKG_BIN_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/bin")
 
-
-    # ==== mpg123 を pkg-config ではなく手動で探す ====
+    # ==== mpg123 を手動で探す ====
     find_path(MPG123_INCLUDE_DIR
         NAMES mpg123.h
         PATHS
@@ -190,10 +188,10 @@ elseif(UNIX AND NOT APPLE)
         message(FATAL_ERROR "mpg123 not found. Install libmpg123-dev (Debian/Ubuntu) or mpg123-devel / mpg123 for your distro.")
     endif()
 
-    include_directories(
-        ${SDL2_INCLUDE_DIRS}
-        ${SDL2_IMAGE_INCLUDE_DIRS}
-        ${SDL2_TTF_INCLUDE_DIRS}
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        ${SDL3_INCLUDE_DIRS}
+        ${SDL3_IMAGE_INCLUDE_DIRS}
+        ${SDL3_TTF_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIRS}
         ${ASSIMP_INCLUDE_DIRS}
         ${OPENAL_INCLUDE_DIR}
@@ -201,16 +199,17 @@ elseif(UNIX AND NOT APPLE)
     )
 
     target_link_libraries(${PROJECT_NAME}
-        ${OPENGL_LIBRARIES}
-        ${SDL2_LIBRARIES}
-        ${SDL2_IMAGE_LIBRARIES}
-        ${SDL2_TTF_LIBRARIES}
-        ${GLEW_LIBRARIES}
-        ${ASSIMP_LIBRARIES}
-        OpenAL::OpenAL
+        OpenGL::GL
+        SDL3::SDL3
+        SDL3_image::SDL3_image
+        SDL3_ttf::SDL3_ttf
+        GLEW::GLEW
+        assimp::assimp
+        ${OPENAL_LIBRARY}
         ${MPG123_LIBRARY}
     )
-    
+endif()
+
 elseif(APPLE)
     message(STATUS "Configuring for macOS build")
 
