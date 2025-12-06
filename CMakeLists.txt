@@ -208,8 +208,6 @@ elseif(UNIX AND NOT APPLE)
         ${OPENAL_LIBRARY}
         ${MPG123_LIBRARY}
     )
-endif()
-
 elseif(APPLE)
     message(STATUS "Configuring for macOS build")
 
