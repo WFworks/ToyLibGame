@@ -144,16 +144,28 @@ if(WIN32)
 elseif(UNIX AND NOT APPLE)
     message(STATUS "Configuring for Linux build")
 
-    find_package(OpenGL REQUIRED)
-    find_package(PkgConfig REQUIRED)
 
-    # SDL2 / image / ttf / GLEW / assimp は pkg-config でOK
-    pkg_check_modules(SDL2 REQUIRED sdl2)
-    pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
-    pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
-    pkg_check_modules(ASSIMP REQUIRED assimp)
-    find_package(GLEW REQUIRED)
-    find_package(OpenAL REQUIRED)   # openal-soft で解決されることが多い
+    # SDL3 系 (Homebrew のパスを HINTS に追加)
+    find_package(SDL3        REQUIRED)
+    find_package(SDL3_image  REQUIRED)
+    find_package(SDL3_ttf    REQUIRED)
+
+    find_package(GLEW   REQUIRED)
+    find_package(ASSIMP REQUIRED)
+    find_package(OpenAL REQUIRED)
+
+
+    # ========================
+    # vcpkg のルートとトリプレット
+    # ========================
+    # 必要なら自分の環境に合わせてここだけ変えてOK
+    set(VCPKG_ROOT "~/Repos/vcpkg")
+    set(VCPKG_TRIPLET "x64-linux")
+
+    set(VCPKG_INC_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/include")
+    set(VCPKG_LIB_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/lib")
+    set(VCPKG_BIN_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/bin")
+
 
     # ==== mpg123 を pkg-config ではなく手動で探す ====
     find_path(MPG123_INCLUDE_DIR
@@ -205,12 +217,9 @@ elseif(APPLE)
     find_package(OpenGL REQUIRED)
 
     # SDL3 系 (Homebrew のパスを HINTS に追加)
-    find_package(SDL3        REQUIRED CONFIG
-        HINTS /opt/homebrew/opt/sdl3)
-    find_package(SDL3_image  REQUIRED CONFIG
-        HINTS /opt/homebrew/opt/sdl3_image)
-    find_package(SDL3_ttf    REQUIRED CONFIG
-        HINTS /opt/homebrew/opt/sdl3_ttf)
+    find_package(SDL3        REQUIRED CONFIG HINTS /opt/homebrew/opt/sdl3)
+    find_package(SDL3_image  REQUIRED CONFIG HINTS /opt/homebrew/opt/sdl3_image)
+    find_package(SDL3_ttf    REQUIRED CONFIG HINTS /opt/homebrew/opt/sdl3_ttf)
 
     find_package(GLEW   REQUIRED HINTS /opt/homebrew/opt/glew)
     find_package(ASSIMP REQUIRED HINTS /opt/homebrew/opt/assimp)
