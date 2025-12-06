@@ -56,6 +56,11 @@ public:
     
     // クリアカラー設定
     void SetClearColor(const Vector3& color);
+    const Vector3& GetClearColor() const { return mClearColor; }
+    
+    // ワイヤーフレームカラー
+    void SetWireColor(const Vector3& color) { mWireColor = color; }
+    const Vector3& GetWireColor() const { return mWireColor; }
     
     
     //---------------------------------------------------------
@@ -194,6 +199,9 @@ private:
     
     // クリアカラー
     Vector3 mClearColor;
+    
+    // ワイヤフレームのカラー
+    Vector3 mWireColor;
     
     
     //---------------------------------------------------------

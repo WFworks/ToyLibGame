@@ -89,6 +89,12 @@ bool Renderer::LoadSettings(const std::string& filePath)
     JsonHelper::GetVector3(data, "clearColor", mClearColor);
     
     //---------------------------------------------------------
+    // ワイヤーフレームカラー
+    //   "wireColor": [1.0, 1.0, 1.0]
+    //---------------------------------------------------------
+    JsonHelper::GetVector3(data, "wireColor", mWireColor);
+    
+    //---------------------------------------------------------
     // フォグ設定
     //   "fog": {
     //       "maxDist": 100.0,
