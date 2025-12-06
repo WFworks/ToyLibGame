@@ -204,14 +204,19 @@ elseif(APPLE)
 
     find_package(OpenGL REQUIRED)
 
-    find_package(SDL2 REQUIRED HINTS /opt/homebrew/opt/sdl2)
-    find_package(SDL2_image REQUIRED HINTS /opt/homebrew/opt/sdl2_image)
-    find_package(SDL2_ttf REQUIRED HINTS /opt/homebrew/opt/sdl2_ttf)
-    find_package(GLEW REQUIRED HINTS /opt/homebrew/opt/glew)
+    # SDL3 系 (Homebrew のパスを HINTS に追加)
+    find_package(SDL3        REQUIRED CONFIG
+        HINTS /opt/homebrew/opt/sdl3)
+    find_package(SDL3_image  REQUIRED CONFIG
+        HINTS /opt/homebrew/opt/sdl3_image)
+    find_package(SDL3_ttf    REQUIRED CONFIG
+        HINTS /opt/homebrew/opt/sdl3_ttf)
+
+    find_package(GLEW   REQUIRED HINTS /opt/homebrew/opt/glew)
     find_package(ASSIMP REQUIRED HINTS /opt/homebrew/opt/assimp)
     find_package(OpenAL REQUIRED HINTS /opt/homebrew/opt/openal-soft)
 
-    # ==== mpg123 を pkg-config じゃなくて直接探す ====
+    # ==== mpg123 を直接探す ====
     find_path(MPG123_INCLUDE_DIR
         NAMES mpg123.h
         HINTS
@@ -232,11 +237,9 @@ elseif(APPLE)
         message(FATAL_ERROR "mpg123 not found. Please install with 'brew install mpg123'.")
     endif()
 
+    # 必要なものだけ明示的に追加（SDL3 系は imported target に任せられる）
     target_include_directories(${PROJECT_NAME} PRIVATE
         /opt/homebrew/include
-        ${SDL2_INCLUDE_DIRS}
-        ${SDL2_IMAGE_INCLUDE_DIRS}
-        ${SDL2_TTF_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIRS}
         ${ASSIMP_INCLUDE_DIRS}
         ${OPENAL_INCLUDE_DIR}
@@ -245,9 +248,9 @@ elseif(APPLE)
 
     target_link_libraries(${PROJECT_NAME}
         OpenGL::GL
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-        SDL2_ttf::SDL2_ttf
+        SDL3::SDL3
+        SDL3_image::SDL3_image
+        SDL3_ttf::SDL3_ttf
         GLEW::GLEW
         assimp::assimp
         ${OPENAL_LIBRARY}
