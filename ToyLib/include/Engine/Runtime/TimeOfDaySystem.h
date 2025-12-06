@@ -5,7 +5,7 @@ namespace toy {
 struct GameTime
 {
     int   day    = 1;   // 日付を扱いたくなったとき用（とりあえず1日目）
-    int   hour   = 6;   // 0-23
+    int   hour   = 12;   // 0-23
     int   minute = 0;   // 0-59
     float second = 0.0f;
     

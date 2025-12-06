@@ -14,6 +14,7 @@ GameRPG::GameRPG()
     InitAssetManager("ToyGame/Assets/RPG/", GetRenderer()->GetWindowDisplayScale());
     
     GetTimeOfDaySystem()->SetTimeScale(30.f);
+    GetTimeOfDaySystem()->SetTime(19);
 }
 
 GameRPG::~GameRPG()
@@ -118,7 +119,7 @@ void GameRPG::LoadData()
     auto stanMesh = stanActor->CreateComponent<toy::SkeletalMeshComponent>();
     auto stanCllider = stanActor->CreateComponent<toy::ColliderComponent>();
     stanMesh->SetMesh(GetAssetManager()->GetMesh("stan.gltf", true));
-    stanMesh->SetToonRender(true, 1.015f);
+//    stanMesh->SetToonRender(true, 1.015f);
     
     stanActor->SetPosition(Vector3(-3,0,10));
     stanActor->SetScale(0.5f);
@@ -263,7 +264,7 @@ void GameRPG::LoadData()
     mWeather->SetWeatherDome(dome);
     mWeather->SetWeatherOverlay(overlay);
     skyActor->SetPosition(Vector3(0.f, -0.f, 0.f));
-    mWeather->ChangeWeather(toy::WeatherType::CLEAR);
+    mWeather->ChangeWeather(toy::WeatherType::RAIN);
     
     
     // BGM

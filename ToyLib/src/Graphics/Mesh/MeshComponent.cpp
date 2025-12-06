@@ -23,7 +23,7 @@ MeshComponent::MeshComponent(Actor* a, int drawOrder, VisualLayer layer, bool is
 //, mIsVisible(true)
 , mIsSkeletal(isSkeletal)
 , mIsToon(false)
-, mContourFactor(1.1014f)
+, mContourFactor(1.0f)
 //, mIsBlendAdd(false)
 {
     auto renderer = GetOwner()->GetApp()->GetRenderer();
