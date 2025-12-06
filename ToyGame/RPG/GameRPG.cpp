@@ -153,6 +153,12 @@ void GameRPG::LoadData()
     auto animPlayer = wolfMesh->GetAnimPlayer();
     animPlayer->Play(2);
     
+    auto wolfSound = wolfActor->CreateComponent<toy::SoundComponent>();
+    wolfSound->SetSound("growling.wav");
+    wolfSound->SetLoop(true);
+    wolfSound->SetUseDistanceAttenuation(true);
+    wolfSound->Play();
+    
     
     
     auto stanMove = stanActor->CreateComponent<toy::FollowMoveComponent>();
