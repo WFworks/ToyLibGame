@@ -28,7 +28,7 @@
       "cwd": "${workspaceFolder}/build",
       "MIMode": "lldb",
       "console": "internalConsole",
-      "preLaunchTask": "CMake Build (macOS)"
+      "preLaunchTask": "CMake Build (Unix)"
     }
   ]
 }

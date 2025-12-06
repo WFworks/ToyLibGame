@@ -59,7 +59,7 @@ if(WIN32)
     # vcpkg のルートとトリプレット
     # ========================
     # 必要なら自分の環境に合わせてここだけ変えてOK
-    set(VCPKG_ROOT "C:/tools/vcpkg")
+    set(VCPKG_ROOT "C:/Repos/vcpkg")
     set(VCPKG_TRIPLET "x64-windows")
 
     set(VCPKG_INC_DIR "${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}/include")
