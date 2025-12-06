@@ -55,10 +55,10 @@ void WeatherManager::ChangeWeather(const WeatherType weather)
     }
     mWeather = weather;
     
-    mWeatherDome->SetWeatherType(mWeather);
-    mWeatherOverlay->SetRainAmount(rainAmount);
-    mWeatherOverlay->SetFogAmount(fogAmount);
-    mWeatherOverlay->SetSnowAmout(snowAmount);
+    if (mWeatherDome) mWeatherDome->SetWeatherType(mWeather);
+    if (mWeatherOverlay) mWeatherOverlay->SetRainAmount(rainAmount);
+    if (mWeatherOverlay) mWeatherOverlay->SetFogAmount(fogAmount);
+    if (mWeatherOverlay) mWeatherOverlay->SetSnowAmout(snowAmount);
 }
 
 } // namespace toy
